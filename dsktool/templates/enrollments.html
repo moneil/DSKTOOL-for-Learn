@@ -1,0 +1,1703 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<div id="overlay">
+  <div class="cv-spinner">
+    <span class="spinner"></span>
+  </div>
+</div>
+<h1>Search for Enrollments</h1>
+
+<h5>Select Search Parameters</h5>
+<!-- [DONE] Search Parameter DIVS -->
+<div>
+  <input type="radio" id="byCrsUsrRb" name="searchBy" value="byCrsUsr" onclick="toggleDivs('byCrsUsr'); hideElement('selectAllInput'); hideElement('processBlock'); document.getElementById('submitSearchByCrsAndUser').disabled=false" checked>
+  <label for="byCrsUsrRb">Course and User</label> &nbsp;&nbsp;
+  <input type="radio" id="byCrsRb" name="searchBy" value="byCrs" onclick="toggleDivs('byCrs'); hideElement('processBlock'); showElement('selectAllInput'); document.getElementById('submitSearchByCrs').disabled=false"> 
+  <label for="byCrsRb">Course</label> &nbsp;&nbsp;
+  <input type="radio" id="byUsrRb" name="searchBy" value="byUsr" onclick="toggleDivs('byUsr'); hideElement('processBlock'); showElement('selectAllInput'); document.getElementById('submitSearchByUsr').disabled=false"> 
+  <label for="byUsrRb">User</label> &nbsp;&nbsp;
+  <!-- <input type="radio" id="byDSKRb" name="searchBy" value="byDSK" onclick="toggleDivs('byDSK'); hideElement('processBlock'); showElement('selectAllInput'); document.getElementById('submitSearchByDSK').disabled=false"> 
+  <label for="byDSKRb">Data Source Key</label> -->
+  <p></p>
+</div>
+
+<!-- [DONE] SEARCH BY COURSE and USER -->
+  <div id=byCrsUsr style=display:inline>
+    <h5>Search by Course Identifier and User Identifier</h5>
+    <p>
+      Enter Text in the textfield(s) to search. All searches are 'equal to' and case sensitive.
+    </p>
+    <form class="searchEnrollmentByCrsAndUser" id="searchEnrollmentByCrsandUsrForm" name="searchEnrollmentByCrsandUsrForm">
+      {% csrf_token %}
+      Course/Org Identifier:&nbsp;
+      <select name="searchBy" id="searchEnrollmentByCrsandUsrIdByCRSID">
+        <option value="externalId">External Id</option>
+        <option value="courseId">Course Id</option>
+      </select>
+      &nbsp;
+      <input type="text" id="searchValueCrstoSearch" name="searchValueCrs">
+      &nbsp;&nbsp;
+      User Identifier&nbsp;
+      <select class="searchBy" name="searchByUsr" id="searchEnrollmentByCrsandUserIdByUSRID">
+        <option value="externalId">External Id</option>
+        <option value="userName">Username</option>
+      </select>
+      &nbsp;        
+      <input type="text" id="searchValueUsrtoSearch" name="searchValueUsr"><p></p>
+      <p></p>
+      <div style="text-align:right; width:100%; padding:0;">
+        <input id="submitSearchByCrsAndUser" name="submitSearchByCrsandUsr" type="submit" value="New Search"/>
+      </div>
+    </form>
+  </div>
+
+<!-- [DONE] COURSE SEARCH DIV -->
+  <div id=byCrs style=display:none>
+    <h5>Search by Course Identifier</h5>
+    <p>
+      Enter Text in the textfield(s) to search. All searches are 'equal to' and case sensitive.
+    </p>
+      <form class="searchEnrollmentByCrs" id="searchEnrollmentByCrsForm" name="searchEnrollmentByCrsForm">
+        {% csrf_token %}
+        Course/Org External Id: &nbsp;
+        <select name="searchBy" id="searchByCrsCRSID">
+          <option value="externalId">External Id</option>
+          <option value="courseId">Course Id</option>
+        </select>
+        &nbsp;
+        <input type="text" class="searchValue" id="searchValueCrs" name="searchValueCrs"><p></p>
+        <p></p> 
+        <h6>Optional: Filter by Data Source Key</h6> 
+        <input type="checkbox" id="filterCourseByDSKCheckbox" name="filterCourseByDSKCheckbox">
+        <label for="filterCourseByDSKCheckbox">Filter by DSK </label>&nbsp;&nbsp;&nbsp;&nbsp;
+    
+        <div id="filterCourseByDSKDiv" name="filterCourseByDSKDiv" style=display:inline>
+          Select DSK to filter Course Enrollments:
+          <select id="courseDSKFilterOptions" name="courseDSKFilterOptions">
+
+          </select> 
+        </div>
+        <p></p>
+        <div style="text-align:right; width:100%; padding:0;">
+          <input id="submitSearchByCrs" name="submitSearchByCrs" type="submit" value="New Search"/>
+        </div>
+      </form>
+  </div>
+
+<!-- [DONE] USR SEARCH DIV -->
+  <div id=byUsr style=display:none>  
+    <h5>Search by User Identifier</h5>
+    <p>
+      Enter Text in the textfield(s) to search. All searches are 'equal to' and case sensitive.
+    </p>
+    <form id="searchEnrollmentsByUsrForm" name="searchEnrollmentsByUsrForm">
+      {% csrf_token %}
+      User Identifier:
+      &nbsp;
+      <select class="searchBy" name="searchBy" id="searchByUsrUSRID">
+        <option value="externalId">External Id</option>
+        <option value="userName">Username</option>
+      </select>
+      &nbsp;
+      <input type="text" class="searchValue" id="searchValueUsr" name="searchValueUsr"><p></p>
+      
+      <h6>Optional: Filter by Data Source Key</h6> 
+        <input type="checkbox" id="filterUserByDSKCheckbox" name="filterUserByDSKCheckbox">
+        <label for="filterUserByDSKCheckbox">Filter by DSK </label>&nbsp;&nbsp;&nbsp;&nbsp;
+    
+        <div id="filterUserByDSKDiv" name="filterUserByDSKDiv" style=display:inline>
+          Select DSK to filter User Enrollments:
+          <select id="userDSKFilterOptions" name="userDSKFilterOptions">
+
+          </select> 
+        </div>
+        <p></p> 
+        <p></p> 
+        <div style="text-align:right; width:100%; padding:0;">
+          <input id="submitSearchByUsr" name="submitSearchByUsr" type="submit" value="New Search"/>
+        </div>
+    </form>
+  </div>
+
+<!-- [IN PROGRESS]SEARCH BY DSK -->
+  <!-- <div id=byDSK style=display:none>
+    <h5>Search by Data Source Key</h5>
+    A list of memberships will be built based on the courses matching the selected Data Source Key and course availability.<p></p>
+    <h5>Select Data Source Key</h5>
+    <form id="searchEnrollmentsByDSKForm" name="searchEnrollmentsByDSKForm">
+      {% csrf_token %}
+      Search for enrollments with the selected DSK:&nbsp;
+      <select id="dataSourceKeyOptions" name="dataSourceKeyOptions">
+
+      </select> 
+      <p></p>
+      
+      <h5>Select Courses to search by Availability</h5>
+      <input type="radio" id="crsAvailFilterRb" name="crsAvailFilter" value="available" checked> 
+      <label for="crsAvailFilterRb">Available Only</label>
+      &nbsp;&nbsp;<input type="radio" id="crsAvailFilterRb" name="crsAvailFilter" value="unavailable"> 
+      <label for="crsAvailFilterRb">Unavailable Only</label>  
+      &nbsp;&nbsp;<input type="radio" id="crsAvailFilterRb" name="crsAvailFilter" value="disabled"> 
+      <label for="crsAvailFilterRb">Disabled Only</label>  
+      &nbsp;&nbsp;<input type="radio" id="crsAvailFilterRb" name="crsAvailFilter" value="all"> 
+      <label for="crsAvailFilterRb">All Courses</label>  
+      <p></p> -->
+      <!-- Select User Availability:<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" id="usrAvailFilterRb" name="usrAvailFilter" value="available" checked> 
+      <label for="usrAvailFilterRb">Available Only</label>
+      &nbsp;&nbsp;<input type="radio" id="usrAvailFilterRb" name="usrAvailFilter" value="unavailable"> 
+      <label for="usrAvailFilterRb">Unavailable Only</label>  
+      &nbsp;&nbsp;<input type="radio" id="usrAvailFilterRb" name="usrAvailFilter" value="disabled"> 
+      <label for="usrAvailFilterRb">Disabled Only</label> 
+      &nbsp;&nbsp;<input type="radio" id="crsAvailFilterRb" name="crsAvailFilter" value="all"> 
+      <label for="crsAvailFilterRb">All Users</label>   
+      <p></p> -->
+      <!-- <p></p>
+      <div style="text-align:right; width:100%; padding:0;">
+        <input id="submitSearchByDSK" name="submitSearchByDSK" type="submit" value="New Search"/>
+      </div>
+    </form>
+  </div> -->
+
+<div id="processBlock" style="display:none">
+  <div id="searchResultsBlock">
+    <p></p>
+    <hr>
+    <p></p>
+    <h3>Search Results</h3>
+    Light gray rows indicate enrollment is in a child course. </br></br>
+    <form id="processSelectedMembershipsForm" name="processSelectedMembershipsForm">
+      {% csrf_token %}
+      <input type="hidden" id="crsSearchValue" name="crsSearchValue" value="0">
+      <input type="hidden" id="crsSearchBy" name="crsSearchBy" value="0">
+        <div name="resultsTable" id="resultsTable" style="display:inline;">
+          <div id="selectAllInput" style="display:none;">
+            <input type="checkbox" id="checkAll" name="checkAll"><label for="checkAll">&nbsp;&lt;-- Click to toggle all records for processing.</label> <a href="#updateSection">[&darr;]</a>
+          </div>
+          <div class="outerTable" id="resp-table" >
+            <div class="divTable ajaxTable">
+              <div class="divTableHeading" id="resp-table-header">
+              
+              </div>
+              <div class="divTableBody" id="resultsTableBody">
+        
+              </div>
+            </div>
+          </div>
+        
+          <div id="searchUpdate" style="display:inline;">
+            <p></p>
+            <h3 id="updateSection">Update Above Selected Records</h3>
+            <p>
+            First check 'Update the above selected records', then check Availability and/or Data Source Key and select a value to update the Availability and/or Data Source Key respectively. <a href="#top">[&uarr;]</a><br>
+            </p>  
+            <table>
+              <thead>
+                <th></th> <input id="isUpdateRequired1" name="isUpdateRequired1" type="checkbox" value="true" onclick="setIsProcessable();"/>
+                <!-- <label for="isUpdateRequired1">&nbsp;<b>&lt; Update the above selected records.</b></label>  -->
+                <label for="isUpdateRequired1">&nbsp;<b>&lt; Update the above selected records.</b></label>
+                   <p>
+                     <strong>Reason for change</strong>
+                     <br>
+                     Please comment the change in plain text. Comments entered here will be stored in a local database table.
+                     <br>
+                     <textarea id="comment" name="comment" rows="6" cols="100"></textarea>
+                   </p>
+                </th>
+                <th style="padding:10px">
+                  <input id="isAvailabilityUpdateRequired1" name="isAvailabilityUpdateRequired1" type="checkbox" value="true" onclick="setIsProcessable();"/>
+                  Availability
+                </th>
+                <th style="padding:10px">
+                  <input id="isDataSourceKeyUpdateRequired1" name="isDataSourceKeyUpdateRequired1" type="checkbox" value="true" onclick="setIsProcessable();"/>
+                  Data Source Key
+                </th>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="padding:10px"> </td>
+                  <td style="padding:10px">
+                    <select id="selectedAvailability" name="selectedAvailability">
+                      <option value="Yes">Available</option>
+                      <option value="No">Unavailable</option>
+                      <option value="Disabled">Disabled</option>
+                    </select>
+                  </td>
+                  <td style="padding:10px">
+                    <select id="selectedDataSourceKey" name="selectedDataSourceKey">
+                    <!-- <option>Choose a DSK or use field to right.</option> -->
+                  
+                    </select>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- End search update -->
+          
+          <div style="text-align:right; width:100%; padding:0;" id="updateCourseMembershipsSubmit" name="updateCourseMembershipsSubmit"><p></p>
+            <p></p>
+            <input type="submit" id="processSubmit" value="Process Course Memberships" disabled/>
+          </div>
+        </div>
+      </form>
+  </div>
+  <div id="updateResults" name="updateResults" style="display:none;" >
+    <p></p>
+      <hr>
+      <p></p>
+      <h3>Update Results</h3>
+      <div class="outerTable" name="updateResultsTable" id="updateResultsTable">
+        <div class="divTable ajaxTable" id="update-table" >
+          <div class="divTableHeading" id="update-table-header">
+            
+          </div>
+          <div class="divTableBody" id="updateTableBody" name="updateTableBody">
+            
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+
+
+
+
+{% block javascript %}
+<script>
+var isProcessable=false;
+var activeDiv = "byCrsUsr";
+
+// [DONE] Process Spinner
+$(document).ajaxSend(function() {
+		  $("#overlay").fadeIn(300);　
+    });
+
+$(document).ready(function(){
+  if ( activeDiv == 'byCrsUsr' ) {
+    console.log("SEARCHINGBY byCrsUsr")
+    let respTableHdr = '<div class="divTableHead">Select to Process</div>' +
+          '<div class="divTableHead">Available</div>' +
+          '<div class="divTableHead">User Course Role</div>' +
+          '<div class="divTableHead">External Id</div>' +
+          '<div class="divTableHead">Username</div>' +
+          '<div class="divTableHead">User First Name</div>' +
+          '<div class="divTableHead">User Middle Name</div>' +
+          '<div class="divTableHead">User Last Name</div>' +
+          '<div class="divTableHead">User Email</div>' +
+          '<div class="divTableHead">Membership Data Source</div>' +
+          '<div class="divTableHead">Date Membership Modified</div>';
+        $("#resp-table-header").append(respTableHdr);
+        
+        let updateTableHdr = '<div class="divTableHead">Available</div>' +
+          '<div class="divTableHead">User Course Role</div>' +
+          '<div class="divTableHead">External Id</div>' +
+          '<div class="divTableHead">Username</div>' +
+          '<div class="divTableHead">User First Name</div>' +
+          '<div class="divTableHead">User Middle Name</div>' +
+          '<div class="divTableHead">User Last Name</div>' +
+          '<div class="divTableHead">User Email</div>' +
+          '<div class="divTableHead">Membership Data Source</div>' +
+          '<div class="divTableHead">Date Membership Modified</div>';
+        $("#update-table-header").append(updateTableHdr);
+  } else {
+    console.log("SEARCHINGBY COURSE or EXTERNAL ID")
+    let respTableHdr = '<div class="divTableHead">Select to Process</div>' +
+          '<div class="divTableHead">Available</div>' +
+          '<div class="divTableHead">User Course Role</div>' +
+          '<div class="divTableHead">Course External Id</div>' +
+          '<div class="divTableHead">Course Name</div>' +
+          '<div class="divTableHead">Membership Data Source</div>' +
+          '<div class="divTableHead">Date Membership Modified</div>';
+        $("#resp-table-header").append(respTableHdr);
+
+        let updateTableHdr = '<div class="divTableHead">Available</div>' +
+          '<div class="divTableHead">User Course Role</div>' +
+          '<div class="divTableHead">Course External Id</div>' +
+          '<div class="divTableHead">Course Name</div>' +
+          '<div class="divTableHead">Membership Data Source</div>' +
+          '<div class="divTableHead">Date Membership Modified</div>';
+        $("#update-table-header").append(updateTableHdr);
+  }
+});
+// ===== COURSE AND USER ===== //
+// [DONE] Manage divs: searchEnrollmentByCrsandUsrForm:searchEnrollmentByCrsandUsrIdByCRSID
+$("#searchEnrollmentByCrsandUsrIdByCRSID").change(function () {
+  // console.log("searchEnrollmentByCrsandUsrIdByCRSID: searchBy changed");
+  // console.log("Course Identifier: " + document.getElementById("searchEnrollmentByCrsandUsrForm").searchEnrollmentByCrsandUsrIdByCRSID.value);
+  // manage divs - clear and hide because we have a new search
+  $("#resultsTableBody").empty();
+  $("#updateTableBody").empty();
+  $("#searchValueCrstoSearch").val("");
+  $("#resultsTable").hide();
+  $("#searchUpdate").hide();
+  $("#updateResults").hide();
+  $("#processBlock").hide();
+  $("#isUpdateRequired1").prop("checked", false);
+  $("#isAvailabilityUpdateRequired1").prop("checked", false);
+  $("#isDataSourceKeyUpdateRequired1").prop("checked", false);
+  $("#comment").val('');
+});
+
+// [DONE] Manage divs: searchEnrollmentByCrsandUsrForm:searchEnrollmentByCrsandUserIdByUSRID
+$("#searchEnrollmentByCrsandUserIdByUSRID").change(function () {
+  // console.log("searchEnrollmentByCrsandUserIdByUSRID: searchBy changed");
+  // console.log("User Identifier: " + document.getElementById("searchEnrollmentByCrsandUsrForm").searchEnrollmentByCrsandUserIdByUSRID.value)
+  // manage divs - clear and hide because we have a new search
+  $("#resultsTableBody").empty();
+  $("#updateTableBody").empty();
+  $("#searchValueUsrtoSearch").val("");
+  $("#resultsTable").hide();
+  $("#searchUpdate").hide();
+  $("#updateResults").hide();
+  $("#processBlock").hide();
+  $("#isUpdateRequired1").prop("checked", false);
+  $("#isAvailabilityUpdateRequired1").prop("checked", false);
+  $("#isDataSourceKeyUpdateRequired1").prop("checked", false);
+  $("#comment").val('');
+});
+
+// [DONE] Manage divs: searchEnrollmentByDSKForm:searchEnrollmentByDSK
+$("#searchEnrollmentByDSK").change(function () {
+  console.log("searchEnrollmentByDSK: searchBy changed");
+  console.log("searchEnrollmentByDSK: DSK: " + document.getElementById("dataSourceKeyOptions").value);
+  // manage divs - clear and hide because we have a new search
+  $("#resultsTableBody").empty();
+  $("#updateTableBody").empty();
+  $("#searchValueCrstoSearch").val("");
+  $("#resultsTable").hide();
+  $("#searchUpdate").hide();
+  $("#updateResults").hide();
+  $("#processBlock").hide();
+  $("#isUpdateRequired1").prop("checked", false);
+  $("#isAvailabilityUpdateRequired1").prop("checked", false);
+  $("#isDataSourceKeyUpdateRequired1").prop("checked", false);
+  $("#comment").val('');
+});
+
+// [DONE] Validate course: searchEnrollmentByCrsandUsrForm:search:searchEnrollmentByCrsandUserIdByCRSID
+$("#searchValueCrstoSearch").change(function(){
+  // console.log("searchValueCrstoSearch: Validate change");
+  // console.log("Course: " + document.getElementById("searchEnrollmentByCrsandUsrForm").searchValueCrstoSearch.value);
+  // Validate Crs Id: call ajax function that validates course ids based on serialized form data
+  $("#resultsTableBody").empty();
+  $("#updateTableBody").empty();
+
+  $("#resultsTable").hide();
+  $("#searchUpdate").hide();
+  $("#updateResults").hide();
+  $("#processBlock").hide();
+  $("#isUpdateRequired1").prop("checked", false);
+  $("#isAvailabilityUpdateRequired1").prop("checked", false);
+  $("#isDataSourceKeyUpdateRequired1").prop("checked", false);
+  $("#comment").val('');
+  
+  var data = {
+    "searchBy": document.getElementById("searchEnrollmentByCrsandUsrForm").searchEnrollmentByCrsandUsrIdByCRSID.value, 
+    "searchValue": document.getElementById("searchEnrollmentByCrsandUsrForm").searchValueCrstoSearch.value
+  }
+
+  // console.log("VALIDATE: searchEnrollmentByCrsandUsrForm:\n" + JSON.stringify(data));
+
+  $.ajax({
+    //type: 'POST',
+    url: '/ajax/validate_courseIdentifier/',
+    data: data, //$('#selectCourseForm').serialize(),
+    dataType: 'json',
+    success: function (data) {
+      if (!data.is_found) {
+        alert("A course with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+        document.getElementById("searchEnrollmentByCrsandUsrForm").searchValueCrstoSearch.value="";
+      }
+      
+    }
+  }).done(function() {
+    $("#overlay").fadeOut(300);
+  });
+});
+
+// [DONE] Validate User Value: searchEnrollmentByCrsandUsrForm:search:searchValueUsrtoSearch
+$("#searchValueUsrtoSearch").change(function(){
+  // console.log("searchValueUsrtoSearch: Validate change");
+  // console.log("User: " + document.getElementById("searchEnrollmentByCrsandUsrForm").searchValueUsrtoSearch.value);
+
+  // Validate User Id: call function that validates user ids based on serialized form data
+
+  $("#resultsTableBody").empty();
+  $("#updateTableBody").empty();
+
+  $("#resultsTable").hide();
+  $("#searchUpdate").hide();
+  $("#updateResults").hide();
+  $("#processBlock").hide();
+  $("#isUpdateRequired1").prop("checked", false);
+  $("#isAvailabilityUpdateRequired1").prop("checked", false);
+  $("#isDataSourceKeyUpdateRequired1").prop("checked", false);
+  $("#comment").val('');
+  
+
+  var data = {
+    "searchBy": document.getElementById("searchEnrollmentByCrsandUsrForm").searchEnrollmentByCrsandUserIdByUSRID.value, 
+    "searchValue": document.getElementById("searchEnrollmentByCrsandUsrForm").searchValueUsrtoSearch.value
+  }
+
+  // console.log("VALIDATE: searchEnrollmentByCrsandUsrForm:\n" + JSON.stringify(data));
+
+  $.ajax({
+    //type: 'POST',
+    url: '/ajax/validate_userIdentifier/',
+    data: data, //$('#selectCourseForm').serialize(),
+    dataType: 'json',
+    success: function (data) {
+      if (!data.is_found) {
+        alert("A user with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+        document.getElementById("searchEnrollmentByCrsandUsrForm").searchValueUsrtoSearch.value="";
+      }
+      
+    }
+  }).done(function() {
+    $("#overlay").fadeOut(300);
+  });
+});
+
+// [DONE] validate User Search Identifier
+$("#searchValue").change(function () {
+      var searchBy = document.getElementById("selectUserForm").searchByUserOnlyId.value;
+      var searchValue = document.getElementById("selectUserForm").searchValueForUserOnlySearch.value;
+      //console.log("searchBy: " + searchByUserOnlyId);
+      //console.log("searchValue: " + searchValueForUserOnlySearch);
+      // console.log("SERIALIZED FORM:\n" + $('#selectCourseForm').serialize());
+
+      $("#resultsTableBody").empty();
+      $("#updateTableBody").empty();
+      $("#resultsTable").hide();
+      $("#searchUpdate").hide();
+      $("#updateResults").hide();
+      $("#processBlock").hide();
+      $("#isUpdateRequired1").prop("checked", false);
+      $("#isAvailabilityUpdateRequired1").prop("checked", false);
+      $("#isDataSourceKeyUpdateRequired1").prop("checked", false);
+      $("#comment").val('');
+
+      $.ajax({
+        //type: 'POST',
+        url: '/ajax/validate_courseIdentifier/',
+        data: $('#selectCourseForm').serialize(),
+        dataType: 'json',
+        success: function (data) {
+          if (!data.is_found) {
+            alert("A course with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+          }
+        }
+      }).done(function() {
+          $("#overlay").fadeOut(300);
+      });
+    });
+
+// ===== COURSE ===== //
+// Manage divs and validate entries on form changes: searchEnrollmentByCrsForm:searchByCrsCRSID
+$("#searchByCrsCRSID").change(function () {
+  // console.log("searchByCrsCRSID: Validate change");
+  // console.log("Course Id: " + document.getElementById("searchEnrollmentByCrsForm").searchByCrsCRSID.value);
+  // manage divs - clear and hide because we have a new search
+  $("#resultsTableBody").empty();
+  $("#updateTableBody").empty();
+  $("#searchValueCrs").val("");
+  $("#resultsTable").hide();
+  $("#searchUpdate").hide();
+  $("#updateResults").hide();
+  $("#processBlock").hide();
+  $("#isUpdateRequired1").prop("checked", false);
+  $("#isAvailabilityUpdateRequired1").prop("checked", false);
+  $("#isDataSourceKeyUpdateRequired1").prop("checked", false);
+  $("filterCourseByDSKCheckbox").prop("checked", false);
+  $("#userDSKFilterOptions").empty();
+  $("#comment").val('');
+});
+
+// [DONE] Validate: entered crsId searchEnrollmentsByCrsForm:searchValueCrs
+$("#searchValueCrs").change(function(){
+  // console.log("searchValueCrs: Validate change");
+  // console.log("Course Id: " + document.getElementById("searchEnrollmentByCrsForm").searchValueCrs.value);
+  // manage divs - clear and hide because we have a new search
+  $("#resultsTableBody").empty();
+  $("#updateTableBody").empty();
+  $("#resultsTable").hide();
+  $("#searchUpdate").hide();
+  $("#updateResults").hide();
+  $("#processBlock").hide();
+  $("#isUpdateRequired1").prop("checked", false);
+  $("#isAvailabilityUpdateRequired1").prop("checked", false);
+  $("#isDataSourceKeyUpdateRequired1").prop("checked", false);
+  $("#comment").val('');
+  // Validate CrsId: call ajax function that validates course ids based on serialized form data
+
+  var data = {
+    "searchBy": document.getElementById("searchEnrollmentByCrsForm").searchByCrsCRSID.value, 
+    "searchValue": document.getElementById("searchEnrollmentByCrsForm").searchValueCrs.value
+  }
+  $.ajax({
+    //type: 'POST',
+    url: '/ajax/validate_courseIdentifier/',
+    data: data, // $('#selectCourseForm').serialize(),
+    dataType: 'json',
+    success: function (data) {
+      if (!data.is_found) {
+        alert("A course with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+        toggleDivs(activeDiv);
+      }
+    }
+    }).done(function() {
+          $("#overlay").fadeOut(300);
+    });
+});
+
+// ===== USER ===== //
+// validate user search value
+// [DONE] Validate: entered userId searchEnrollmentsByUsrForm:searchValueUsr
+$("#searchValueUsr").change(function(){
+  // console.log("searchValueUsr: Validate change");
+  // console.log("User Id: " + document.getElementById("searchEnrollmentsByUsrForm").searchValueUsr.value);
+  // manage divs - clear and hide because we have a new search
+  $("#resultsTableBody").empty();
+  $("#updateTableBody").empty();
+  $("#resultsTable").hide();
+  $("#searchUpdate").hide();
+  $("#updateResults").hide();
+  $("#processBlock").hide();
+  $("#isUpdateRequired1").prop("checked", false);
+  $("#isAvailabilityUpdateRequired1").prop("checked", false);
+  $("#isDataSourceKeyUpdateRequired1").prop("checked", false);
+  $("#comment").val('');
+  // Validate CrsId: call ajax function that validates course ids based on serialized form data
+
+  var data = {
+    "searchBy": document.getElementById("searchEnrollmentsByUsrForm").searchByUsrUSRID.value, 
+    "searchValue": document.getElementById("searchEnrollmentsByUsrForm").searchValueUsr.value
+  }
+  $.ajax({
+    //type: 'POST',
+    url: '/ajax/validate_userIdentifier/',
+    data: data, // $('#selectCourseForm').serialize(),
+    dataType: 'json',
+    success: function (data) {
+      if (data.error_result) {
+        alert("Error!\n\n" + data.error_result);
+      }
+      if (!data.is_found) {
+        alert("A user with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+        toggleDivs(activeDiv);
+      }
+    }
+    }).done(function() {
+          $("#overlay").fadeOut(300);
+    });
+});
+
+// ===== Searches and Updates AJAX!!!
+// [DONE] Search by course and user:
+$('#searchEnrollmentByCrsandUsrForm').on('submit', function(e){
+  e.preventDefault();
+  
+  $("#resultsTableBody").empty();
+  $("#updateTableBody").empty();
+  $("#resultsTable").hide();
+  $("#searchUpdate").hide();
+  $("#updateResults").hide();
+  $("#isUpdateRequired1").prop("checked", false);
+  $("#isAvailabilityUpdateRequired1").prop("checked", false);
+  $("#isDataSourceKeyUpdateRequired1").prop("checked", false);
+  $("#selectedDataSourceKey")[0].selectedIndex = 0;
+  $("#comment").val('');
+  console.log("submitSearchByCrsAndUser");
+
+  if (document.getElementById("searchEnrollmentByCrsandUsrForm").searchValueCrstoSearch.value === "" || document.getElementById("searchEnrollmentByCrsandUsrForm").searchValueUsrtoSearch.value === "") {
+    alert("You must provide both Course and User identifiers.");
+    return;
+  }
+
+  var searchData = {
+      "crsSearchBy": document.getElementById("searchEnrollmentByCrsandUsrForm").  searchEnrollmentByCrsandUsrIdByCRSID.value, 
+      "crsToSearchFor": document.getElementById("searchEnrollmentByCrsandUsrForm").searchValueCrstoSearch.value,
+      "usrToSearchFor": document.getElementById("searchEnrollmentByCrsandUsrForm").searchValueUsrtoSearch.value,
+      "usrSearchBy": document.getElementById("searchEnrollmentByCrsandUsrForm").searchEnrollmentByCrsandUserIdByUSRID.value
+    }
+
+  console.log("SEARCH: searchEnrollmentByCrsandUsrForm:\n" + JSON.stringify(searchData));
+
+  $.ajax({
+  	type: 'GET',
+    url: '/ajax/getCourseMembership/',
+    data: searchData,
+		success: function (data) {
+      console.log("ajax/getCourseMembership complete...");
+
+      if (!data.is_found) {
+        alert("No memberships were found for this course and user.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+      } else { // process results
+        console.log("FULL RESULTS: " + JSON.stringify(data));
+        newResults = data["memberships_json"];
+        console.log("MEMBERSHIPS RESULTS:\n", JSON.stringify(newResults));
+        // console.log("Results Length: " + Object.keys(newResults).length);
+        
+        var userId = newResults["userId"];
+        var available = newResults["availability"]["available"];
+        let courseRoleId = newResults["courseRoleId"]
+        var externalId = newResults["user"]["externalId"];
+        var userName = newResults["user"]["userName"];
+        var firstName = newResults["user"]["name"]["given"];
+        var middleName = newResults.user.name.middle;//["user"]["name"]["middle"];
+        if (typeof middleName == 'undefined') {
+          middleName = "";
+        }
+        var lastName = newResults["user"]["name"]["family"];
+        var email;
+        var contact = newResults["user"]["contact"];
+        if (typeof contact == 'undefined') {
+          email = "N/A";
+        } else {
+          email = newResults["user"]["contact"]["email"];
+        }
+        var dsk = newResults["dataSourceId"];
+        var enrolled = (newResults["created"]).substring(0, 10);
+        var modified = (newResults["modified"]).substring(0, 10);
+        var pmcId="pmc"+userId;
+
+        var tableRow = '<div class="divTableRow">' +
+          '<div class="divTableCell"><input type="checkbox" name="pmcUserId[]" class="pmcUserId" value="' + userId + '"></div>' +
+          '<div class="divTableCell">' + available + '</div>' +
+          '<div class="divTableCell">' + courseRoleId + '</div>' +
+          
+          '<div class="divTableCell">' + externalId + '</div>'+ 
+          '<div class="divTableCell">' + userName + '</div>'+
+          '<div class="divTableCell">' + firstName + '</div>'+
+          '<div class="divTableCell">' + middleName + '</div>'+
+          '<div class="divTableCell">' + lastName + '</div>'+
+          '<div class="divTableCell">' + email + '</div>'+
+          '<div class="divTableCell">' + dsk + '</div>' +
+          '<div class="divTableCell">' + enrolled + '</div>' +
+          '<div class="divTableCell">' + modified + '</div>' +
+          '</div>';
+
+          $("#resultsTableBody").append(tableRow);
+
+          var dskOption = '';
+          dskList = data["dsks_json"]
+          if (typeof dskList == 'undefined') {
+            alert("No Data Source Keys were found. Check that you are still logged in by using the Who am I link to the left and logout/login if necessary.");
+          } else {
+            let x = 0;
+            x = document.getElementById("selectedDataSourceKey").options.length;
+            console.log("selectedDataSourceKey LENGTH: " + x);
+            if (x == 0) {
+              for ( dsk in dskList) {
+                dskOption = '<option value ='+ dskList[dsk]['id'] + '>'+ dskList[dsk]['externalId'] + '</option>';
+                $('#selectedDataSourceKey').append(dskOption);
+              }
+            }
+          }
+          // show pertinent divs
+          $("#processBlock").show();
+          $("#resultsTable").show();
+          $("#searchUpdate").show();
+          $("#isUpdateRequired1").prop("checked", false);
+          $("#isAvailabilityUpdateRequired1").prop("checked", false);
+          $("#isDataSourceKeyUpdateRequired1").prop("checked", false);
+          $("#comment").val('');
+        }
+      }
+    }).done(function() {
+      $("#overlay").fadeOut(300);
+    });
+});
+
+// [DONE] Search by course:
+$('#searchEnrollmentByCrsForm').on('submit', function(e){
+  // form id="searchEnrollmentByCrsForm"
+  // searchBy...id="searchByCrsCRSID"
+  // searchValue...id="searchValueCrs"
+  // submit id="submitSearchByCrs"
+  e.preventDefault();
+  $("#resultsTableBody").empty();
+  $("#updateTableBody").empty();
+  $("#isUpdateRequired1").prop("checked", false);
+  $("#isAvailabilityUpdateRequired1").prop("checked", false);
+  $("#isDataSourceKeyUpdateRequired1").checked=false;
+  $("#selectedDataSourceKey")[0].selectedIndex = 0;
+  $("#comment").val('');
+
+  if (document.getElementById("searchEnrollmentByCrsForm").searchValueCrs.value === "") {
+    alert("You must provide a Course/Org identifier.");
+    return;
+  }
+
+  var formData = {
+    "activeDiv": activeDiv,
+    "searchBy": document.getElementById("searchEnrollmentByCrsForm").searchByCrsCRSID.value, 
+    "searchValue": document.getElementById("searchEnrollmentByCrsForm").searchValueCrs.value,
+    "filterByDSK": $("#filterCourseByDSKCheckbox").is(':checked'),
+    "filterDSK": document.getElementById("searchEnrollmentByCrsForm").courseDSKFilterOptions.value,
+  }
+
+  // console.log("ACTIVE DIV: " + activeDiv);
+
+  $.ajax({
+    type: 'GET',
+    url: '/ajax/getCourseMemberships/',
+    data: formData, //$('#selectCourseForm').serialize(),
+    //contentType: "application/x-www-form-urlencoded",
+    dataType: 'json',
+    success: function(responseData) {
+      console.log("ajax/getCourseMemberships success...");
+      console.log("Full RESULTS: \n" + JSON.stringify(responseData));
+            
+      newResults = responseData["memberships_json"]["results"];
+      console.log("MEMBERSHIPS RESULTS:\n", JSON.stringify(newResults));
+
+      //console.log("Results Length: " + newResults.length);
+      console.log("PASSED RESULTS:\n" + JSON.stringify(newResults));
+      console.log("Results Length: " + newResults.length);
+
+      if ((newResults.length == 0) && $("#filterCourseByDSKCheckbox").is(':checked')) { 
+        alert("No enrollments found under this data source...");
+        return;
+      }
+
+      let tableContents = "";
+      tableContents = setCrsMembershipResultsTableBody(newResults);
+      $("#resultsTableBody").append(tableContents);
+
+      // <option>Choose a DSK or use field to right.</option> -->
+      var dskOption = '';
+      dskList = responseData["dsks_json"]
+                
+      if (typeof dskList == 'undefined') {
+        alert("No Data Source Keys were found. Check that you are still logged in by using the Who am I link to the left and logout/login if necessary.");
+      } else {
+        let x = 0;
+        x = document.getElementById("selectedDataSourceKey").options.length;
+        console.log("selectedDataSourceKey LENGTH: " + x);
+        if (x == 0) {
+          for ( dsk in dskList) {
+            dskOption = '<option value ='+ dskList[dsk]['id'] + '>'+ dskList[dsk]['externalId'] + '</option>';
+            $('#selectedDataSourceKey').append(dskOption);
+          }
+        }
+      }
+
+      $("#processBlock").show();
+      $("#resultsTable").show();
+      $("#searchUpdate").show();
+    }
+    }).done(function() {
+			$("#overlay").fadeOut(300);
+    });      
+  });
+
+// [DONE] Search by User:
+$('#searchEnrollmentsByUsrForm').on('submit', function(e){
+  console.log("searchEnrollmentsByUsrForm");
+  // form id="searchEnrollmentByCrsForm"
+  // searchBy...id="searchByCrsCRSID"
+  // searchValue...id="searchValueCrs"
+  // submit id="submitSearchByCrs"
+  e.preventDefault();
+  $("#resultsTableBody").empty();
+  $("#updateTableBody").empty();
+  $("#isUpdateRequired1").prop("checked", false);
+  $("#isAvailabilityUpdateRequired1").prop("checked", false);
+  $("#isDataSourceKeyUpdateRequired1").prop("checked", false);
+  $("#selectedDataSourceKey")[0].selectedIndex = 0;
+  $("#comment").val('');
+
+  if (document.getElementById("searchEnrollmentsByUsrForm").searchValueUsr.value === "") {
+    alert("You must provide a User identifier.");
+    return;
+  }
+
+  var formData = {
+    "activeDiv": activeDiv,
+    "searchBy": document.getElementById("searchEnrollmentsByUsrForm").searchByUsrUSRID.value, 
+    "searchValue": document.getElementById("searchEnrollmentsByUsrForm").searchValueUsr.value,
+    "filterByDSK": $("#filterUserByDSKCheckbox").is(':checked'),
+    "filterDSK": document.getElementById("searchEnrollmentsByUsrForm").userDSKFilterOptions.value,
+  }
+  console.log("REQUEST DATA: \n" + JSON.stringify(formData));
+  // console.log("ACTIVE DIV: " + activeDiv);
+
+  $.ajax({
+    type: 'GET',
+    url: '/ajax/getUserMemberships/',
+    data: formData, //$('#selectCourseForm').serialize(),
+    //contentType: "application/x-www-form-urlencoded",
+    dataType: 'json',
+    success: function(responseData) {
+      console.log("ajax/getUserMemberships success...");
+      console.log("FULL RESULTS: \n" + JSON.stringify(responseData));
+            
+      newResults = responseData["memberships_json"]["results"];
+      // console.log("Results Length: " + newResults.length);
+      console.log("MEMBERSHIPS RESULTS:\n" + JSON.stringify(newResults));
+      console.log("Results Length: " + newResults.length);
+
+      if ((newResults.length == 0) && $("#filterUserByDSKCheckbox").is(':checked')) { 
+        alert("No enrollments found under this data source...");
+        return;
+      }
+      // console.log("Processing results");
+
+      let tableContents = "";
+      tableContents = setUsrMembershipResultsTableBody(newResults);
+      $("#resultsTableBody").append(tableContents);
+
+      // <option>Choose a DSK or use field to right.</option> -->
+      var dskOption = '';
+      dskList = responseData["dsks_json"]
+                
+      if (typeof dskList == 'undefined') {
+        alert("No Data Source Keys were found. Check that you are still logged in by using the Who am I link to the left and logout/login if necessary.");
+      } else {
+        let x = 0;
+        x = document.getElementById("selectedDataSourceKey").options.length;
+        console.log("selectedDataSourceKey LENGTH: " + x);
+        if (x == 0) {
+          for ( dsk in dskList) {
+            dskOption = '<option value ='+ dskList[dsk]['id'] + '>'+ dskList[dsk]['externalId'] + '</option>';
+            $('#selectedDataSourceKey').append(dskOption);
+          }
+        }
+      }
+      $("#processBlock").show();
+      $("#resultsTable").show();
+      $("#searchUpdate").show();
+    }
+    }).done(function() {
+			$("#overlay").fadeOut(300);
+    });      
+  });
+
+// [IN PROGRESS] Search by DSK
+$('#searchEnrollmentsByDSKForm').on('submit', function(e){
+  e.preventDefault();
+  console.log("SEARCH ENROLLMENTS By DSK FORM");
+  let t0 = performance.now();
+  
+  $("#resultsTableBody").empty();
+  $("#updateTableBody").empty();
+  $("#isUpdateRequired1").prop("checked", false);
+  $("#isAvailabilityUpdateRequired1").prop("checked", false);
+  $("#isDataSourceKeyUpdateRequired1").checked=false;
+
+  var formData = {"searchBy": "DSK",
+                  "searchValue": document.getElementById("searchEnrollmentsByDSKForm").dataSourceKeyOptions.value,
+                  "crsAvailFilter": document.getElementById("searchEnrollmentsByDSKForm").crsAvailFilter.value,
+                }
+
+  ajaxURL = '/ajax/getMembershipsByDSK/';
+  
+  $("#instructions").html('First check \'Update the above selected records\', then check Availability and/or Data Source Key and select a value to update the Availability and/or Data Source Key respectively. <a href="#top">[&uarr;]</a><br><br>');
+
+  console.log("ajaxURL: " + ajaxURL);
+  console.log("formData: \n" + JSON.stringify(formData));
+
+  $.ajax({
+    type: 'GET',
+    url: ajaxURL,
+    data: formData, //$('#selectCourseForm').serialize(),
+    //contentType: "application/x-www-form-urlencoded",
+    dataType: 'json',
+    success: function(responseData) {
+      console.log(ajaxURL + " success...");
+      console.log("Full responseData: \n" + JSON.stringify(responseData));
+      newResults = responseData["result_json"]["results"]
+      console.log("NEWRESULTS(DSK): " + newResults);
+      
+      let tableContents = "";
+      let isError = "";
+      isError = newResults
+      if (typeof newResults === 'undefined') {
+        alert("No Enrollments were found. \n Check that you are still logged in by using the 'Who am I' link to the left and logout/login if necessary.");
+      } else {
+        isError = newResults['error_result'];
+        if (typeof isError != 'undefined') {
+          alert("Error:\n" + isError);
+          return;
+        } 
+        if (document.getElementById("searchCourseForm").searchBy.value == 'DSK') {
+          tableContents = setCoursesResultsTableBody(newResults);
+        } else {
+          tableContents = setCourseResultsTableBody(newResults);
+        }
+        // console.log("TABLE CONTENTS\n" + tableContents);
+        $("#resultsTableBody").append(tableContents);
+        var dskOption = '';
+        dskList = responseData["dsks_json"]
+        if (typeof dskList == 'undefined') {
+        } else {
+          let x = 0;
+          x = document.getElementById("selectedDataSourceKey").options.length;
+          console.log("selectedDataSourceKey LENGTH: " + x);
+          if (x == 0) {
+            for ( dsk in dskList) {
+              if ('INTERNAL' != dskList[dsk]['externalId']) {
+                dskOption = '<option value ='+ dskList[dsk]['id'] + '>'+ dskList[dsk]['externalId'] + '</option>';
+                $('#selectedDataSourceKey').append(dskOption);
+              }
+            }
+          }
+        }
+        // $("#searchDetailsJSON").text(JSON.stringify(newResults));
+        $("#processBlock").show();
+        $("#selectAllInput").show();
+        $("#checkAll").prop("checked", false); 
+        $("#selectedDataSourceKey")[0].selectedIndex = 0;
+        $("#resultsTable").show();
+        $("#resultsTableHeader").show();
+        $("#resultsTableBody").show();
+        $("#searchUpdate").show();
+      }
+    }
+  }).done(function() {
+    $("#overlay").fadeOut(300);
+    let t1 = performance.now()
+    console.log("SEARCH TOOK: " + ((t1 - t0)/1000).toFixed(2) + " SECONDS.")
+  });      
+});
+
+// [DONE] Manage divs: searchEnrollmentsByUsrForm:searchByUsrUSRID
+$("#searchByUsrUSRID").change(function () {
+  // console.log("searchByUsrUSRID: searchBy changed");
+  // console.log(document.getElementById("searchEnrollmentsByUsrForm").searchByUsrUSRID.value);
+  // console.log("searchByUsrUSRID: Validate change");
+  // console.log("USER Id: " + document.getElementById("searchEnrollmentsByUsrForm").searchByUsrUSRID.value);
+  // manage divs - clear and hide because we have a new search
+  $("#resultsTableBody").empty();
+  $("#updateTableBody").empty();
+  $("#searchValueUsr").val("");
+  $("#resultsTable").hide();
+  $("#searchUpdate").hide();
+  $("#updateResults").hide();
+  $("#processBlock").hide();
+  $("#isUpdateRequired1").prop("checked", false);
+  $("#isAvailabilityUpdateRequired1").prop("checked", false);
+  $("#isDataSourceKeyUpdateRequired1").prop("checked", false);
+  $("#comment").val('');
+});
+
+// Validate: searchEnrollmentsByUsrForm:searchValueUsr
+$("#searchValueUsr").change(function(){
+  console.log("searchValueUsr: searchBy changed");
+  console.log(document.getElementById("searchEnrollmentsByUsrForm").searchValueUsr.value);
+  // Validate Usr Id: call ajax function that validates course ids based on serialized form data
+  
+});
+
+// ===== PROCESS SELECTIONS ===== //
+$('#selectCourseForm').on('submit', function(e) {
+  console.log("selectCourseForm (SEARCH) on submit");
+        e.preventDefault();
+        $("#resultsTableBody").empty();
+        $("#updateTableBody").empty();
+        $("#isUpdateRequired1").prop("checked", false);
+        $("#isAvailabilityUpdateRequired1").prop("checked", false);
+        $("#isDataSourceKeyUpdateRequired1").checked=false;
+        $("#resultsTable").show();
+        $("#searchUpdate").show();
+        $.ajax({
+            type: 'GET',
+            url: '/ajax/getCourseMemberships/',
+            data: $('#selectCourseForm').serialize(),
+            //contentType: "application/x-www-form-urlencoded",
+            dataType: 'json',
+            success: function(responseData) {
+              console.log("ajax/getCourseMemberships success...");
+              console.log("FULL RESULTS: " + JSON.stringify(responseData["memberships_json"]));
+            
+              newResults = responseData["memberships_json"]["results"];
+              // console.log("Memberships resulsts length: " + newResults.length);
+              console.log("MEMBERSHIPS RESULTS:\n" + JSON.stringify(newResults));
+              console.log("Results Length: " + newResults.length);
+
+              if ((newResults.length == 0) && $("#filterCourseByDSKCheckbox").is(':checked')) { 
+                alert("No enrollments found under this data source...");
+                return;
+              }
+
+              for(var row in newResults) {
+                //console.log(newResults[row]);
+                //set vars
+                var userId = newResults[row]["userId"];
+                var available = newResults[row]["availability"]["available"];
+                var externalId = newResults[row]["user"]["externalId"];
+                var userName = newResults[row]["user"]["userName"];
+                var firstName = newResults[row]["user"]["name"]["given"];
+                var middleName = newResults[row].user.name.middle;//["user"]["name"]["middle"];
+                if (typeof middleName == 'undefined') {
+                  middleName = "";
+                }
+                var lastName = newResults[row]["user"]["name"]["family"];
+                var email;
+                var contact = newResults[row]["user"]["contact"];
+                if (typeof contact == 'undefined') {
+                  email = "N/A";
+                } else {
+                  email = newResults[row]["user"]["contact"]["email"];
+                }
+                var dsk = newResults[row]["dataSourceId"];
+                var enrolled = (newResults[row]["created"]).substring(0, 10);
+                var modified = (newResults[row]["modified"]).substring(0, 10);
+                var pmcId="pmc"+userId;
+
+                var tableRow = '<div class="divTableRow">' +
+                  '<div class="divTableCell"><input type="checkbox" name="pmcUserId[]" class="pmcUserId" value="' + userId + '"></div>' +
+                  '<div class="divTableCell">' + available + '</div>' +
+                  '<div class="divTableCell">' + externalId + '</div>'+ 
+                  '<div class="divTableCell">' + userName + '</div>'+
+                  '<div class="divTableCell">' + firstName + '</div>'+
+                  '<div class="divTableCell">' + middleName + '</div>'+
+                  '<div class="divTableCell">' + lastName + '</div>'+
+                  '<div class="divTableCell">' + email + '</div>'+
+                  '<div class="divTableCell">' + dsk + '</div>' +
+                  '<div class="divTableCell">' + enrolled + '</div>' +
+                  '<div class="divTableCell">' + modified + '</div>' +
+                  '</div>';
+
+                $("#resultsTableBody").append(tableRow);
+
+
+                // $("#memberships_results").append(JSON.stringify(responseData["memberships_json"]["results"])+"<br>");
+              }
+              // if (typeof responseData["memberships_json"]["paging"] != 'undefined'){
+              //     console.log("NEXTPAGE? " + responseData["memberships_json"]["paging" ["nextPage"]);
+              // }
+
+              // <option>Choose a DSK or use field to right.</option> -->
+              var dskOption = '';
+              dskList = responseData["dsks_json"]
+                
+              if (typeof dskList == 'undefined') {
+              } else {
+                let x = 0;
+                x = document.getElementById("selectedDataSourceKey").options.length;
+                console.log("selectedDataSourceKey LENGTH: " + x);
+                if (x == 0) {
+                  for ( dsk in dskList) {
+                    dskOption = '<option value ='+ dskList[dsk]['id'] + '>'+ dskList[dsk]['externalId'] + '</option>';
+                    $('#selectedDataSourceKey').append(dskOption);
+                  }
+                }
+              }
+            }
+          }).done(function() {
+				    $("#overlay").fadeOut(300);
+        });      
+    });
+
+// [DONE] Process selected memberships //
+$('#processSelectedMembershipsForm').on('submit', function(e) {
+  console.log("processSelectedMembershipsForm (UPDATES) on submit");
+
+  e.preventDefault();
+  // console.log("processSelectedForm: processSelectedMembershipsForm");
+  // console.log("FORM: \n" + $("#processSelectedMembershipsForm").serialize());
+  // console.log("SET results div display to visible");
+
+  $("#updateResults").hide();
+  $("#updateTableBody").empty();
+
+  selectionCount=$(this).find('input[name="pmcUserId[]"]:checked').length;
+  commentExists=document.getElementById("processSelectedMembershipsForm").comment.value;
+
+  // get form data based on active div
+  let crsorusrForm = "";
+  let crsSearchBy = "";
+  let crsToSearchFor = "";
+  let usrSearchBy = "";
+  let usrToSearchFor = "";
+
+  if (activeDiv === "byCrs") {
+    crsorusrForm = "searchEnrollmentByCrsForm";
+    crsSearchBy = document.getElementById(crsorusrForm).searchByCrsCRSID.value;
+    crsToSearchFor = document.getElementById(crsorusrForm).searchValueCrs.value;
+    usrToSearchFor = "not_required";
+    usrSearchBy = "not_required";
+  } else if (activeDiv === "byUsr") {
+    crsorusrForm = "searchEnrollmentsByUsrForm";
+    crsSearchBy = "not_required";
+    crsToSearchFor = "not_required";
+    usrToSearchFor = document.getElementById(crsorusrForm).searchValueUsr.value;
+    usrSearchBy = document.getElementById(crsorusrForm).searchByUsrUSRID.value;
+  } else { //activeDiv is byCrsUsr
+    crsorusrForm = "searchEnrollmentByCrsandUsrForm";
+    crsSearchBy = document.getElementById(crsorusrForm).searchEnrollmentByCrsandUsrIdByCRSID.value;
+    crsToSearchFor = document.getElementById(crsorusrForm).searchValueCrstoSearch.value;
+    usrToSearchFor = document.getElementById(crsorusrForm).searchValueUsrtoSearch.value;
+    usrSearchBy = document.getElementById(crsorusrForm).searchEnrollmentByCrsandUserIdByUSRID.value;
+  }
+
+  let pmcUserList = [];
+
+  $('input[name="pmcUserId[]"]:checked').each(function() {
+    pmcUserList.push($(this).val());
+  });
+
+  // console.log("pmcUserList: " + pmcUserList);
+
+  var searchData = {
+      "crsSearchBy": crsSearchBy, 
+      "crsToSearchFor": crsToSearchFor,
+      "usrToSearchFor": usrToSearchFor,
+      "usrSearchBy": usrSearchBy,
+      "isUpdateRequired1": document.getElementById("processSelectedMembershipsForm").isUpdateRequired1.checked,
+      "isAvailabilityUpdateRequired1": document.getElementById("processSelectedMembershipsForm").isAvailabilityUpdateRequired1.checked,
+      "selectedAvailability": document.getElementById("processSelectedMembershipsForm").selectedAvailability.value,
+      "isDataSourceKeyUpdateRequired1": document.getElementById("processSelectedMembershipsForm").isDataSourceKeyUpdateRequired1.checked,
+      "selectedDataSourceKey": document.getElementById("processSelectedMembershipsForm").selectedDataSourceKey.value,
+      "pmcUserId[]": pmcUserList,
+      "crsorusr": activeDiv,
+       "comment": document.getElementById("processSelectedMembershipsForm").comment.value,
+    }
+  
+  console.log("REQUEST DATA:\n" + JSON.stringify(searchData));
+
+  var ajxUrl = '/ajax/updateCourseMembership/';
+
+  switch (activeDiv) {
+    case "byCrsUsr":
+      ajxUrl = '/ajax/updateCourseMembership/';
+      break;
+    case "byCrs":
+      ajxUrl = '/ajax/updateCourseMemberships/';
+      break;
+    case "byUsr":
+      ajxUrl = '/ajax/updateUserMemberships/';
+      break;
+  }
+  // console.log("ACTIVE DIV: " + activeDiv);
+  // console.log("AJXURL: " + ajxUrl);
+  
+  if (!selectionCount > 0 ) {
+    alert("You must select at least one record.")
+    return;
+  }
+
+  if (commentExists === '' ) {
+    alert("You must provide a reason for change.")
+    return;
+  }
+
+  $.ajax({
+    type: 'GET',
+    url: ajxUrl,
+    data: searchData,
+		success: function (data) {
+
+        if (!data.is_found) {
+          alert("There was an error processing this request. Reload page and try again.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+        } else {
+          if (!selectionCount > 0 ) {
+            alert("You must select at least one record.")
+            return;
+          } else { // process selected records
+            //console.log(newResults[row]);
+            console.log("UPDATE RESULT DATA:\n" + JSON.stringify(data));
+            
+            let tableContents = "HELP!!!";
+
+            // console.log("processSelectedMembershipsForm: ACTIVEDIV: " + activeDiv);
+
+            if (activeDiv == "byCrs" || activeDiv == "byCrsUsr") {
+              newResults = data["updateList"];
+              console.log("UPDATELIST: PROCESS: BYCRS/BYCRSUSR: \n" + JSON.stringify(newResults));
+              tableContents = setCrsMembershipUpdatesTableBody(newResults);
+            } else {
+              newResults = data["updateList"];
+              console.log("PROCESS: BYUSR: UPDATELIST: \n" + JSON.stringify(newResults));
+              tableContents = setUsrMembershipUpdatesTableBody(newResults);
+              console.log("PROCESS: BYUSR: tableContents: \n" + tableContents);
+            }
+            $('#updateTableBody').append(tableContents);
+            $('#updateTableBody').show();
+            $('#updateResults').show();
+            $('#updateResultsTable').show();
+            $('#update-table').show();
+            $('#update-table-header').show();
+          }
+
+        }
+      }
+      }).done(function() {
+				  $("#overlay").fadeOut(300);
+        });      
+    });
+
+// [DONE] validate Course Identifier
+$("#searchValue").change(function () {
+      var searchBy = document.getElementById("selectCourseForm").searchBy.value;
+      var searchValue = document.getElementById("selectCourseForm").searchValue.value;
+      var task = document.getElementById("selectCourseForm").task.value;
+      // console.log("searchBy: " + searchBy);
+      // console.log("searchValue: " + searchValue);
+      // console.log("task: " + task);
+      // console.log("SERIALIZED FORM:\n" + $('#selectCourseForm').serialize());
+
+      $("#resultsTableBody").empty();
+      $("#updateTableBody").empty();
+      $("#resultsTable").hide();
+      $("#searchUpdate").hide();
+      $("#updateResults").hide();
+      $("#processBlock").hide();
+      $("#isUpdateRequired1").prop("checked", false);
+      $("#isAvailabilityUpdateRequired1").prop("checked", false);
+      $("#isDataSourceKeyUpdateRequired1").prop("checked", false);
+      $("#comment").val('');
+      
+      
+
+      $.ajax({
+        //type: 'POST',
+        url: '/ajax/validate_courseIdentifier/',
+        data: $('#selectCourseForm').serialize(),
+        dataType: 'json',
+        success: function (data) {
+          if (!data.is_found) {
+            alert("A course with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+          }
+        }
+      }).done(function() {
+          $("#overlay").fadeOut(300);
+      });
+    });
+
+$("#filterCourseByDSKCheckbox").change(function(){
+  console.log("FILTER BY DSK SELECTED");
+  if ( $("#filterCourseByDSKCheckbox").is(':checked') ) {
+    $("#courseDSKFilterOptions").empty();
+    dsklist = getDataSourceKeys();
+    $('#filterCourseByDSKDiv').show();
+  } else {
+    $('#filterCourseByDSKDiv').hide();
+  }
+});
+
+// [DONE] setup to filter user search
+$("#filterUserByDSKCheckbox").change(function(){
+  console.log("FILTER BY DSK SELECTED");
+  if ( $("#filterUserByDSKCheckbox").is(':checked') ) {
+    $("#userDSKFilterOptions").empty();
+    dsklist = getDataSourceKeys();
+    $('#filterUserByDSKDiv').show();
+  } else {
+    $('#filterUserByDSKDiv').hide();
+  }
+});
+
+// ================= //
+// General Functions //
+// [DONE] Check all boxes: Callable when more than one option is available.
+$("#checkAll").click(function(){
+      $(':checkbox.pmcUserId').not(this).prop('checked', this.checked);
+    });
+
+// [DONE] Set whether selections are processable - e.g. have the processing options been selected
+function setIsProcessable() {
+  if ((document.getElementById('isUpdateRequired1').checked == true) &&
+      (document.getElementById('isAvailabilityUpdateRequired1').checked == true || 
+       document.getElementById('isDataSourceKeyUpdateRequired1').checked == true)) {
+    document.getElementById('processSubmit').disabled=false;
+  } else {
+    document.getElementById('processSubmit').disabled=true;
+  }
+}
+
+// [DONE] Show specific element
+function showElement(showme) {
+  document.getElementById(showme).style.display = "inline";
+}
+
+// [DONE] Hide specific element
+function hideElement(hideme) {
+  document.getElementById(hideme).style.display = "none";
+}
+
+// [DONE] toggle the divs on this page based on selection
+function toggleDivs(anyDiv) {
+  divArray = ['byCrsUsr', 'byCrs', 'byUsr'];
+
+  // console.log("toggleDivs: anyDiv: " + anyDiv)
+  // console.log( "toggleDivs: divArray.length: " + divArray.length );
+
+  for (index = 0; index < divArray.length; index++) { 
+    if (divArray[index] === anyDiv) {
+      document.getElementById(divArray[index]).style.display = "inline";
+      // console.log("divArray[index] value: " + divArray[index]);
+      activeDiv = divArray[index];
+      $("#resultsTableBody").empty();
+      $("#updateTableBody").empty();
+      $("#searchValueCrstoSearch").val("");
+      $("#searchValueUsrtoSearch").val("");
+      $("#searchValueUsr").val("");
+      $("#searchValueCrs").val("");
+      $("#resultsTable").hide();
+      $("#searchUpdate").hide();
+      $("#updateResults").hide();
+      $("#processBlock").hide();
+      $("#checkAll").prop("checked", false);
+      $("#isUpdateRequired1").prop("checked", false);
+      $("#isAvailabilityUpdateRequired1").prop("checked", false);
+      $("#isDataSourceKeyUpdateRequired1").prop("checked", false);
+      $("#filterCourseByDSKDiv").hide();
+      $("#filterUserByDSKDiv").hide();
+      $("#filterCourseByDSKCheckbox").prop("checked", false);
+      $("#filterUserByDSKCheckbox").prop("checked", false);
+      $("#comment").val('');
+      
+      // if byCrsUsr or byCrs set result-table-header and update-table-header to what they are now - user info centric
+      // if byUsr set result-table-header and update-table-header to reflect course info \not\ user-centric info
+
+      if (activeDiv == "byUsr") {
+        // console.log("SETTING result-table and update-table headers for User Memberships");
+        $("#resp-table-header").empty();
+        $("#update-table-header").empty();
+        if (activeDiv == "byUsr") {
+          $("#filterUsrByDSK").hide();
+          $("#filterUsrByDSK").prop("checked", false);
+        }
+        let respTableHdr = '<div class="divTableHead">Select to Process</div>' +
+          '<div class="divTableHead">Available</div>' +
+          '<div class="divTableHead">User Course Role</div>' +
+          '<div class="divTableHead">Course External Id</div>' +
+          '<div class="divTableHead">Course Name</div>' +
+          '<div class="divTableHead">Membership Data Source</div>' +
+          '<div class="divTableHead">Date&nbsp;Enrolled</div>' +
+          '<div class="divTableHead">Date Membership Modified</div>';
+        $("#resp-table-header").append(respTableHdr);
+
+        let updateTableHdr = '<div class="divTableHead">Available</div>' +
+          '<div class="divTableHead">User Course Role</div>' +
+          '<div class="divTableHead">Course External Id</div>' +
+          '<div class="divTableHead">Course Name</div>' +
+          '<div class="divTableHead">Membership Data Source</div>' +
+          '<div class="divTableHead">Date&nbsp;Enrolled</div>' +
+          '<div class="divTableHead">Date Membership Modified</div>';
+        $("#update-table-header").append(updateTableHdr);
+      } else {
+        //if ( (activeDiv == "byCrsUsr") || (activeDiv == "byCrs") ) {
+        // console.log("SETTING result-table and update-table headers for Course Memberships");
+        $("#resp-table-header").empty();
+        $("#update-table-header").empty();
+
+        let respTableHdr = '<div class="divTableHead">Select to Process</div>' +
+          '<div class="divTableHead">Available</div>' +
+          '<div class="divTableHead">User Course Role</div>' +
+          '<div class="divTableHead">External Id</div>' +
+          '<div class="divTableHead">Username</div>' +
+          '<div class="divTableHead">User First Name</div>' +
+          '<div class="divTableHead">User Middle Name</div>' +
+          '<div class="divTableHead">User Last Name</div>' +
+          '<div class="divTableHead">User Email</div>' +
+          '<div class="divTableHead">Membership Data Source</div>' +
+          '<div class="divTableHead">Date&nbsp;Enrolled</div>' +
+          '<div class="divTableHead">Date Membership Modified</div>';
+        $("#resp-table-header").append(respTableHdr);
+        
+        let updateTableHdr = '<div class="divTableHead">Available</div>' +
+          '<div class="divTableHead">User Course Role</div>' +
+          '<div class="divTableHead">External Id</div>' +
+          '<div class="divTableHead">Username</div>' +
+          '<div class="divTableHead">User First Name</div>' +
+          '<div class="divTableHead">User Middle Name</div>' +
+          '<div class="divTableHead">User Last Name</div>' +
+          '<div class="divTableHead">User Email</div>' +
+          '<div class="divTableHead">Membership Data Source</div>' +
+          '<div class="divTableHead">Date&nbsp;Enrolled</div>' +
+          '<div class="divTableHead">Date Membership Modified</div>';
+        $("#update-table-header").append(updateTableHdr);
+
+        if (activeDiv == "byCrs") {
+          $("#filterCourseByDSK").hide();
+          $("#filterCourseByDSK").prop("checked", false);
+
+        }
+      }
+    } else {
+      // console.log("TOGGLE INDEX: " + index)
+      // console.log("Hiding DIV...: " + divArray[index]);
+
+      document.getElementById(divArray[index]).style.display = "none"; 
+    }
+  }
+} 
+
+function setCrsMembershipResultsTableBody(newResults) {
+  console.log("setCrsMembershipResultsTableBody Called...");
+  console.log("PASSED RESULTS: \n" + JSON.stringify(newResults));
+  contents = "";
+  for(var row in newResults) {
+    //console.log(newResults[row]);
+    //set vars
+    let childCourseId = newResults[row]["childCourseId"];
+    let tRow = "";
+    // console.log("CHILDCOURSEID: " + childCourseId);
+    if (childCourseId === undefined) {
+      tRow = '<div class="divTableRow">';
+    } else {
+      tRow = '<div class="divTableRow" style="background-color: whitesmoke;">';
+    }
+    let userId = newResults[row]["userId"];
+    // console.log("userId: " + userId);
+    let available = newResults[row]["availability"]["available"];
+    // console.log("available: " + available);
+    let courseRoleId = newResults[row]["courseRoleId"];
+    // console.log("userId: " + userId);
+    let externalId = newResults[row]["user"]["externalId"];
+    // console.log("externalId: " + externalId);
+    let userName = newResults[row]["user"]["userName"];
+    // console.log("userName: " + userName);
+    let firstName = newResults[row]["user"]["name"]["given"];
+    // console.log("firstName: " + firstName);
+    let middleName = newResults[row]["user"]["name"]["middle"];
+    if (typeof middleName == 'undefined') {
+      middleName = "";
+    }
+    // console.log("middleName: " + middleName);
+    let lastName = newResults[row]["user"]["name"]["family"];
+    // console.log("lastName: " + lastName);
+    let email;
+    let contact = newResults[row]["user"]["contact"];
+    if (typeof contact == 'undefined') {
+      email = "N/A";
+    } else {
+      email = newResults[row]["user"]["contact"]["email"];
+    }
+    // console.log("email: " + email);
+    let dsk = newResults[row]["dataSourceId"];
+    // console.log("dsk: " + dsk);
+    let enrolled = (newResults[row]["created"]).substring(0, 10);
+    let modified = (newResults[row]["modified"]).substring(0, 10);
+    // console.log("modified: " + modified);
+    let pmcId="pmc"+userId;
+    // console.log("pmcId: " + pmcId);
+
+    let tableRow = tRow +
+          '<div class="divTableCell"><input type="checkbox" name="pmcUserId[]" class="pmcUserId" value="' + userId + '"></div>' +
+          '<div class="divTableCell">' + available + '</div>' +
+          '<div class="divTableCell">' + courseRoleId + '</div>' +
+          '<div class="divTableCell">' + externalId + '</div>'+ 
+          '<div class="divTableCell">' + userName + '</div>'+
+          '<div class="divTableCell">' + firstName + '</div>'+
+          '<div class="divTableCell">' + middleName + '</div>'+
+          '<div class="divTableCell">' + lastName + '</div>'+
+          '<div class="divTableCell">' + email + '</div>'+
+          '<div class="divTableCell">' + dsk + '</div>' +
+          '<div class="divTableCell">' + enrolled + '</div>' +
+          '<div class="divTableCell">' + modified + '</div>' +
+          '</div>';
+    contents += tableRow;
+    }
+
+  return contents;
+}
+
+function setCrsMembershipUpdatesTableBody(newResults) {
+  console.log("setCrsMembershipUpdatesTableBody Called...")
+  contents = "";
+  for(var row in newResults) {
+    //console.log(newResults[row]);
+    //set vars
+    let userId = newResults[row]["userId"];
+    // console.log("userId: " + userId);
+    let available = newResults[row]["availability"]["available"];
+    let courseRoleId = newResults[row]["courseRoleId"];
+
+    let externalId = newResults[row]["user"]["externalId"];
+    let userName = newResults[row]["user"]["userName"];
+    let firstName = newResults[row]["user"]["name"]["given"];
+    let middleName = newResults[row]["user"]["name"]["middle"];
+    if (typeof middleName == 'undefined') {
+      middleName = "";
+    }
+    let lastName = newResults[row]["user"]["name"]["family"];
+    let email;
+    let contact = newResults[row]["user"]["contact"];
+    if (typeof contact == 'undefined') {
+      email = "N/A";
+    } else {
+      email = newResults[row]["user"]["contact"]["email"];
+    }
+    let dsk = newResults[row]["dataSourceId"];
+    let enrolled = (newResults[row]["created"]).substring(0, 10);
+    let modified = (newResults[row]["modified"]).substring(0, 10);
+    let pmcId="pmc"+userId;
+
+    let tableRow = '<div class="divTableRow">' +
+      '<div class="divTableCell">' + available + '</div>' +
+      '<div class="divTableCell">' + courseRoleId + '</div>' +
+          '<div class="divTableCell">' + externalId + '</div>'+ 
+          '<div class="divTableCell">' + userName + '</div>'+
+          '<div class="divTableCell">' + firstName + '</div>'+
+          '<div class="divTableCell">' + middleName + '</div>'+
+          '<div class="divTableCell">' + lastName + '</div>'+
+          '<div class="divTableCell">' + email + '</div>'+
+          '<div class="divTableCell">' + dsk + '</div>' +
+          '<div class="divTableCell">' + enrolled + '</div>' +
+          '<div class="divTableCell">' + modified + '</div>' +
+          '</div>';
+
+    contents += tableRow;
+  }
+
+  return contents;
+}
+
+function setUsrMembershipResultsTableBody(newResults) {
+  console.log("setUsrMembershipResultsTableBody Called...")
+  contents = "";
+  console.log("newResults: \n" + JSON.stringify(newResults));
+  //[{"id":"_117834_1","userId":"_1354_1","courseId":"_9682_1","dataSourceId":"BATCH","modified":"2020-09-24T16:09:40.857Z","availability":{"available":"Yes"},"courseRoleId":"Instructor"},{"id":"_115581_1","userId":"_1354_1","courseId":"_9681_1","dataSourceId":"SYSTEM","modified":"2020-09-22T03:03:31.737Z","availability":{"available":"Yes"},"courseRoleId":"Instructor"}]
+
+  for(var row in newResults) {
+    //console.log(newResults[row]);
+    //set vars
+    let userId = newResults[row]["userId"];
+    // console.log("userId: " + userId);
+    let crsId = newResults[row]["courseId"];
+    // console.log("crsId: " + crsId);
+    let available = newResults[row]["availability"]["available"];
+    // console.log("available: " + available);
+    let externalId = newResults[row]["course"]["externalId"];
+    // console.log("externalId: " + externalId);
+    let name = newResults[row]["course"]["name"];
+    // console.log("name: " + name);
+    let dsk = newResults[row]["dataSourceId"];
+    // console.log("dsk: " + dsk);
+    let role = newResults[row]["courseRoleId"];
+    // console.log("role: " + role);
+    let enrolled = (newResults[row]["created"]).substring(0, 10);
+    let modified = (newResults[row]["modified"]).substring(0, 10);
+    // console.log("modified: " + modified);
+
+    //let pmcId="pmc"+userId;
+
+    let tableRow = '<div class="divTableRow">' +
+          '<div class="divTableCell"><input type="checkbox" name="pmcUserId[]" class="pmcUserId" value="' + crsId + ':' + userId + '"></div>' +
+          '<div class="divTableCell">'+ available +'</div>' +
+          '<div class="divTableCell">'+ role +'</div>' +
+          '<div class="divTableCell">'+ externalId +'</div>' +
+          '<div class="divTableCell">'+ name +'</div>' +
+          '<div class="divTableCell">'+ dsk +'</div>' +
+          '<div class="divTableCell">'+ enrolled +'</div>' +
+          '<div class="divTableCell">'+ modified +'</div>' +
+          '</div>';
+
+    contents += tableRow;
+    }
+
+  return contents;
+}
+
+function setUsrMembershipUpdatesTableBody(newResults) {
+  console.log("setUsrMembershipUpdatesTableBody Called...")
+  contents = "";
+  console.log("Passed Results: \n" + JSON.stringify(newResults));
+  //[{"id":"_117834_1","userId":"_1354_1","courseId":"_9682_1","dataSourceId":"SYSTEM","modified":"2020-09-24T21:18:49.960Z","availability":{"available":"Yes"},"courseRoleId":"Instructor","course":{"name":"moneil test course"}},{"id":"_115581_1","userId":"_1354_1","courseId":"_9681_1","dataSourceId":"SYSTEM","modified":"2020-09-24T21:18:52.643Z","availability":{"available":"Yes"},"courseRoleId":"Instructor","course":{"name":"moneil-enabled"}}]
+
+  for(var row in newResults) {
+    //console.log(newResults[row]);
+    //set vars
+    let userId = newResults[row]["userId"];
+    // console.log("userId: " + userId);
+    let crsId = newResults[row]["courseId"];
+    // console.log("crsId: " + crsId);
+    let available = newResults[row]["availability"]["available"];
+    // console.log("available: " + available);
+    let externalId = newResults[row]["course"]["externalId"];
+    // console.log("externalId: " + externalId);
+    let name = newResults[row]["course"]["name"];
+    // console.log("name: " + name);
+    let dsk = newResults[row]["dataSourceId"];
+    // console.log("dsk: " + dsk);
+    let role = newResults[row]["courseRoleId"];
+    // console.log("role: " + role);
+    let enrolled = (newResults[row]["created"]).substring(0, 10);
+    let modified = (newResults[row]["modified"]).substring(0, 10);
+    // console.log("modified: " + modified);
+
+    let tableRow = '<div class="divTableRow">' +
+          '<div class="divTableHead">'+ available +'</div>' +
+          '<div class="divTableHead">'+ role +'</div>' +
+          '<div class="divTableHead">'+ externalId +'</div>' +
+          '<div class="divTableHead">'+ name +'</div>' +
+          '<div class="divTableHead">'+ dsk +'</div>' +
+          '<div class="divTableHead">'+ enrolled +'</div>' +
+          '<div class="divTableHead">'+ modified +'</div>' +
+          '</div>';
+    contents = contents + tableRow;
+    console.log("CONTENTS: \n" + contents);
+  }
+  return contents;
+}
+
+// [DONE] getDataSourceKeys: ajax function for retrieving a list of data source keys from target system.
+function getDataSourceKeys() {
+  console.log("Entered getDataSourceKeys");
+  let dskList = undefined;
+  var ajxUrl = '/ajax/getDataSourceKeys/';
+
+  console.log("getDataSourceKeys: Getting list of Data Source Keys");
+
+  $.ajax({
+    type: 'GET',
+    url: ajxUrl,
+    //data: data,
+    success: function (data) {
+      if (!data.is_found) {
+        alert("Data Sources could not be loaded. Reload page and try again.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+      } else {            
+        let dskOptions = ""
+        newResults = data["result_json"];
+        console.log("GET DSK LIST: RESULTS_JSON: \n" + JSON.stringify(newResults));
+        dataSourceKeyOptions = setDSKOptionsBody(newResults);
+        $('#dataSourceKeyOptions').append(dataSourceKeyOptions);
+        $('#courseDSKFilterOptions').append(dataSourceKeyOptions);
+        $('#userDSKFilterOptions').append(dataSourceKeyOptions);
+        
+      }
+    }
+  }).done(function() {
+    // console.log("OVERLAY TIME")
+    $("#overlay").fadeOut(300);
+    console.log("getDataSourceKeys: completed");
+  });
+};
+
+// [DONE] setDSKOptionsBody: ajax function that builds the DSK Options body
+function setDSKOptionsBody(newResults) {
+  console.log("setDSKOptionsBody Called...");
+  console.log("PASSED RESULTS: \n" + JSON.stringify(newResults));
+  dskOptions = "";
+  dskOption = "";
+
+  if (typeof newResults === undefined) { 
+    alert("No Data Source Keys were found. Check that you are still logged in by using the Who am I link to the left and logout/login if necessary.");
+  } else {
+    // for each element in newResults get add an option for the DSK
+    for ( dsk in newResults) {
+      // console.log("option value/label: "+ newResults[dsk]['id'] + "/" + newResults[dsk]['externalId'])
+      id = newResults[dsk]['id']
+      externalId = newResults[dsk]['externalId']
+      if (externalId != 'INTERNAL') {
+        dskOption = '<option value ='+ id + '>'+ externalId + '</option>\n';
+        dskOptions += dskOption;
+      }
+    }    
+  }
+  
+  // console.log("dskOptions: \n" + dskOptions)
+  return dskOptions;
+}
+
+</script>
+{% endblock %}
+{% endblock %}

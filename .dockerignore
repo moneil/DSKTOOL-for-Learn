@@ -1,0 +1,15 @@
+# ignore .git and .cache folders
+.git
+.cache
+venv
+
+# ignore all markdown files (md) beside all README*.md other than README-secret.md
+*.md
+!README*.md
+
+# ignore config file
+config.py
+docker/my-docker-compose.yml
+
+#ignore Dockerfile
+Dockerfile

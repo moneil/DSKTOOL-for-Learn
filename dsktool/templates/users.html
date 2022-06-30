@@ -1,0 +1,1101 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<div id="overlay">
+  <div class="cv-spinner">
+    <span class="spinner"></span>
+  </div>
+</div>
+
+<h1>Search for Users</h1>
+<!-- SEARCH DIVS -->
+<div name="userSearchForm" id="userSearchForm">
+  <p>Enter Text in the textfield to search.
+    <br>Searches by "Contains" look for the value contained in the search option and are case <strong>insensitive</strong>.
+    <br>Searches by "Exact" look for the exact value and are case <strong>sensitive</strong>
+
+  <form id="searchUserForm">
+    {% csrf_token %}
+    <select name="searchBy" id="searchBy">
+      <option value="externalId">External Id</option>
+      <option value="userName">User Name</option>
+      <!-- <option value="givenName">Given Name</option> -->
+      <option value="familyName">Family Name</option>
+      <option value="DSK">Data Source Key</option>
+    </select>
+    <div name="searchOpSelect" id="searchOpSelect" style="display: inline;">
+      <select name="searchOperator" id="searchOperator">
+        <option value="contains" selected>Contains</option>
+        <option value="exact">Exact</option>
+      </select>
+    </div>
+    <div name="dskOptions" id="dskOptions" style="display: inline;">Search for all users with the selected DSK: <select id="dataSourceKeyOptions" name="dataSourceKeyOptions">
+    </select> <!-- <br>
+    <label for="manualDSK">or enter a specific DSK: </label> <input type="text" id="manualDSK" name="manualDSK"><br> -->
+    </div>
+
+    <div name="nonDSKSearch" id="nonDSKSearch" style="display: inline;">
+      <input type="text" id="searchValueUsrtoSearch" name="searchValueUsrtoSearch"></br>
+    </div>
+
+    <div><p>&nbsp;</p></div>
+    <!-- SEARCH OPTIONS -->
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-6" id="searchOptions" name="searchOptions" style="display: inline;">
+          <b>Search Options <i>(multiple selections increase search time)</i>:</b>
+          <p>
+            <input type="checkbox" id="searchAvailability" name="searchAvailability"> <label for="searchAvailability">Availability (do not check if you want all results)</label>
+            <div id="searchByAvailStatus" name="searchByAvailStatus" style="display: none;">
+              <input type="radio" name="searchAvailabilityOption" id="onlyAvailableStatus" value="yes" checked> <label for="onlyAvailableStatus">Only Available</label>&nbsp;&nbsp;<input type="radio" name="searchAvailabilityOption" id="unAvailableStatus" value="no"> <label for="unAvailStatus">Only Unavailable</label>&nbsp;&nbsp;<input type="radio" name="searchAvailabilityOption" id="disabledAvailableStatus" value="disabled"> <label for="disabledAvailableStatus">Only Disabled</label> <!-- <input type="radio" name="searchAvailabilityOption" id="allAvailableStatus" value="term" checked> <label for="allAvailStatus">by Term</label> -->
+            </div>
+          </p>
+          <!-- BY DATE -->
+          <p>
+            <div id="searchByDateChkBx" name="searchByDateChkBx" style="display: inline;">
+              <input type="checkbox" id="searchDate" name="searchDate" unchecked> Search by Date Created
+      
+              <div id="searchByDate" name="searchByDate" style="display: none;">
+              mm/dd/yy or select using calendar (blank date uses current date and time)
+                <div name="dtpicker" id="dtpicker" class="col-xs-6" style="display: inline;">
+                  <div class="form-group">
+                    <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
+                      <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker1"/>
+                      <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+                        <div class="input-group-text">
+                          <i class="fa fa-calendar"></i>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div display: block>
+                  <p>
+                    Select Comparison: 
+                  </p>
+                  <p>
+                    <input type="radio" id="lessThan" name="dtCompare" value="lessThan"> <label for="lessThan">Less than</label> &nbsp;&nbsp; <input type="radio" id="greaterOrEqual" name="dtCompare" value="greaterOrEqual" checked> <label for="greaterOrEqual">Equal to or greater than</label>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:right; width:100%; padding:0;">
+      <input id="submitSearchUserForm" type="submit" value="New Search"/>
+    </div>
+  </form>
+</div>
+<!-- END SEARCH DIVS -->
+
+<!-- ERROR DIV -->
+<div id="error" style="display:none">
+  <hr>
+  <h3>Error</h3>
+  {{ error_json }}
+</div>
+<!-- END ERROR DIV -->
+
+<!-- PROCESS REQUEST (UPDATE) BLOCK -->
+<div id="processBlock" style="display:none">
+    <hr>
+    <h3>Search Results</h3>    
+    <div id="searchResultsBlock">   
+    <form id="processUserForm" name="processUserForm">
+     {% csrf_token %}
+      <div id="selectAllInput" style="display:none;">
+        <input type="checkbox" id="checkAll" name="checkAll"><label for="checkAll">&nbsp;&lt;-- Click to toggle all records for processing.</label> <a href="#updateSection">[&darr;]</a>
+      </div>
+
+      <div class="divTable ajaxTable" id="resultsTableHeader">
+        <div class="divTableHeading">
+          <div class="divTableHead"></div>
+          <div class="divTableHead">Available</div>
+          <div class="divTableHead">External Id</div>
+          <div class="divTableHead">Username</div>
+          <div class="divTableHead">First Name</div>
+          <div class="divTableHead">Middle Name</div>
+          <div class="divTableHead">Last Name</div>
+          <div class="divTableHead">Email</div>
+          <div class="divTableHead">Data Source</div>
+          <div class="divTableHead">Date Modified</div>
+        </div>
+        <div class="divTableBody" id="resultsTableBody" name="resultsTableBody">
+          <div class="divTableRow">
+            
+          </div>
+        </div>
+      </div>
+      <!-- <p></p><p></p><p></p>
+      <h6>details json:</h6>
+      <div id="searchDetailsJSON">
+      </div> -->
+      <hr>
+      <!-- </div> -->
+      <div id="searchUpdate" style="display:none">
+        <h3 id="updateSection">Update Selected Records</h3>
+        <div id="instructions">
+        First check 'Update the above selected records', then check Availability and/or Data Source Key and select a value to update the Availability and/or Data Source Key respectively.
+        </div>  
+        {% csrf_token %}
+        <div class="field">
+          <table>
+            <thead>
+              <tr style="padding:10px">
+                <th></th> <input id="isUpdateRequired1" name="isUpdateRequired1" type="checkbox" value="true" onclick="setIsProcessable();"/>
+                <!-- <label for="isUpdateRequired1">&nbsp;<b>&lt; Update the above selected records.</b></label>  -->
+                <label for="isUpdateRequired1">&nbsp;<b>&lt; Update the above selected records.</b></label>
+                   <p>
+                     <strong>Reason for change</strong>
+                     <br>
+                     Please comment the change in plain text. Comments entered here will be stored in a local database table.
+                     <br>
+                     <textarea id="comment" name="comment" rows="6" cols="100"></textarea>
+                   </p> 
+                </th>
+                <th style="padding:10px">
+                  <input id="isAvailabilityUpdateRequired1" name="isAvailabilityUpdateRequired1" type="checkbox" value="true" onclick="setIsProcessable();"/>
+                  Availability
+                </th>
+                <th style="padding:10px">
+                  <input id="isDataSourceKeyUpdateRequired1" name="isDataSourceKeyUpdateRequired1" type="checkbox" value="true" onclick="setIsProcessable();"/>
+                  Data Source Key
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding:10px"> </td>
+                <td style="padding:10px">
+                  <select id="selectedAvailability" name="selectedAvailability">
+                    <option value="Yes">Available</option>
+                    <option value="No">Unavailable</option>
+                    <option value="Disabled">Disabled</option>
+                  </select>
+                </td>
+                <td style="padding:10px">
+                  <select id="selectedDataSourceKey" name="selectedDataSourceKey">
+                  <!-- <option>Choose a DSK or use field to right.</option> -->
+                
+                  </select>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- End search update -->
+
+        <div style="text-align:right; width:100%; padding:0;" id="updateUsersSubmit" name="updateUsersSubmit"><p></p>
+          <p></p>
+          <input id="processSubmit" name="processSubmit" type="submit" value="Update" disabled/>
+        </div>
+      </div>
+    </form>
+  </div>
+<!-- END UPDATE DIV -->
+
+<!-- UPDATE RESULTS DIV -->
+<div id="updateResults" name="updateResults" style="display:none;" >
+  <p></p>
+    <hr>
+    <p></p>
+    <h3>Update Results</h3>
+    <div class="outerTable" name="updateResultsTable" id="updateResultsTable">
+      <div class="divTable ajaxTable" id="update-table" >
+        <div class="divTableHeading" id="update-table-header">
+          <div class="divTableHead">Available</div>
+          <div class="divTableHead">External Id</div>
+          <div class="divTableHead">Username</div>
+          <div class="divTableHead">First Name</div>
+          <div class="divTableHead">Middle Name</div>
+          <div class="divTableHead">Last Name</div>
+          <div class="divTableHead">Email</div>
+          <div class="divTableHead">Data Source</div>
+          <div class="divTableHead">Date Modified</div>
+      </div>
+        <div class="divTableBody" id="updateResultsTableBody" name="updateResultsTableBody">
+      
+    </div>
+  </div>
+</div>
+</div>
+<!-- END RESULTS DIV -->
+</div>
+
+
+<script>
+function setIsProcessable() {
+  if ((document.getElementById('isUpdateRequired1').checked == true) &&
+      (document.getElementById('isAvailabilityUpdateRequired1').checked == true || 
+       document.getElementById('isDataSourceKeyUpdateRequired1').checked == true)) {
+    document.getElementById('processSubmit').disabled=false;
+  } else {
+    document.getElementById('processSubmit').disabled=true;
+  }
+}
+function showElement(showme) {
+  document.getElementById(showme).style.display = "inline";
+}
+function hideElement(hideme) {
+  document.getElementById(hideme).style.display = "none";
+}
+
+// [DONE] Check all boxes: Callable when more than one option is available.
+$("#checkAll").click(function(){
+  $(':checkbox.pmcUserId').not(this).prop('checked', this.checked);
+});
+
+
+$(document).ready(function(){
+      if ( '#searchBy'.value == 'DSK')
+      {
+        $("#dskOptions").show();
+        $("#nonDSKSearch").hide();
+        $("#searchOptions").show();
+        $("#searchByDateChkBx").show();
+      }
+      else
+      {
+        $("#dskOptions").hide();
+        $("#nonDSKSearch").show();
+        $("#searchOptions").hide();
+        $("#searchByDateChkBx").hide();
+      }
+});
+
+$(document).ready(function(){
+  // console.log("Option Change!!")
+    $('#searchBy').on('change', function() {
+      if ( this.value == 'DSK') {
+        let dsklist = "";
+        let x = 0;
+        x = document.getElementById("dataSourceKeyOptions").options.length;
+        //console.log("before:\n" + x)
+        $("#dskOptions").show();
+        $("#nonDSKSearch").hide();
+        $("#searchOptions").show();
+        $("#searchByDateChkBx").show();
+        $("#searchOpSelect").hide();
+
+        alert("Please note: Searching for Users based on Data Source may result in a longer processing time due to the possible number of users associated with the Data Source. \n\nApproximately 30sec to process and display 10K records (500K max).");
+        if (x == 0) {
+          dsklist = getDataSourceKeys();
+          //console.log("dskList: " + dsklist);
+          if (typeof dsklist === undefined) {
+            //do nothing
+          } else {
+            //build dskoptions
+            for ( dsk in dsklist) {
+              dskOption = '<option value ='+ dsklist[dsk]['id'] + '>'+ dsklist[dsk]['externalId'] + '</option>';
+              $('#dataSourceKeyList').append(dskOption);
+            }
+          }
+        }
+      }
+      else if ( this.value == 'familyName') {
+        $("#searchOpSelect").hide();
+        alert("Family Name searches always use the 'contains' search operator.")
+      }
+      else {
+        $("#dskOptions").hide();
+        $("#nonDSKSearch").show();
+        $("#searchOptions").hide();
+        $("#searchByDateChkBx").hide();
+        $("#searchOpSelect").show();
+      }
+    });
+});
+
+$(document).ready(function(){
+  if (!$('#searchAvailability').checked) {
+      console.log("searchByAvailStatus hide!");
+      $('#searchByAvailStatus').hide();
+  }
+  $("#searchAvailability").change(function () {
+    console.log("searchAvailability checkbox toggled!")
+    //$('#searchByDate').toggle();
+    if (!this.checked) {
+      console.log("searchBAvailability hide!");
+      $('#searchByAvailStatus').hide();
+    } else {
+      console.log("searchByAvailStatus show!");
+      $('#searchByAvailStatus').show();
+      //$('#searchByDate').hide();
+      //$('#searchDate').prop('checked', false);
+    }
+  });
+});
+
+$(document).ready(function(){
+  if (!$('#searchDate').checked) {
+      console.log("searchDate hide!");
+      $('#searchByDate').hide();
+  }
+  $("#searchDate").change(function () {
+    console.log("searchDate checkbox toggled!")
+    //$('#searchByDate').toggle();
+    if (!this.checked) {
+      console.log("searchDate hide!");
+      $('#searchByDate').hide();
+    } else {
+      console.log("searchDate show!");
+      $('#searchByDate').show();
+      //$('#searchByAvailStatus').hide();
+      //$('#searchAvailability').prop('checked', false);
+    }
+  });
+});
+
+/* AJAX!! */
+// [DONE] Process Spinner
+$(document).ajaxSend(function() {
+		  $("#overlay").fadeIn(300);　
+    });
+
+// user Id validation request
+// [DONE] Validate User Value: search:searchValueUsrtoSearch
+$("#searchValueUsrtoSearch").change(function(){
+  console.log("searchValueUsrtoSearch: Validate change");
+  if (document.getElementById("searchUserForm").searchValueUsrtoSearch.value === "") return;
+  // console.log("User: " + document.getElementById("searchUserForm").searchValueUsrtoSearch.value);
+  // console.log("By: " + document.getElementById("searchUserForm").searchBy.value);
+
+  // Validate User Id: call function that validates user ids based on serialized form data
+
+  $("#resultsTableBody").empty();
+  $("#updateResultsTableBody").empty();
+  $("#resultsTable").hide();
+  $("#searchUpdate").hide();
+  $("#selectAllInput").hide();
+  $("#checkAll").prop("checked", false);
+  $("#updateResults").hide();
+  $("#processBlock").hide();
+  $("#isUpdateRequired1").prop("checked", false);
+  $("#isAvailabilityUpdateRequired1").prop("checked", false);
+  $("#isDataSourceKeyUpdateRequired1").prop("checked", false);
+  $("#selectedDataSourceKey")[0].selectedIndex = 0;
+  $("#comment").val('');
+
+  var data = {
+    "searchBy": document.getElementById("searchUserForm").searchBy.value, 
+    "searchValue": document.getElementById("searchUserForm").searchValueUsrtoSearch.value,
+    "searchOperator": document.getElementById("searchUserForm").searchOperator.value
+  }
+
+  //searchAvailabilityOption
+  console.log("CHECK COURSE FOR SEARCH OPTIONS");
+  console.log("searchAvailability = " + $('#searchAvailability').prop('checked') );
+  if ( $('#searchAvailability').prop('checked') ) {
+    console.log("COLLECT SEARCH BY AVAILABILITY OPTIONS.")
+
+    // add searchAvailabilityOption to data
+    console.log("AVAILABILITY OPTION: " + $("input[name=searchAvailabilityOption]:checked").val() );
+    data["searchAvailabilityOption"] = $('#searchAvailabilityOption').value;
+  }
+  //searchDateOption
+  if ($('#searchDate').checked) {
+    // add searchDateOption to data
+    console.log("COLLECT SEARCH BY DATE OPTIONS.")
+
+    var date = $('#datetimepicker1').datetimepicker('viewDate');
+        console.log("selectedDate: " + date);
+        // var tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
+        // var localTime = (selectedDate - tzoffset);
+        // console.log("localTime: " + localTime);
+
+        console.log("ISODATE [button]: " + localISOTime(date) );
+    data.push("searchDate", localISOTime(date));
+    data.push("searchDateOption", $('#dtCompare').value);
+  }
+
+  console.log("VALIDATE ENTERED USER IDENTIFIER:searchUserForm:\n" + JSON.stringify(data));
+
+  $.ajax({
+    //type: 'POST',
+    url: '/ajax/validate_userIdentifier/',
+    data: data, //$('#selectCourseForm').serialize(),
+    dataType: 'json',
+    success: function (data) {
+      if (!data.is_found) {
+        alert("A user with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+        document.getElementById("searchUserForm").searchValueUsrtoSearch.value="";
+      }
+      
+    }
+  }).done(function() {
+    // console.log("OVERLAY TIME")
+    $("#overlay").fadeOut(300);
+    console.log("HASFOCUS: " + document.activeElement.id);
+    if ((!document.activeElement.id) ||(document.activeElement.id !== "submitSearchUserForm")) {
+      // alert("I DON'T KNOW WHAT YOU CLICKED");
+      document.getElementById("submitSearchUserForm").focus();
+    }
+  });
+});
+
+
+
+// usr searchBy change cleanup: 
+// [DONE] clears forms when changing searchBy term
+$("#searchBy").change(function () {
+  // console.log("searchUserForm: searchBy changed");
+  // manage divs - clear and hide because we have a new search
+  $("#searchValueUsrtoSearch").val("")
+  $("#resultsTableBody").empty();
+  $("#updateResultsTableBody").empty();
+  $("#resultsTable").hide();
+  $("#searchUpdate").hide();
+  $("#updateResults").hide();
+  $("#processBlock").hide();
+  $("#selectAllInput").hide();
+  $("#checkAll").prop("checked", false);
+  // clear checkboxes
+  $("#isUpdateRequired1").prop("checked", false);
+  $("#isAvailabilityUpdateRequired1").prop("checked", false);;
+  $("#isDataSourceKeyUpdateRequired1").prop("checked", false);
+  $("#selectedDataSourceKey")[0].selectedIndex = 0;
+  $("#comment").val('');
+  
+  if ( this.value == 'DSK') {
+    $("#dskOptions").show();
+    $("#nonDSKSearch").hide();
+    $("#searchOptions").show();
+    $("#searchByDateChkBx").show();
+    $("#searchOpSelect").hide();
+  } else {
+    $("#dskOptions").hide();
+    $("#nonDSKSearch").show();
+    $("#searchOptions").hide();
+    $("#searchByDateChkBx").hide();
+    $("#searchOpSelect").show();
+  }
+  
+});
+
+$("#dataSourceKeyOptions").change(function () {
+  $("#searchValueUsrtoSearch").val("")
+  $("#resultsTableBody").empty();
+  $("#updateResultsTableBody").empty();
+  $("#resultsTable").hide();
+  $("#searchUpdate").hide();
+  $("#updateResults").hide();
+  $("#processBlock").hide();
+  $("#selectAllInput").hide();
+  $("#checkAll").prop("checked", false);
+  // clear checkboxes
+  $("#isUpdateRequired1").prop("checked", false);
+  $("#isAvailabilityUpdateRequired1").prop("checked", false);;
+  $("#isDataSourceKeyUpdateRequired1").prop("checked", false);
+  $("#selectedDataSourceKey")[0].selectedIndex = 0;
+  $("#comment").val('');
+});
+
+// [DONE] user search request
+$('#searchUserForm').on('submit', function(e){
+  console.log("searchUserForm called");
+  let t0 = performance.now();
+
+  $( "#searchValueUsrtoSearch" ).trigger( "blur" );
+  e.preventDefault();
+  $("#resultsTableBody").empty();
+  $("#updateResultsTableBody").empty();
+  $("#resultsTable").hide();
+  $("#updateResults").hide();
+  $("#updateTable").hide();
+  $("#isUpdateRequired1").prop("checked", false);
+  $("#isAvailabilityUpdateRequired1").prop("checked", false);
+  $("#isDataSourceKeyUpdateRequired1").checked=false;
+  $("#selectedDataSourceKey")[0].selectedIndex = 0;
+  $("#comment").val('');
+
+  if ( (document.getElementById("searchUserForm").searchValueUsrtoSearch.value === "") 
+    && 
+    (document.getElementById("searchUserForm").searchBy.value != "DSK") ) {
+    alert("You must provide a User identifier.");
+    return;
+  }
+
+  //validate form criteria - in this case searchValueUsrtoSearch
+  // if (validateSearchValueUsrtoSearch() === false) return;
+
+
+  var formData = {
+    "searchBy": document.getElementById("searchUserForm").searchBy.value, 
+  }
+
+  if (document.getElementById("searchUserForm").searchBy.value == 'DSK') {
+    //use get users endpoint and add options to formData...
+    ajaxURL = '/ajax/getUsers/'
+    formData["searchBy"] = document.getElementById("searchUserForm").searchBy.value
+    formData['searchValueUsr']=document.getElementById("searchUserForm").dataSourceKeyOptions.value;
+    if ( $('#searchAvailability').prop('checked') ) {
+      console.log("COLLECT SEARCH BY AVAILABILITY OPTIONS.")
+      // add searchAvailabilityOption to data
+      console.log("AVAILABILITY OPTION: " + $("input[name=searchAvailabilityOption]:checked").val() );
+      formData["searchOptions"] = "availability";
+      formData["searchAvailabilityOption"] = $("input[name=searchAvailabilityOption]:checked").val();
+
+    }
+    //searchDateOption
+    if ( $('#searchDate').prop('checked') ) {
+      // add searchDateOption to data
+      console.log("COLLECT SEARCH BY DATE OPTIONS.")
+            var date = $('#datetimepicker1').datetimepicker('viewDate');
+            console.log("selectedDate: " + date);
+            console.log("ISODATE [button]: " + localISOTime(date) );
+            if ( $('#searchAvailability').prop('checked') ) {
+              formData["searchOptions"]= formData["searchOptions"]+";date";
+            } else {
+              formData["searchOptions"] = "date";
+            }
+            formData["searchDate"] = localISOTime(date);
+            formData["searchDateOption"] = $("input[name=dtCompare]:checked").val();
+          }
+          console.table(formData);
+        // } else {
+          // formData['searchValueUser']=document.getElementById("manualDSK").value;
+          // console.log("manualDSK: " + document.getElementById("manualDSK").value)
+        // }
+    $("#instructions").html('First check \'Update the above selected records\', then check Availability and/or Data Source Key and select a value to update the Availability and/or Data Source Key respectively. <a href="#top">[&uarr;]</a><br><br>');
+    // console.log("DSK INSTRUCTIONS: " + $("#instructions").text());
+  } else if (document.getElementById("searchUserForm").searchOperator.value == 'contains' || document.getElementById("searchUserForm").searchBy.value == 'familyName') {
+    ajaxURL = '/ajax/getUsers/'
+    formData["searchValueUsr"] = document.getElementById("searchUserForm").searchValueUsrtoSearch.value
+    $("#instructions").html('First check \'Update the above selected records\', then check Availability and/or Data Source Key and select a value to update the Availability and/or Data Source Key respectively.<br><br>');
+  } else {
+    //use get user endpoint
+    ajaxURL = '/ajax/getUser/'
+    formData["searchValueUsr"] = document.getElementById("searchUserForm").searchValueUsrtoSearch.value
+    $("#instructions").html('First check \'Update the above selected records\', then check Availability and/or Data Source Key and select a value to update the Availability and/or Data Source Key respectively.<br><br>');
+    // console.log("NON-DSK INSTRUCTIONS: " + $("#instructions").text());
+  }
+
+  // console.log("FORMDATA: \n" + JSON.stringify(formData));
+  console.log("AJAXURL: \n" + ajaxURL);
+
+  $.ajax({
+    type: 'GET',
+    url: ajaxURL,
+    data: formData, 
+    dataType: 'json',
+    success: function(responseData) {
+      console.log("Success: " + ajaxURL);
+      console.log("Full responseData: \n" + JSON.stringify(responseData));
+      if (document.getElementById("searchUserForm").searchBy.value == 'DSK' || document.getElementById("searchUserForm").searchOperator.value == 'contains' ||document.getElementById("searchUserForm").searchBy.value == 'familyName') {
+        newResults = responseData["users_json"]["results"]
+      } else {
+      newResults = responseData["user_json"];
+      }
+
+      // https://demo.blackboard.com:443 "GET /learn/api/public/v1/users/name.family:O'Neil?fields=id%2C+userName%2C+name.given%2C+name.middle%2C+name.family%2C+externalId%2C+contact.email%2C+availability.available%2C+dataSourceId%2C+created%2C+modified HTTP/1.1" 404 84
+
+      console.log("Results Length: " + newResults.length);
+      console.log("PASSED RESULTS:\n" + JSON.stringify(newResults));
+
+      // console.log("Processing results");
+      if (newResults.length == 0) {
+        alert("No users found under this data source...");
+        return;
+      }
+
+      let tableContents = "";
+      if (typeof newResults === 'undefined') {
+      } else {
+        if (document.getElementById("searchUserForm").searchBy.value == 'DSK' || document.getElementById("searchUserForm").searchOperator.value == 'contains' || document.getElementById("searchUserForm").searchBy.value == 'familyName') {
+          $("#resultsTableBody").empty();
+          tableContents = setUsrsResultsTableBody(newResults);
+        } else {
+          $("#resultsTableBody").empty();
+          tableContents = setUsrResultsTableBody(newResults);
+        }
+
+        // console.log("TABLE CONTENTS\n" + tableContents);
+        $("#resultsTableBody").append(tableContents);
+
+        // <option>Choose a DSK or use field to right.</option> -->
+        var dskOption = '';
+        dskList = responseData["dsks_json"]
+                
+        if (typeof dskList === 'undefined') {
+        } else {
+          let x=0;
+          x = document.getElementById("selectedDataSourceKey").options.length;
+          if (x == 0) {
+          for ( dsk in dskList) {
+            if ('INTERNAL' != dskList[dsk]['externalId']) {
+              dskOption = '<option value ='+ dskList[dsk]['id'] + '>'+ dskList[dsk]['externalId'] + '</option>';
+              $('#selectedDataSourceKey').append(dskOption);
+            }
+          }
+        }
+      }
+      // $("#searchDetailsJSON").text(JSON.stringify(newResults));
+      $("#processBlock").show();
+        if (document.getElementById("searchUserForm").searchBy.value == "DSK" || document.getElementById("searchUserForm").searchOperator.value == 'contains') {
+          $("#selectAllInput").show();
+          $("#checkAll").prop("checked", false);
+        } else {
+          $("#selectAllInput").hide();
+          $("#checkAll").prop("checked", false);
+        }
+        $("#selectedDataSourceKey")[0].selectedIndex = 0;
+        $("#resultsTable").show();
+        $("#resultsTableHeader").show();
+        $("#resultsTableBody").show();
+        $("#searchUpdate").show();
+      }
+    }
+    }).done(function() {
+      $("#overlay").fadeOut(300);
+      let t1 = performance.now()
+      console.log("SEARCH TOOK: " + ((t1 - t0)/1000).toFixed(2) + " SECONDS.")
+    });      
+  });
+
+// [DONE] user update request
+$('#processUserForm').on('submit', function(e) {
+  e.preventDefault();
+  console.log("PROCESS USER UPDATE FORM");
+  let t0 = performance.now();
+
+  $("#updateResults").hide();
+  $("#updateResultsTableBody").empty();
+
+  selectionCount=$(this).find('input[name="pmcUserId[]"]:checked').length;
+  commentExists=document.getElementById("processUserForm").comment.value;
+
+  console.log("selectionCount:" + selectionCount)
+
+
+  // get form data based on active div
+  let searchBy = document.getElementById("searchUserForm").searchBy.value;
+  let searchValueUsr = document.getElementById("searchUserForm").searchValueUsrtoSearch.value;
+  let searchOperator = document.getElementById("searchUserForm").searchOperator.value;
+  // console.log("searchBy: " + searchBy);
+  // console.log("searchValueUsr " + searchValueUsr);
+
+  let pmcUserList = "";
+  n = 1;
+  $('input[name="pmcUserId[]"]:checked').each(function() {
+    //pmcUserList.push($(this).val());
+    pmcUserList += $(this).val();
+    if ((searchBy == 'DSK' || searchBy == 'familyName' || searchOperator == 'contains') && (n < selectionCount)) {
+      pmcUserList += ","
+      n += 1;
+    }
+    console.log("PMCUSERLIST ADD: " + $(this).val() )
+  });
+
+  console.log("PMCUSERLIST: COUNT:" + pmcUserList.length)
+  console.log("PMCUSERLIST:" + pmcUserList)
+
+  var updateData = {
+      "isUpdateRequired1": document.getElementById("processUserForm").isUpdateRequired1.checked,
+      "isAvailabilityUpdateRequired1": document.getElementById("processUserForm").isAvailabilityUpdateRequired1.checked,
+      "selectedAvailability": document.getElementById("processUserForm").selectedAvailability.value,
+      "isDataSourceKeyUpdateRequired1": document.getElementById("processUserForm").isDataSourceKeyUpdateRequired1.checked,
+      "selectedDataSourceKey": document.getElementById("processUserForm").selectedDataSourceKey.value,
+      "comment": document.getElementById("processUserForm").comment.value,
+      }
+  
+  // console.log("SEARCHDATA:\n" + JSON.stringify(updateData));
+
+  let ajaxURL = '';
+  
+  if (!selectionCount > 0 ) {
+    alert("You must select at least one record.")
+    return;
+  }
+
+  if (commentExists === '' ) {
+    alert("You must provide a reason for change.")
+    return;
+  }
+
+  // searchBy = document.getElementById("searchUserForm").searchBy.value;
+  // searchValueUsr = document.getElementById("searchUserForm").searchValueUsrtoSearch.value;
+  console.log("OPERATOR: " + searchOperator)
+  if (searchBy == 'DSK' || searchBy=='familyName' || searchOperator == 'contains') {
+    //use update users endpoint
+    console.log("CALLING AJAX/UPDATEUSERS")
+    ajaxURL = '/ajax/updateUsers/'
+    // we are already passing the list so set searchBy to DSK for python logic
+    updateData["pmcUserId[]"] = pmcUserList;
+
+  } else {
+    // console.log("NOT DSK")
+    //use update user endpoint
+    console.log("CALLING AJAX/UPDATEUSER")
+
+    ajaxURL = '/ajax/updateUser/'
+    //set searchBy and searchValueUsr
+    searchBy = document.getElementById("searchUserForm").searchBy.value;
+    searchValueUsr = document.getElementById("searchUserForm").searchValueUsrtoSearch.value;
+    updateData["searchBy"] = searchBy;
+    updateData["searchValueUsr"] = searchValueUsr; 
+    updateData["pmcUserId[]"] = pmcUserList;
+
+  }
+  // console.log("processUserForm: searchBy: " + searchBy);
+  // console.log("processUserForm: searchValueUsr: " + searchValueUsr);
+  // console.log("processUserForm: ajaxURL: " + ajaxURL)
+  // console.log("processUserForm: pmcUserList:\n" + pmcUserList);
+  // if pmcUsersList is == 1 then set the searchValueUser == pmcUserList[0]
+
+  console.log("UPDATE DATA:\n" + JSON.stringify(updateData));
+
+
+  $.ajax({
+    type: 'GET',
+    url: ajaxURL,
+    data: updateData,
+    success: function (data) {
+      if (!data.is_found) {
+        alert("There was an error processing this request. Reload page and try again.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+      } else {
+        // process selected records
+        //console.log(newResults[row]);
+        // console.log("UPDATE RESULT DATA:\n" + JSON.stringify(data));
+            
+        let tableContents = "HELP!!!";
+
+        newResults = data["result_json"];
+        console.log("PROCESS USR: NEWRESULTS_JSON: \n" + JSON.stringify(newResults));
+
+        if (searchBy == 'DSK' || searchBy=='familyName' || searchOperator == 'contains') {
+          tableContents = setUpdateUsrsResultsTableBody(newResults);
+        } else {
+          tableContents = setUpdateUsrResultsTableBody(newResults);
+        }
+        
+        // console.log("PROCESS: BYUSR: tableContents: \n" + tableContents);
+
+        
+        // $("#updateDetailsJSON").text(JSON.stringify(newResults));
+        $('#updateResultsTableBody').append(tableContents);
+        $('#updateTableBody').show();
+        $('#updateResults').show();
+        $('#updateResultsTable').show();
+        $('#update-table').show();
+        $('#update-table-header').show();
+      }
+    }
+  }).done(function() {
+    $("#overlay").fadeOut(300);
+    let t1 = performance.now()
+    console.log("UPDATE TOOK: " + ((t1 - t0)/1000).toFixed(2) + " SECONDS.")
+  });      
+});
+
+// ajax support
+function setUsrResultsTableBody(newResults) {
+  console.log("setUsrsResultsTableBody Called...");
+  console.log("PASSED RESULTS: \n" + JSON.stringify(newResults));
+  contents = "";
+  tableBody = ""; 
+  
+  if (typeof newResults === undefined){
+  } else {
+      // console.log('newResults["id"]: ' + newResults["id"]);
+      let id = (typeof newResults["id"] == 'undefined') ? '' : newResults["id"];
+      // console.log('newResults["available"]: ' + newResults["availability"]["available"]);
+      let available = (typeof newResults["availability"] == 'undefined') ? '' : newResults["availability"]["available"];
+    
+      let externalId = (typeof newResults["externalId"] == 'undefined') ? '' : newResults["externalId"];
+    
+      let userName = (typeof newResults["userName"] == 'undefined') ? '' : newResults["userName"];
+
+      let firstName = (typeof newResults["name"] == 'undefined') ? '' : newResults["name"]["given"];
+
+      let middleName = (typeof newResults["name"]["middle"] == 'undefined') ? '' : newResults["name"]["middle"];
+
+      let lastName = (typeof newResults["name"]["family"] == 'undefined') ? '' : newResults["name"]["family"];
+
+      let email = (typeof newResults["contact"] == 'undefined') ? 'N/A' : newResults["contact"]["email"];
+
+      let dsk = (typeof newResults["dataSourceId"] == 'undefined') ? '' : newResults["dataSourceId"];
+
+      let modified = (typeof newResults["modified"] == 'undefined') ? '' : (newResults["modified"]).substring(0, 10);
+
+      let pmcId="pmc"+id;
+
+      tableBody += '<div class="divTableRow">' +
+          '<div class="divTableCell"><input type="checkbox" name="pmcUserId[]" class="pmcUserId" value="' + id + '"></div>' +
+          '<div class="divTableCell">' + available + '</div>' +
+          '<div class="divTableCell">' + externalId + '</div>'+ 
+          '<div class="divTableCell">' + userName + '</div>'+
+          '<div class="divTableCell">' + firstName + '</div>'+
+          '<div class="divTableCell">' + middleName + '</div>'+
+          '<div class="divTableCell">' + lastName + '</div>'+
+          '<div class="divTableCell">' + email + '</div>'+
+          '<div class="divTableCell">' + dsk + '</div>' +
+          '<div class="divTableCell">' + modified + '</div>' +
+          '</div>';
+  }
+
+  return tableBody;
+}
+
+function setUsrsResultsTableBody(newResults) {
+  console.log("setUsrsResultsTableBody Called...");
+  console.log("PASSED RESULTS: \n" + JSON.stringify(newResults));
+  contents = "";
+  tableBody = ""; 
+  
+  if (typeof newResults === undefined){
+  } else {
+    for ( dataset in newResults) {
+      //console.log("DATASET: [" + newResults[dataset] +"]")
+      let id = (typeof newResults[dataset]["id"] == 'undefined') ? '' : newResults[dataset]["id"];
+    
+      let available = (typeof newResults[dataset]["availability"] == 'undefined') ? '' : newResults[dataset]["availability"]["available"];
+    
+      //let courseRoleId = (typeof newResults["courseRoleId"] == 'undefined') ? '' : newResults["courseRoleId"];
+    
+      let externalId = (typeof newResults[dataset]["externalId"] == 'undefined') ? '' : newResults[dataset]["externalId"];
+    
+      let userName = (typeof newResults[dataset]["userName"] == 'undefined') ? '' : newResults[dataset]["userName"];
+
+      let firstName = (typeof newResults[dataset]["name"]["given"] == 'undefined') ? '' : newResults[dataset]["name"]["given"];
+
+      let middleName = (typeof newResults[dataset]["name"]["middle"] == 'undefined') ? '' : newResults[dataset]["name"]["middle"];
+
+      let lastName = (typeof newResults[dataset]["name"]["family"] == 'undefined') ? '' : newResults[dataset]["name"]["family"];
+
+      let email = (typeof newResults[dataset]["contact"] == 'undefined') ? 'N/A' : newResults[dataset]["contact"]["email"];
+
+      let dsk = (typeof newResults[dataset]["dataSourceId"] == 'undefined') ? '' : newResults[dataset]["dataSourceId"];
+
+      let modified = (typeof newResults[dataset]["dataSomodifiedurceId"] == 'undefined') ? '' : (newResults[dataset]["modified"]).substring(0, 10);
+
+      let pmcId="pmc"+id;
+
+      tableBody += '<div class="divTableRow">' +
+          '<div class="divTableCell"><input type="checkbox" name="pmcUserId[]" class="pmcUserId" value="' + id + '"></div>' +
+          '<div class="divTableCell">' + available + '</div>' +
+          '<div class="divTableCell">' + externalId + '</div>'+ 
+          '<div class="divTableCell">' + userName + '</div>'+
+          '<div class="divTableCell">' + firstName + '</div>'+
+          '<div class="divTableCell">' + middleName + '</div>'+
+          '<div class="divTableCell">' + lastName + '</div>'+
+          '<div class="divTableCell">' + email + '</div>'+
+          '<div class="divTableCell">' + dsk + '</div>' +
+          '<div class="divTableCell">' + modified + '</div>' +
+          '</div>';
+    }
+  }
+
+  return tableBody;
+}
+
+function setUpdateUsrResultsTableBody(newResults) {
+  console.log("setUpdateUsrResultsTableBody Called...");
+  console.log("PASSED RESULTS: \n" + JSON.stringify(newResults));
+  contents = "";
+  let id = newResults["id"];
+    // console.log("id: " + id);
+    let available = newResults["availability"]["available"];
+    // console.log("available: " + available);
+    let courseRoleId = newResults["courseRoleId"];
+    // console.log("courseRoleId: " + courseRoleId);
+    let externalId = newResults["externalId"];
+    // console.log("externalId: " + externalId);
+    let userName = newResults["userName"];
+    // console.log("userName: " + userName);
+    let firstName = newResults["name"]["given"];
+    // console.log("firstName: " + firstName);
+    let middleName = newResults["name"]["middle"];
+    if (typeof middleName == 'undefined') {
+      middleName = "";
+    }
+    // console.log("middleName: " + middleName);
+    let lastName = newResults["name"]["family"];
+    // console.log("lastName: " + lastName);
+    let email;
+    let contact = newResults["contact"];
+    if (typeof contact == 'undefined') {
+      email = "N/A";
+    } else {
+      email = newResults["contact"]["email"];
+    }
+    // console.log("email: " + email);
+    let dsk = newResults["dataSourceId"];
+    // console.log("dsk: " + dsk);
+    let modified = (newResults["modified"]).substring(0, 10);
+    // console.log("modified: " + modified);
+    let pmcId="pmc"+id;
+    // console.log("pmcId: " + pmcId);
+
+    let tableRow = '<div class="divTableRow">' +
+          '<div class="divTableCell">' + available + '</div>' +
+          '<div class="divTableCell">' + externalId + '</div>'+ 
+          '<div class="divTableCell">' + userName + '</div>'+
+          '<div class="divTableCell">' + firstName + '</div>'+
+          '<div class="divTableCell">' + middleName + '</div>'+
+          '<div class="divTableCell">' + lastName + '</div>'+
+          '<div class="divTableCell">' + email + '</div>'+
+          '<div class="divTableCell">' + dsk + '</div>' +
+          '<div class="divTableCell">' + modified + '</div>' +
+          '</div>';
+    
+  return tableRow;
+}
+
+function setUpdateUsrsResultsTableBody(newResults) {
+  console.log("setUpdateUsrResultsTableBody Called...");
+  console.log("PASSED RESULTS: \n" + JSON.stringify(newResults));
+  let tableBody = "";
+  if (typeof newResults === undefined) { 
+  } else {
+    // for each element in newResults get add an option for the DSK
+    for (user in newResults) {
+      let id = newResults[user]["id"];
+      // console.log("id: " + id);
+      let available = newResults[user]["availability"]["available"];
+      // console.log("available: " + available);
+      let courseRoleId = newResults[user]["courseRoleId"];
+      // console.log("courseRoleId: " + courseRoleId);
+      let externalId = newResults[user]["externalId"];
+      // console.log("externalId: " + externalId);
+      let userName = newResults[user]["userName"];
+      // console.log("userName: " + userName);
+      let firstName = newResults[user]["name"]["given"];
+      // console.log("firstName: " + firstName);
+      let middleName = newResults[user]["name"]["middle"];
+      if (typeof middleName == 'undefined') {
+        middleName = "";
+      }
+      // console.log("middleName: " + middleName);
+      let lastName = newResults[user]["name"]["family"];
+      // console.log("lastName: " + lastName);
+      let email;
+      let contact = newResults[user]["contact"];
+      if (typeof contact == 'undefined') {
+        email = "N/A";
+      } else {
+        email = newResults[user]["contact"]["email"];
+      }
+      // console.log("email: " + email);
+      let dsk = newResults[user]["dataSourceId"];
+      // console.log("dsk: " + dsk);
+      let modified = (newResults[user]["modified"]).substring(0, 10);
+      // console.log("modified: " + modified);
+      let pmcId="pmc"+id;
+      // console.log("pmcId: " + pmcId);
+    
+      tableBody += '<div class="divTableRow">' +
+          '<div class="divTableCell">' + available + '</div>' +
+          '<div class="divTableCell">' + externalId + '</div>'+ 
+          '<div class="divTableCell">' + userName + '</div>'+
+          '<div class="divTableCell">' + firstName + '</div>'+
+          '<div class="divTableCell">' + middleName + '</div>'+
+          '<div class="divTableCell">' + lastName + '</div>'+
+          '<div class="divTableCell">' + email + '</div>'+
+          '<div class="divTableCell">' + dsk + '</div>' +
+          '<div class="divTableCell">' + modified + '</div>' +
+          '</div>';
+    
+    }
+  }
+    
+  return tableBody;
+}
+
+// [DONE] getDataSourceKeys: ajax function for retrieving a list of data source keys from target system.
+function getDataSourceKeys() {
+  console.log("Entered getDataSourceKeys");
+  let dskList = undefined;
+  var ajxUrl = '/ajax/getDataSourceKeys/';
+
+  // console.log("getDataSourceKeys: Getting list of Data Source Keys");
+
+  $.ajax({
+    type: 'GET',
+    url: ajxUrl,
+    //data: data,
+    success: function (data) {
+      if (!data.is_found) {
+        alert("Data Sources could not be loaded. Reload page and try again.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+      } else {            
+        let dskOptions = ""
+        newResults = data["result_json"];
+        console.log("GET DSK LIST: RESULTS_JSON: \n" + JSON.stringify(newResults));
+        dataSourceKeyOptions = setDSKOptionsBody(newResults);
+        $('#dataSourceKeyOptions').append(dataSourceKeyOptions);
+      }
+    }
+  }).done(function() {
+    // console.log("OVERLAY TIME")
+    $("#overlay").fadeOut(300);
+  });
+};
+
+// [DONE] setDSKOptionsBody: ajax function that builds the DSK Options body
+function setDSKOptionsBody(newResults) {
+  console.log("setDSKOptionsBody Called...");
+  console.log("PASSED RESULTS: \n" + JSON.stringify(newResults));
+  dskOptions = "";
+  dskOption = "";
+
+  if (typeof newResults === undefined) { 
+  } else {
+    // for each element in newResults get add an option for the DSK
+    for ( dsk in newResults) {
+      // console.log("option value/label: "+ newResults[dsk]['id'] + "/" + newResults[dsk]['externalId'])
+      id = newResults[dsk]['id']
+      externalId = newResults[dsk]['externalId']
+      if (externalId != 'INTERNAL') {
+        dskOption = '<option value ='+ id + '>'+ externalId + '</option>\n';
+        dskOptions += dskOption;
+      }
+    }    
+  }
+  
+  // console.log("dskOptions: \n" + dskOptions)
+  return dskOptions;
+}
+
+var selectedDate
+$(document).ready(function() {
+  $(function() {
+    // $('#datetimepicker1').datetimepicker({
+    //   format: 'MM-DD-YYYY HH:mm',
+    // });
+    var date = $('#datetimepicker1').datetimepicker('viewDate');
+    $('#getDate').text(date.toString('mm-dd-yyyy HH:mm'));
+    $('#datetimepicker1').on("change.datetimepicker", function (e) {
+      console.log(e.date.toString());
+      // console.log(e.localDate.toString());
+      date = $('#datetimepicker1').datetimepicker('viewDate');
+      // $('#getDate').text(date);
+      selectedDate = date;
+      console.log("SELECTED_DATE [event]: " + date );
+      console.log("ISODATE [event]: " + localISOTime(selectedDate) );
+    });
+  });
+});
+
+function logDate () {
+  console.log("Log Date Button Clicked");
+  var date = $('#datetimepicker1').datetimepicker('viewDate');
+  date = $('#datetimepicker1').datetimepicker('viewDate');
+  selectedDate = date;
+  console.log("selectedDate [button]: " + date);
+  console.log("ISODATE [button]: " + localISOTime(date) );
+};
+
+function localISOTime(d) { 
+  if (!d) d = new Date();
+  var newDate = new Date(d);
+  var tzoffset = newDate.getTimezoneOffset() * 60000; //offset in milliseconds 
+  var correctDateTime = new Date(d - tzoffset);
+  correctDateTime.setSeconds(0,0);
+  return correctDateTime.toISOString(); 
+}
+
+</script>
+
+{% endblock %}

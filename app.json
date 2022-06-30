@@ -1,0 +1,47 @@
+{
+    "name": "OSCELOT DSKTOOL",
+    "description": "A Djago/Python-based RESTful version of the Original York DSK tool for Heroku and Docker.",
+    "keywords": [
+      "Django",
+      "Blackboard",
+      "Learn",
+      "REST",
+      "DSKTOOL"
+    ],
+    "website": "https://github.com/moneil/DSKTool",
+    "repository": "https://github.com/moneil/OSCELOT-DSKTOOL-for-HEROKU",
+    "success_url": "/isup",
+    "env": {
+      "BLACKBOARD_LEARN_INSTANCE": {
+        "description": "The FQDN for your Blackboard Learn instance. E.g.: demo.blackboard.com. Do NOT include the protocol (http:// or https://)",
+        "required": true
+      },
+      "APPLICATION_KEY": {
+        "description": "Paste the APPLICATION KEY provided when you registered your Application in the Blackboard Developer Portal. (Contains hyphens)",
+        "required": true
+      },
+      "APPLICATION_SECRET": {
+        "description": "Paste the APPLICATION SECRET provided when you registered your Application. (Contains no hyphens)",
+        "required": true
+      },
+      "DJANGO_SECRET_KEY": {
+        "description": "Paste the DJANGO SECRET from this website: https://djskgen.herokuapp.com (remove the single quotes)",
+        "required": true
+      },
+      "DJANGO_ALLOWED_HOSTS": {
+        "description": "Leave this set as is or edit for your custom domain for successful deploy.",
+        "required": true,
+        "value": ".heroku.com .herokuapp.com"
+      },
+      "DJANGO_DEBUG": {
+        "description": "Leave this set as is for production deploy. May set to True in non-production environments.",
+        "required": true,
+        "value": "False"
+      },
+      "DISABLE_COLLECTSTATIC": {
+        "description": "Leave this set as is for successful deploy.",
+        "required": true,
+        "value": "1"
+      }
+    }
+  }

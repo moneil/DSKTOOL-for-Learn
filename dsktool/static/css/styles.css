@@ -1,0 +1,124 @@
+* {
+  margin: 10;
+}
+
+.sidebar-nav {
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+}
+
+html, body {
+  height: 100%;
+}
+
+.page-wrap {
+  min-height: 100%;
+  /* equal to footer height */
+  margin-bottom: -55px; 
+}
+
+.page-wrap:after {
+  content: "";
+  display: block;
+}
+
+.footer, .page-wrap:after {
+  height: 55px; 
+}
+
+.footer {
+  text-align: center;
+  line-height: 55px;
+  vertical-align: middle;
+  background: gainsboro ;
+  font-size: 14px;
+}
+
+
+/* tables */
+.outerTable {
+    overflow: auto;
+    max-height: 500px;
+}
+
+div.ajaxTable {
+  border: 0px solid dimgrey;
+  width: 100%;
+  text-align: left;
+  border-collapse: collapse;
+  border-style: hidden;
+  max-height: 500px;
+}
+
+.divTable.ajaxTable .divTableCell, .divTable.ajaxTable .divTableHead {
+  border: 1px solid dimgrey;
+  padding: 5px 10px;
+  max-height: 500px;
+}
+
+
+.divTable.ajaxTable .divTableHeading .divTableHead {
+  font-weight: bold;
+  color: black;
+  border-left: 1px solid #444444;
+  max-height: 500px;
+
+  background: lightgray;
+  border-bottom: 2px solid #444444;
+  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
+
+  position: sticky;
+  top: 0; /* Don't forget this, required for the stickiness */
+}
+
+ .ajaxTable {
+  color: #444444;
+  border-top: 1px solid #444444;
+  max-height: 500px;
+  overflow: auto;
+  
+}
+
+.divTable{ display: table; }
+.divTableRow { display: table-row; }
+.divTableHeading { display: table-header-group;}
+.divTableCell, .divTableHead { display: table-cell;}
+.divTableHeading { display: table-header-group;}
+.divTableBody { display: table-row-group;}
+
+
+
+/* Spinner */
+#overlay{	
+	position: fixed;
+	top: 0;
+	z-index: 100;
+	width: 100%;
+	height:100%;
+	display: none;
+    background-color: rgba(255,255,255,0.4);}
+
+.cv-spinner {
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;  
+}
+
+.spinner {
+	width: 72px;
+	height: 72px;
+	border: 20px #ddd solid;
+	border-top: 20px #2e93e6 solid;
+	border-radius: 50%;
+	animation: sp-anime 0.8s infinite linear;
+}
+@keyframes sp-anime {
+	100% { 
+		transform: rotate(360deg); 
+	}
+}
+.is-hide{
+	display:none;
+}

@@ -1,0 +1,47 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>This is you in Blackboard Learn</h1>
+  <hr>
+  <div>
+  {% if user_json %}
+  <table>
+    <thead>
+      <tr>
+        <th style="padding:10px" valign="top">External Id</th>
+        <th style="padding:10px" valign="top">User Name</th>
+        <th style="padding:10px" valign="top">First Name</th>
+        <th style="padding:10px" valign="top">Middle Name</th>
+        <th style="padding:10px" valign="top">Last Name</th>
+        <th style="padding:10px" valign="top">Email</th>
+        <th style="padding:10px" valign="top">Data Source</th>
+        <th style="padding:10px" valign="top">Date Created</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td style="padding:10px">{{user_json.externalId}}</td>
+        <td style="padding:10px">{{user_json.userName}}</td>
+        <td style="padding:10px">{{user_json.name.given}}</td>
+        <td style="padding:10px">{{user_json.name.middle}}</td>
+        <td style="padding:10px">{{user_json.name.family}}</td>
+        <td style="padding:10px">{{user_json.contact.email}}</td>
+        <td style="padding:10px">{{user_json.dataSourceId}}</td>
+        <td style="padding:10px">{{user_json.created}}</td>
+      </tr>
+  </tbody>
+</table>
+  {% else %}
+    oops something went wrong!!
+  {% endif %}
+  <hr>
+
+  </div>
+</br>
+</br>
+Here is the json:
+  <ul>
+    <li><strong>My User JSON:</strong> {{ user_json }}</li>
+  </ul>
+
+{% endblock %}

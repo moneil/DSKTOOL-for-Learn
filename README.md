@@ -42,11 +42,9 @@ Learn is now ready and you may proceed with the installation by clicking the bel
 
 ## Heroku
 
-Note: I have temporarially disabled the Heroku Deploy buttons and docker container build until I sort out some deployment issues... the project runs locally outside of Heroku and Docker just fine - use the Localhost instructions.
+Clicking any of the below 'Deploy to Heroku' buttons will open Heroku to your application setup screen and enable deploying the target branch. 
 
-Clicking the below 'Deploy to Heroku' button will open Heroku to your application setup screen. 
-
-Note: if you do not have a Heroku account you will be prompted to create one. You will be directed to the setup screen on account create completion.
+Note: if you do not have a Heroku account you will be prompted to create one and you will be directed to the setup screen on account create completion.
 
 
 ##### Deploy Latest Stable Release (v1.2.1): 
