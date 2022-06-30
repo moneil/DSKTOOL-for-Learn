@@ -46,7 +46,6 @@ Clicking any of the below 'Deploy to Heroku' buttons will open Heroku to your ap
 
 Note: if you do not have a Heroku account you will be prompted to create one and you will be directed to the setup screen on account create completion.
 
-
 ##### Deploy Latest Stable Release (v1.2.5): 
 <a href="https://heroku.com/deploy?template=https://github.com/moneil/DSKTOOL-for-Heroku/tree/main">">
   <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy"> 
