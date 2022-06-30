@@ -1,6 +1,6 @@
 {
     "name": "OSCELOT DSKTOOL",
-    "description": "A Djago/Python-based RESTful version of the Original York DSK tool for Heroku and Docker.",
+    "description": "A Django/Python-based RESTful version of the Original York DSK tool for Heroku and Docker.",
     "keywords": [
       "Django",
       "Blackboard",
