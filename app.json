@@ -1,5 +1,5 @@
 {
-    "name": "OSCELOT DSKTOOL",
+    "name": "DSKTOOL v1.2.6 (07/04/2022)",
     "description": "A Django/Python-based RESTful version of the Original York DSK tool for Heroku and Docker.",
     "keywords": [
       "Django",
@@ -8,8 +8,8 @@
       "REST",
       "DSKTOOL"
     ],
-    "website": "https://github.com/moneil/DSKTool",
-    "repository": "https://github.com/moneil/OSCELOT-DSKTOOL-for-HEROKU",
+    "website": "https://github.com/moneil/DSKTOOL-for-Heroku",
+    "repository": "https://github.com/moneil/DSKTOOL-for-Heroku",
     "success_url": "/isup",
     "env": {
       "BLACKBOARD_LEARN_INSTANCE": {

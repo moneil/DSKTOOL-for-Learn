@@ -1,11 +1,11 @@
-# OSCELOT DSKTOOL for Docker v1.2.5 (04/11/2022)
+# DSKTOOL for Learn on Docker v1.2.6 (04/11/2022)
 
 See below [Docker Release Notes](#Release-Notes).
 
-This directory contains the files for building and running the OSCELOT DSKTOOL as a Docker container.
+This directory contains the files for building and running the DSKTOOL as a Docker container.
 
 # Installation
-There are two methods for running the OSCELOT DSKTOOL in Docker.
+There are two methods for running the DSKTOOL in Docker.
 
 1. Deploy using a prebuilt image - requires only the docker-compose.yml file
 2. Build and deploy - requires a clone of this repository.
@@ -17,7 +17,7 @@ Both are suitable for local or remote deployment. For the sake of simplicity the
 ## Deploy Using a Prebuilt Image
 With each release starting with 1.0.9 I will be providing a Docker image available at DockerHub.com. The docker-compose.yml file points to that image tagged with the latest version and will contain any changes necessary to support any future project changes.
 
-> Note: The OSCELOT DSKTOOL uses three-legged OAuth (3LO) for authentication. 3LO requires `https`.
+> Note: The DSKTOOL uses three-legged OAuth (3LO) for authentication. 3LO requires `https`.
 
 The installation is performed in three easy steps:
 
@@ -109,7 +109,7 @@ If for some reason you get an error loading the site there are a few things to c
 ## Release Notes
 This and future releases will update this section only with changes/additions to the Docker Image. 
 
-Application Release Notes are available at: <a href='https://github.com/moneil/OSCELOT-DSKTOOL-for-HEROKU'>https://github.com/moneil/OSCELOT-DSKTOOL-for-HEROKU</a> </li>
+Application Release Notes are available at: <a href='https://github.com/moneil/DSKTOOL-for-Heroku'>https://github.com/moneil/DSKTOOL-for-Heroku</a> </li>
 
 ### v1.1.5 (06/25/2021)
 <ul>
