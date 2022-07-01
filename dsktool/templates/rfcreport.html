@@ -200,6 +200,12 @@
 </style>
 {% block javascript %}
 <script>
+  /* AJAX!! */
+  // [DONE] Process Spinner
+  $(document).ajaxSend(function() {
+		  $("#overlay").fadeIn(300);　
+    });
+
   $( ".accordion" ).click(function() {
     $(this).text(function(i, text){
           return text === "show changed records" ? "hide changed records" : "show changed records";
@@ -211,9 +217,27 @@
     var answer = window.confirm("Delete all records from the database?");
     if (answer) {
       alert("Deleting all records from the database...");
-      location.reload()
+      console.log("deleteRecords:: searchValueUsrtoSearch: Validate change");
+      $.ajax({
+        //type: 'POST',
+        url: '/ajax/purgereportdata/',
+        //data: data, //$('#selectCourseForm').serialize(),
+        dataType: 'json',
+        success: function (data) {
+          if (!data.is_found) {
+            alert("The database could not be purged");
+          } else {
+            alert("The database has been purged of all records.")
+          }
+        }
+      }).done(function() {
+        // console.log("OVERLAY TIME")
+        $("#overlay").fadeOut(300);
+      });
+        location.reload()
     } else {
       alert("DO NOT delete!");
+      console.log("deleteRecords:: DO NOT delete!");
     }
   }
 
