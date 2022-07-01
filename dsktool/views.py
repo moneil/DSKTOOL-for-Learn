@@ -20,7 +20,8 @@ import pytz
 from dsktool.rfc import Rfc
 from dsktool.models import Messages
 from dsktool.models import Logs
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 
 from django.http import JsonResponse
 
@@ -2664,10 +2665,13 @@ def rfcreport(request):
 
     try:
         messages = paginator.page(page)
-    except PageNotAnInteger:
+    except (PageNotAnInteger):
         messages = paginator.page(1)
-    except EmptyPage:
+    except (EmptyPage):
         messages = paginator.page(paginator.num_pages)
+    except: 
+        logging.error("RFCREPORT:NO RECORDS")
+        messages = ""
 
     context = {
         'messages': messages,

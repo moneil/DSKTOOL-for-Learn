@@ -5,60 +5,61 @@
   <hr>
   <div>
     {% if messages %}
-    {% load static %}
-    <div class="row";>
-      <div class="columnleft">
-        <a href="./exportcsv">
-          <img src="{% static 'images/download.png' %}" alt="Download records" width="28" height="30"onclick="downloadRecords()"/>
-        </a>&nbsp;&nbsp;Download records (.ZIP file)
-      </div>
+      {% if messages != "NO RECORDS" %} 
+      {% load static %}
+      <div class="row";>
+        <div class="columnleft">
+          <a href="./exportcsv">
+            <img src="{% static 'images/download.png' %}" alt="Download records" width="28" height="30"onclick="downloadRecords()"/>
+          </a>&nbsp;&nbsp;Download records (.ZIP file)
+        </div>
         
-      <!--Pagination-->
-      <div class="columncenter">
-        <nav aria-label="Page navigation" style="display: inline;">
-          <ul class="pagination justify-content-center pagination-sm">
-            {% if messages.has_previous %}
-            <li class="page-item">
-              <a class="page-link" href="?page={{ messages.previous_page_number }}">Previous</a>
-            </li>
-            {% else %}
-            <li class="page-item disabled">
-              <a class="page-link" href="#" tabindex="-1" aria-disabled="True">Previous</a>
-            </li>
-            {% endif %}
-            {% for i in messages.paginator.page_range %}
-              {% if messages.number == i %}
-                <li class="page-item active" aria-current="page">
-                  <span class="page-link">
-                    {{ i }}
-                    <span class="sr-only">(current)</span>
-                  </span>
+        <!--Pagination-->
+        <div class="columncenter">
+          <nav aria-label="Page navigation" style="display: inline;">
+           <ul class="pagination justify-content-center pagination-sm">
+              {% if messages.has_previous %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ messages.previous_page_number }}">Previous</a>
+              </li>
+              {% else %}
+              <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="True">Previous</a>
+              </li>
+              {% endif %}
+              {% for i in messages.paginator.page_range %}
+                {% if messages.number == i %}
+                  <li class="page-item active" aria-current="page">
+                    <span class="page-link">
+                      {{ i }}
+                      <span class="sr-only">(current)</span>
+                    </span>
+                  </li>
+                {% else %}
+                  <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }} </a></li>
+                {% endif %}
+              {% endfor %}
+              {% if messages.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ messages.next_page_number }}">Next</a>
                 </li>
               {% else %}
-                <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }} </a></li>
+                <li class="page-item disabled">
+                  <a class="page-link" href="#" tabindex="-1" aria-disabled="True">Next</a>
+                </li>
               {% endif %}
-            {% endfor %}
-            {% if messages.has_next %}
-              <li class="page-item">
-                <a class="page-link" href="?page={{ messages.next_page_number }}">Next</a>
-              </li>
-            {% else %}
-              <li class="page-item disabled">
-                <a class="page-link" href="#" tabindex="-1" aria-disabled="True">Next</a>
-              </li>
-            {% endif %}
-            </ul>
-        </nav>
-        <!--end of Pagination-->
-      </div>
+              </ul>
+          </nav>
+          <!--end of Pagination-->
+        </div>
 
-      <div class="columnright">
+        <div class="columnright">
           Purge records&nbsp;&nbsp;<img src="{% static 'images/delete.png' %}" alt="Delete records" width="20" height="20" onclick="deleteRecords()"/>
+        </div>
       </div>
-    </div>
 
-    <table class="table table-sm" width=100%>
-        <thead class="table-primary">
+      <table class="table table-sm" width=100%>
+          <thead class="table-primary">
           <tr>
             <th>ID</th>
             <th>User Name</th>
@@ -109,7 +110,7 @@
                 </div>
               </td>
             </tr>
-          {% endfor %}
+            {% endfor %}
         </tbody>
       </table>
 
@@ -149,8 +150,11 @@
         </ul>
       </nav>
       <!--end of Pagination-->
+      {% else %}
+        No records to display. Complete a change request to view records.
+      {% endif %}
     {% else %}
-      No records
+      No records to display. Complete a change request to view records.
     {% endif %}
   </div>
 
