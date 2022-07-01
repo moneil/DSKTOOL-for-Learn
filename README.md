@@ -88,13 +88,15 @@ Additionally, it appears that your 3LO session may expire hourly (check the "Who
 ### v1.2.6 (...) In Development
 <ul>
   <li>Moved to new git site with new project name.</li>
+  <li>Fixed report error on empty database.</li>
   <li>Added capability to clear report database.</li>
   <li>Added capability to download .zip of report database</li>
-  <li>Released comparable v1.2.5 docker image</li>
+  <li>Released comparable v1.2.6 docker image</li>
 </ul>
 
 ## ToDo
 <ul>
+  <li>Fix Heroku deployment</li>
   <li>Add Availability option to Enrollments Course/User searches</li>
   <li>Add Date option to Enrollments Course/User searches</li>
   <li>Add Role option to Course Membership updates</li>
