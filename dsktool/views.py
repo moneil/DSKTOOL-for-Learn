@@ -2783,5 +2783,13 @@ def exportlogscsv(request):
     return response
 
 def purgeData(request):
+    logging.error("PURGEDATA:START")
 
-    return response
+    items = Messages.objects.all()
+    items.delete()
+    items = Logs.objects.all()
+    items.delete()
+
+    logging.error("PURGEDATA:END, returning to rfcreport.")
+
+    return HttpResponseRedirect(reverse('rfcreport'))
