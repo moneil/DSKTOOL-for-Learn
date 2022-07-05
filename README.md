@@ -140,11 +140,3 @@ I will also be changing the the docker hub URL. Watch release notes and docker-c
   <li>Fixed issue with DSK lists being truncated at 100</li>
   <li>Released comparable v1.2.0 docker image.</li>
 </ul>
-
-
-<!-- 
-After you create and edit your config.py file in the next step you may then run: python manage.py runserver_plus --cert certname
-
-If Using ngrok run pip install -r requirements.txt . Next run python manage.py migrate to apply the migrations. And last, start the server with python manage.py runserver
-If Using your own cert run $ python manage.py runserver_plus --cert certname 
--->
