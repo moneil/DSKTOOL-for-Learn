@@ -1,4 +1,4 @@
-# DSKTOOL for Learn DEV v1.2.7 (...)
+# DSKTOOL for Learn v1.2.6 (07/05/2022)
 
 See [Release Notes](#Release-Notes) below.
 
@@ -47,14 +47,7 @@ Clicking any of the below 'Deploy to Heroku' buttons will open Heroku to your ap
 Note: if you do not have a Heroku account you will be prompted to create one and you will be directed to the setup screen on account create completion.
 
 ##### Deploy Latest Stable Release (v1.2.6): 
-<a href="https://heroku.com/deploy?template=https://github.com/moneil/DSKTOOL-for-Heroku/tree/main">
-  <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy"> 
-</a>
-
-##### Deploy Latest Development Branch (v1.2.7 - note version on Heroku Create App Page):
-**Important: Do not use for production**! This development branch is intended for development testing/preview purposes only! 
-
-<a href="https://heroku.com/deploy?template=https://github.com/moneil/DSKTOOL-for-Heroku/tree/dev">
+<a href="https://heroku.com/deploy?template=https://github.com/moneil/DSKTOOL-for-Learn/tree/main">
   <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy"> 
 </a>
 
@@ -87,12 +80,24 @@ Additionally, it appears that your 3LO session may expire hourly (check the "Who
 <hr>
 
 ## Release Notes
-### v1.2.7 (IN PROGRESS)
+
+### v1.2.6 (07/05/2022)
 <ul>
-  <li>Add Date option to Enrollments Course/User searches</li>
-  <li></li>
-  <li>Released comparable v1.2.6 docker image [https://hub.docker.com/r/oscelot/oscelot-dsktool/tags](https://hub.docker.com/r/oscelot/oscelot-dsktool/tags) (**Note:** As I continue to migrate away from OSCELOT naming, this URL will permanently change in the future. Watch release notes and docker-compose.yml file.)</li>
+  <li>Fixed Heroku deployment</li>
+  <li>Fixed Docker deployment</li>
+  <li>Upgraded Python to 3.10.5</li>
+  <li>Upgraded Django to latest stable (4.0.6 as of this release).</li>
+  <li>Removed OSCELOT references</li>
+  <li>Fixed change report error on empty database.</li>
+  <li>Added capability to clear report database.</li>
+  <li>Added capability to download .zip of report database</li>
+  <li>Released comparable v1.2.6 docker image to https://hub.docker.com/r/oscelot/oscelot-dsktool/tags</li>
 </ul>
+
+### Project URL changes:
+As I continue to migrate away from OSCELOT naming, I will be moving to a yet to be available new github site with the new project name of [DSKTOOL for Learn](https://github.com/moneil/DSKTOOL-for-Learn).
+I will also be changing the the docker hub URL. Watch release notes and docker-compose.yml file.
+
 
 ## ToDo
 <ul>
@@ -102,20 +107,7 @@ Additionally, it appears that your 3LO session may expire hourly (check the "Who
   <li>Clean up code redundancies</li>
 </ul>
 
-### v1.2.6 (07/05/2022)
-<ul>
-  <li>Fixed Heroku deployment</li>
-  <li>Fixed Docker deployment</li>
-  <li>Upgraded Python to 3.10.5</li>
-  <li>Upgraded Django to latest stable (4.0.6 as of this release).</li>
-  <li>Removed OSCELOT references</li>
-  <li>Moved to new git site with new project name "DSKTOOL for Learn" [https://github.com/moneil/DSKTOOL-for-Learn](https://github.com/moneil/DSKTOOL-for-Learn).</li>
-  <li>Fixed change report error on empty database.</li>
-  <li>Added capability to clear report database.</li>
-  <li>Added capability to download .zip of report database</li>
-  <li>Released comparable v1.2.6 docker image [https://hub.docker.com/r/oscelot/oscelot-dsktool/tags](https://hub.docker.com/r/oscelot/oscelot-dsktool/tags) (**Note:** As I continue to migrate away from OSCELOT naming, this URL will permanently change in the future. Watch release notes and docker-compose.yml file.)</li>
-</ul>
-
+## Prior Releases
 ### v1.2.5 (04/11/2022) ###
 <ul>
   <li>Removed token expiration time from index page.</li>
@@ -148,11 +140,3 @@ Additionally, it appears that your 3LO session may expire hourly (check the "Who
   <li>Fixed issue with DSK lists being truncated at 100</li>
   <li>Released comparable v1.2.0 docker image.</li>
 </ul>
-
-
-<!-- 
-After you create and edit your config.py file in the next step you may then run: python manage.py runserver_plus --cert certname
-
-If Using ngrok run pip install -r requirements.txt . Next run python manage.py migrate to apply the migrations. And last, start the server with python manage.py runserver
-If Using your own cert run $ python manage.py runserver_plus --cert certname 
--->
