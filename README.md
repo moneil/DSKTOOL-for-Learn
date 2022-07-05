@@ -1,4 +1,4 @@
-# DSKTOOL for Learn v1.2.6 (07/05/2022)
+# DSKTOOL for Learn DEV v1.2.7 (...)
 
 See [Release Notes](#Release-Notes) below.
 
