@@ -46,7 +46,7 @@ Clicking any of the below 'Deploy to Heroku' buttons will open Heroku to your ap
 
 Note: if you do not have a Heroku account you will be prompted to create one and you will be directed to the setup screen on account create completion.
 
-##### Deploy Latest Stable Release (v1.2.5): 
+##### Deploy Latest Stable Release (v1.2.6): 
 <a href="https://heroku.com/deploy?template=https://github.com/moneil/DSKTOOL-for-Heroku/tree/main">
   <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy"> 
 </a>
@@ -85,14 +85,22 @@ Additionally, it appears that your 3LO session may expire hourly (check the "Who
 <hr>
 
 ## Release Notes
-### v1.2.6 (...) In Development
+### v1.2.6 (07/05/2022)
 <ul>
-  <li>√ Moved to new git site with new project name.</li>
-  <li>√ removed OSCELOT references</li>
-  <li>√ Fixed report error on empty database.</li>
-  <li>√ Added capability to clear report database.</li>
+  <li>Upgraded Python to 3.10.5</li>
+  <li>Upgraded Django to latest stable (4.0.6 as of this release).</li>
+  <li>Removed OSCELOT references</li>
+  <li>Moved to new git site with new project name "DSKTOOL for Learn" [https://github.com/moneil/DSKTOOL-for-Learn](https://github.com/moneil/DSKTOOL-for-Learn).</li>
+  <li>Fixed change report error on empty database.</li>
+  <li>Added capability to clear report database.</li>
   <li>Added capability to download .zip of report database</li>
-  <li>Released comparable v1.2.6 docker image</li>
+  <li>Removed token expiration time from index page.</li>
+  <li>Added 'Contains' search operator on Users and Courses - now supports 'Contains' and 'Exact' searches.</li>
+  <li>Added User Family Name via 'Contains' only search operation</li>
+  <li>Added Course Name via 'Contains' only search operation</li>
+  <li>Added "Reason for change" feature - forces entry of why the change was made.
+  <li>Added how-to for hosting on CPANEL
+  <li>√ Released comparable v1.2.6 docker image [https://hub.docker.com/r/oscelot/oscelot-dsktool/tags]</li>
 </ul>
 
 ## ToDo
@@ -102,17 +110,6 @@ Additionally, it appears that your 3LO session may expire hourly (check the "Who
   <li>Add Date option to Enrollments Course/User searches</li>
   <li>Add Role option to Course Membership updates</li>
   <li>Clean up code redundancies</li>
-</ul>
-
-### v1.2.5 (04/11/2022) In Development
-<ul>
-  <li>Removed token expiration time from index page.</li>
-  <li>Added 'Contains' search operator on Users and Courses - now supports 'Contains' and 'Exact' searches.</li>
-  <li>Added User Family Name via 'Contains' only search operation</li>
-  <li>Added Course Name via 'Contains' only search operation</li>
-  <li>Added "Reason for change" feature - forces entry of why the change was made.
-  <li>Added how-to for hosting on CPANEL
-  <li>Released comparable v1.2.5 docker image</li>
 </ul>
 
 ### v1.2.1 (03/23/2022)
