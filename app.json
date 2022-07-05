@@ -1,5 +1,5 @@
 {
-    "name": "DSKTOOL v1.2.6 (07/04/2022)",
+    "name": "DSKTOOL v1.2.6 (07/05/2022)",
     "description": "A Django/Python-based RESTful version of the Original York DSK tool for Heroku and Docker.",
     "keywords": [
       "Django",
