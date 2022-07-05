@@ -1,4 +1,4 @@
-# DSKTOOL for Learn DEV v1.2.6 (07/05/2022)
+# DSKTOOL for Learn v1.2.6 (07/05/2022)
 
 See [Release Notes](#Release-Notes) below.
 
@@ -50,14 +50,6 @@ Note: if you do not have a Heroku account you will be prompted to create one and
 <a href="https://heroku.com/deploy?template=https://github.com/moneil/DSKTOOL-for-Heroku/tree/main">
   <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy"> 
 </a>
-
-##### Deploy Latest Development Branch (v1.2.7 - note version on Heroku Create App Page):
-**Important: Do not use for production**! This development branch is intended for development testing/preview purposes only! 
-
-<a href="https://heroku.com/deploy?template=https://github.com/moneil/DSKTOOL-for-Heroku/tree/dev">
-  <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy"> 
-</a>
-
 
 ### Configuring your application
 On the setup screen you will need to name your application dyno, select a region and set the configuration variables:
