@@ -1,4 +1,4 @@
-# DSKTOOL for Learn v1.2.6 (07/05/2022)
+# DSKTOOL for Learn DEV v1.2.7 (...)
 
 See [Release Notes](#Release-Notes) below.
 
@@ -52,8 +52,8 @@ Note: if you do not have a Heroku account you will be prompted to create one and
 </a>
 
 ##### Deploy Latest Development Branch (v1.2.7 - note version on Heroku Create App Page):
-**Important: Do not use for production**! This development branch is intended for development testing/preview purposes only!
- 
+**Important: Do not use for production**! This development branch is intended for development testing/preview purposes only! 
+
 <a href="https://heroku.com/deploy?template=https://github.com/moneil/DSKTOOL-for-Heroku/tree/dev">
   <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy"> 
 </a>
@@ -87,6 +87,21 @@ Additionally, it appears that your 3LO session may expire hourly (check the "Who
 <hr>
 
 ## Release Notes
+### v1.2.7 (IN PROGRESS)
+<ul>
+  <li>Add Date option to Enrollments Course/User searches</li>
+  <li></li>
+  <li>Released comparable v1.2.6 docker image [https://hub.docker.com/r/oscelot/oscelot-dsktool/tags](https://hub.docker.com/r/oscelot/oscelot-dsktool/tags) (**Note:** As I continue to migrate away from OSCELOT naming, this URL will permanently change in the future. Watch release notes and docker-compose.yml file.)</li>
+</ul>
+
+## ToDo
+<ul>
+  <li>Add Availability option to Enrollments Course/User searches</li>
+  <li>Add Date option to Enrollments Course/User searches</li>
+  <li>Add Role option to Course Membership updates</li>
+  <li>Clean up code redundancies</li>
+</ul>
+
 ### v1.2.6 (07/05/2022)
 <ul>
   <li>Fixed Heroku deployment</li>
@@ -99,15 +114,6 @@ Additionally, it appears that your 3LO session may expire hourly (check the "Who
   <li>Added capability to clear report database.</li>
   <li>Added capability to download .zip of report database</li>
   <li>Released comparable v1.2.6 docker image [https://hub.docker.com/r/oscelot/oscelot-dsktool/tags](https://hub.docker.com/r/oscelot/oscelot-dsktool/tags) (**Note:** As I continue to migrate away from OSCELOT naming, this URL will permanently change in the future. Watch release notes and docker-compose.yml file.)</li>
-</ul>
-
-## ToDo
-<ul>
-  
-  <li>Add Availability option to Enrollments Course/User searches</li>
-  <li>Add Date option to Enrollments Course/User searches</li>
-  <li>Add Role option to Course Membership updates</li>
-  <li>Clean up code redundancies</li>
 </ul>
 
 ### v1.2.5 (04/11/2022) ###
