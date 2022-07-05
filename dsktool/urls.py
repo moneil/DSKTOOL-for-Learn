@@ -37,6 +37,7 @@ urlpatterns = [
     path('users', views.users, name='users'),
     path('whoami', views.whoami, name='whoami'),
     path('rfcreport', views.rfcreport, name='rfcreport'),
+    path('exportcsvzip/', views.exportcsvzip, name="exportcsvzip"),
 
     path('exportcsv/', views.exportcsv, name='exportcsv'),
     path('exportmessagescsv/', views.exportmessagescsv, name='exportmessagescsv'),

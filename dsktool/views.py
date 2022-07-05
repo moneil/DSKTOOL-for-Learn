@@ -26,7 +26,12 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import JsonResponse
 
 import csv
-from zipfile import ZipFile
+from zipfile import *
+import io
+from wsgiref.util import FileWrapper
+from django.http import StreamingHttpResponse
+
+
 
 # Globals
 # BB: BbRest object - required for all BbRest requests
@@ -2690,21 +2695,28 @@ def exportcsv(request):
 # exportcsvzip returns a zipfile containing both
 # messages and logs csv files
 def exportcsvzip(request):
+    # from dsktool.exportzip import exportzip
+    print("ENTER EXPORTCSVZIP")
+
+
+    # response = HttpResponse(
+    #     content_type='application/zip',
+    #     headers={'Content-Disposition': 'attachment; filename="DSKLogs.zip"'},
+    # )
+
+    # # get data from the database
+    # messages = Messages.objects.all()
+    # logs = Logs.objects.all()
+
+    # #take streams and add to this zip
+
+
+    # # write messages to the zip file
+
     
-    response = HttpResponse(
-        content_type='application/zip',
-        headers={'Content-Disposition': 'attachment; filename="DSKLogs.zip"'},
-    )
 
-    # get data from the database
-    messages = Messages.objects.all()
-    logs = Logs.objects.all()
-
-    # write messages to the zip file
-    
-
-    response = exportmessagecsv(request)
-
+    # response = exportmessagescsv(request)
+    response = exportzip(request)
     return response
 
 def exportmessagescsv(request):
@@ -2793,3 +2805,85 @@ def purgeData(request):
     logging.error("PURGEDATA:END, returning to rfcreport.")
 
     return HttpResponseRedirect(reverse('rfcreport'))
+
+
+def exportzip(request):
+    csv_datas = build_multiple_csv_files()
+    for datum in csv_datas:
+        print (datum)
+    timestr = time.strftime("%Y%m%d-%H%M")
+    zip_file_name = "DSKTOOL_CVS__(" + timestr + ").zip"
+    print ("ZIPFILENAME: ", zip_file_name)
+
+    inMemoryFile = io.BytesIO()
+
+    # zf = zipfile.ZipFile("sample.zip", mode="w", compression=zipfile.ZIP_DEFLATED)
+
+    # with ZipFile(inMemoryFile, "w", ZIP_DEFLATED) as inMemoryFileOpened:
+        # add csv files each library
+    logArchiveFile = "DSKTOOL_LOGS_(" + timestr + ").csv"
+    msgArchiveFile = "DSKTOOL_MSGS_(" + timestr + ").csv"
+    os.environ["TZ"] = "UTC"
+    for x, data in enumerate(csv_datas):
+        if (x == 0):
+            msgContents = ""
+            csvname = "Messages.csv"
+            print ("setting csv name for messages")                    
+            print ("CSNAME: ", csvname)
+            print ("DATA[X] TYPE: ", type(data[x]))
+            msgContents = "Id,User Name,Change Type,Comment,Change Date\n"
+            items = Messages.objects.all()
+            for obj in items:
+                changeDate =  obj.created_at.strftime("%m/%d/%Y %H:%M:%S %Z")
+
+                # 'Time Stamp', 'User Id', 'Change Type', 'Change Comment'
+                objdata = [str(obj.id), str(obj.user_id), str(obj.change_type), str(obj.change_comment), changeDate]
+                msgContents = msgContents + ",".join(objdata) + "\n"
+                
+            # print ("MSGCONTENTS: ", msgContents)
+            # inMemoryFileOpened.writestr("DSKTOOL_MSGS.csv", msgContents)
+
+        elif (x == 1):
+            logsContents = ""
+            csvname = "Logs.csv"
+            print ("CSNAME: ", csvname)
+            print ("DATA[X] TYPE (logs expected): ", type(data[x]))
+            logsContents = " ,Id,Message Id,External Id,Course Id,Course Role, Availability Status,DataSource Id,Change Date\n"
+            items = Logs.objects.all()
+            for obj in items:
+                changeDate =  obj.created_at.strftime("%m/%d/%Y %H:%M:%S %Z")
+                print ("CHANGEDATE: ", changeDate)
+                objdata = [str(obj.state), str(obj.id), str(obj.message_id), str(obj.external_id), str(obj.course_id), str(obj.course_role), str(obj.availability_status), str(obj.datasource_id), changeDate]
+                logsContents = logsContents + ",".join(objdata) + "\n"
+                
+            # print ("LOGCONTENTS: ", logContents)
+            # print ("inMemoryFileOpened TYPE: ", inMemoryFile)
+            # inMemoryFileOpened.writestr('DSKTOOL_LOGS.csv', logContents)
+        else:
+            print ("should never ever see this")            
+
+        BinaryZipPath = "DSKTOOL_CSV_(" + timestr + ").zip"
+        
+    cb = io.BytesIO()
+    cbzf = ZipFile(cb, mode='w')
+    cbzf.writestr(msgArchiveFile, msgContents)
+    cbzf.writestr(logArchiveFile, logsContents)
+    cbzf.close()
+    # write buffer to disk for testing only - cannot save to disk with docker or heroku...
+    # open(BinaryZipPath, 'wb').write(cb.getbuffer()) 
+    # with ZipFile(cb) as zip_archive:
+    #     for item in zip_archive.filelist:
+    #         print(f'\nThere are {len(zip_archive.filelist)} ZipInfo objects present in archive')
+    
+    response = HttpResponse(cb.getvalue())
+    response['Content-Type'] = 'application/x-zip-compressed'
+    response['Content-Disposition'] = 'attachment; filename='+zip_file_name
+
+    return response
+
+def build_multiple_csv_files():
+        messagesCSV = Messages.objects.all()
+        logsCSV = Logs.objects.all()
+        
+        csv_files = [messagesCSV, logsCSV]
+        return csv_files
