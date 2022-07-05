@@ -51,7 +51,7 @@ Note: if you do not have a Heroku account you will be prompted to create one and
   <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy"> 
 </a>
 
-##### Deploy Latest Development Branch (v1.2.6 - note version Heroku Create App Page): 
+##### Deploy Latest Development Branch (v1.2.7 - note version Heroku Create App Page): 
 <a href="https://heroku.com/deploy?template=https://github.com/moneil/DSKTOOL-for-Heroku/tree/dev">
   <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy"> 
 </a>
