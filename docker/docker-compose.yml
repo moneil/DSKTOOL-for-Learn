@@ -1,0 +1,21 @@
+version: "3.3"
+services:
+    DSKTOOL:
+        container_name: DSKTOOL
+        image: oscelot/oscelot-dsktool:version (see readme)
+        ports:
+            - "8000:8000"
+        networks:   
+            - dsktool
+        restart: unless-stopped
+        environment:
+            DJANGO_DEBUG: "False" 
+            DJANGO_ALLOWED_HOSTS: '127.0.0.1 localhost .ngrok.io .herokuapp.com [::1]'  
+            DJANGO_SECRET_KEY: 'secret from https://djskgen.herokuapp.com see readme' 
+            BLACKBOARD_LEARN_INSTANCE: "your Learn FQDN"
+            APPLICATION_KEY: "your application key"
+            APPLICATION_SECRET: "your application secret"
+networks:
+    dsktool:
+        driver: bridge
+        
