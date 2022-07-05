@@ -46,17 +46,18 @@ Clicking any of the below 'Deploy to Heroku' buttons will open Heroku to your ap
 
 Note: if you do not have a Heroku account you will be prompted to create one and you will be directed to the setup screen on account create completion.
 
-##### Deploy Latest Stable Release (v1.2.6): 
+### Deploy Latest Stable Release (v1.2.6): 
 <a href="https://heroku.com/deploy?template=https://github.com/moneil/DSKTOOL-for-Learn/tree/main">
   <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy"> 
 </a>
 
-##### Deploy Latest Development Branch (v1.2.7 - note version on Heroku Create App Page):
-**Important: Do not use for production**! This development branch is intended for development testing/preview purposes only! 
+### Deploy Latest Development Branch (v1.2.7 - note version on Heroku Create App Page):
 
 <a href="https://heroku.com/deploy?template=https://github.com/moneil/DSKTOOL-for-Learn/tree/dev">
   <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy"> 
 </a>
+
+**Important: Do not use Development Branch for production**! This development branch is intended for development/testing/preview purposes only and may not always provide the best experience.
 
 ### Configuring your application
 On the setup screen you will need to name your application dyno, select a region and set the configuration variables:
