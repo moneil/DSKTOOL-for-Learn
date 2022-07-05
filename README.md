@@ -1,4 +1,4 @@
-# DSKTOOL for Learn
+# DSKTOOL for Learn v1.2.6 (07/05/2022)
 
 See [Release Notes](#Release-Notes) below.
 
@@ -87,6 +87,8 @@ Additionally, it appears that your 3LO session may expire hourly (check the "Who
 ## Release Notes
 ### v1.2.6 (07/05/2022)
 <ul>
+  <li>Fixed Heroku deployment</li>
+  <li>Fixed Docker deployment</li>
   <li>Upgraded Python to 3.10.5</li>
   <li>Upgraded Django to latest stable (4.0.6 as of this release).</li>
   <li>Removed OSCELOT references</li>
@@ -94,27 +96,32 @@ Additionally, it appears that your 3LO session may expire hourly (check the "Who
   <li>Fixed change report error on empty database.</li>
   <li>Added capability to clear report database.</li>
   <li>Added capability to download .zip of report database</li>
-  <li>Removed token expiration time from index page.</li>
-  <li>Added 'Contains' search operator on Users and Courses - now supports 'Contains' and 'Exact' searches.</li>
-  <li>Added User Family Name via 'Contains' only search operation</li>
-  <li>Added Course Name via 'Contains' only search operation</li>
-  <li>Added "Reason for change" feature - forces entry of why the change was made.
-  <li>Added how-to for hosting on CPANEL
-  <li>√ Released comparable v1.2.6 docker image [https://hub.docker.com/r/oscelot/oscelot-dsktool/tags]</li>
+  <li>Released comparable v1.2.6 docker image [https://hub.docker.com/r/oscelot/oscelot-dsktool/tags](https://hub.docker.com/r/oscelot/oscelot-dsktool/tags) (**Note:** As I continue to migrate away from OSCELOT naming, this URL will permanently change in the future. Watch release notes and docker-compose.yml file.)</li>
 </ul>
 
 ## ToDo
 <ul>
-  <li>Fix Heroku deployment</li>
+  
   <li>Add Availability option to Enrollments Course/User searches</li>
   <li>Add Date option to Enrollments Course/User searches</li>
   <li>Add Role option to Course Membership updates</li>
   <li>Clean up code redundancies</li>
 </ul>
 
+### v1.2.5 (04/11/2022) ###
+<ul>
+  <li>Removed token expiration time from index page.</li>
+  <li>Added 'Contains' search operator on Users and Courses - now supports 'Contains' and 'Exact' searches.</li>
+  <li>Added User Family Name via 'Contains' only search operation.</li>
+  <li>Added Course Name via 'Contains' only search operation.</li>
+  <li>Added "Reason for change" feature - forces entry of why the change was made.</li>
+  <li>Added how-to for hosting on CPANEL.</li>
+  <li>Released comparable v1.2.5 docker image.</li>
+</ul>
+
 ### v1.2.1 (03/23/2022)
 <ul>
-  <li>Removed token information from index page</li>
+  <li>Removed token information from index page.</li>
   <li>Added token expiration time to index page.</li>
   <li>Altered 3LO behavior with 'offline' scope: Admin is no longer required to log in hourly on API access_token refresh.</li>
   <li>Released comparable v1.2.1 docker image</li>
