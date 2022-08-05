@@ -1,0 +1,14 @@
+
+config.py
+db.sqlite3
+__pycache__/*
+dsktool/__pycache__/*
+dsktool/lib/python3.9/site-packages/__pycache__/*
+db.sqlite3
+cert.pem
+dsktool/lib/*
+key.pem
+dsktool/bin/__pycache__/*
+cert.crt
+cert.key
+dsktool/migrations/__pycache__/*
