@@ -271,7 +271,7 @@ var activeDiv = "byCrsUsr";
 
 // [DONE] Process Spinner
 $(document).ajaxSend(function() {
-		  $("#overlay").fadeIn(300);　
+      $("#overlay").fadeIn(300);　
     });
 
 $(document).ready(function(){
@@ -287,6 +287,7 @@ $(document).ready(function(){
           '<div class="divTableHead">User Last Name</div>' +
           '<div class="divTableHead">User Email</div>' +
           '<div class="divTableHead">Membership Data Source</div>' +
+          '<div class="divTableHead">Date&nbsp;Enrolled</div>' +
           '<div class="divTableHead">Date Membership Modified</div>';
         $("#resp-table-header").append(respTableHdr);
         
@@ -299,6 +300,7 @@ $(document).ready(function(){
           '<div class="divTableHead">User Last Name</div>' +
           '<div class="divTableHead">User Email</div>' +
           '<div class="divTableHead">Membership Data Source</div>' +
+          '<div class="divTableHead">Date&nbsp;Enrolled</div>' +
           '<div class="divTableHead">Date Membership Modified</div>';
         $("#update-table-header").append(updateTableHdr);
   } else {
@@ -309,6 +311,7 @@ $(document).ready(function(){
           '<div class="divTableHead">Course External Id</div>' +
           '<div class="divTableHead">Course Name</div>' +
           '<div class="divTableHead">Membership Data Source</div>' +
+          '<div class="divTableHead">Date&nbsp;Enrolled</div>' +
           '<div class="divTableHead">Date Membership Modified</div>';
         $("#resp-table-header").append(respTableHdr);
 
@@ -317,6 +320,7 @@ $(document).ready(function(){
           '<div class="divTableHead">Course External Id</div>' +
           '<div class="divTableHead">Course Name</div>' +
           '<div class="divTableHead">Membership Data Source</div>' +
+          '<div class="divTableHead">Date&nbsp;Enrolled</div>' +
           '<div class="divTableHead">Date Membership Modified</div>';
         $("#update-table-header").append(updateTableHdr);
   }
@@ -627,10 +631,10 @@ $('#searchEnrollmentByCrsandUsrForm').on('submit', function(e){
   console.log("SEARCH: searchEnrollmentByCrsandUsrForm:\n" + JSON.stringify(searchData));
 
   $.ajax({
-  	type: 'GET',
+    type: 'GET',
     url: '/ajax/getCourseMembership/',
     data: searchData,
-		success: function (data) {
+    success: function (data) {
       console.log("ajax/getCourseMembership complete...");
 
       if (!data.is_found) {
@@ -791,7 +795,7 @@ $('#searchEnrollmentByCrsForm').on('submit', function(e){
       $("#searchUpdate").show();
     }
     }).done(function() {
-			$("#overlay").fadeOut(300);
+      $("#overlay").fadeOut(300);
     });      
   });
 
@@ -873,7 +877,7 @@ $('#searchEnrollmentsByUsrForm').on('submit', function(e){
       $("#searchUpdate").show();
     }
     }).done(function() {
-			$("#overlay").fadeOut(300);
+      $("#overlay").fadeOut(300);
     });      
   });
 
@@ -1090,7 +1094,7 @@ $('#selectCourseForm').on('submit', function(e) {
               }
             }
           }).done(function() {
-				    $("#overlay").fadeOut(300);
+            $("#overlay").fadeOut(300);
         });      
     });
 
@@ -1191,7 +1195,7 @@ $('#processSelectedMembershipsForm').on('submit', function(e) {
     type: 'GET',
     url: ajxUrl,
     data: searchData,
-		success: function (data) {
+    success: function (data) {
 
         if (!data.is_found) {
           alert("There was an error processing this request. Reload page and try again.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
@@ -1228,7 +1232,7 @@ $('#processSelectedMembershipsForm').on('submit', function(e) {
         }
       }
       }).done(function() {
-				  $("#overlay").fadeOut(300);
+          $("#overlay").fadeOut(300);
         });      
     });
 
