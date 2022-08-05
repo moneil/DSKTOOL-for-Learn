@@ -1,5 +1,6 @@
 {% extends "base_generic.html" %}
-
+{% load bootstrap5 %}
+{% load mathfilters %}
 {% block content %}
   <h2>Reason for Change (RFC) Report</h2>
   <hr>
@@ -66,22 +67,25 @@
             <th>Change Type</th>
             <th>Comment</th>
             <th>Timestamp</th>
+            <th>&nbsp;</th>
           </tr>
         </thead>
         <tbody>
           {% for message in messages %}
-            <tr>
+            <tr class="hide-bottom-border">
               <td>{{message.id}}</td>
               <td>{{message.user_id}}</td>
               <td>{{message.change_type}}</td>
               <td>{{message.change_comment}}</td>
               <td>{{message.created_at}}</td>
+              <td>
+                <button class="btn btn-outline-primary btn-sm accordion" data-logs-count="{{ message.logs.count|intdiv:2 }}" data-panel-id="panel-{{ forloop.counter }}" data-bs-toggle="button" role="button" aria-pressed="true">show changed records ({{ message.logs.count|intdiv:2 }})</button>
+              </td>
             </tr>
             <tr>
               <td colspan="6" align="center">
-                <button class="btn btn-outline-primary btn-sm accordion" data-bs-toggle="button" role="button" aria-pressed="true">show changed records</button>
-                <div class="panel">
-                  <table class="table mb-0 table-sm table-bordered table-striped table-light">
+                <div class="panel" id="panel-{{ forloop.counter }}">
+                  <table class="table mb-0 table-sm table-bordered table-light table-striped">
                     <thead class="table-secondary">
                       <tr>
                         <th>&nbsp;</th>
@@ -197,20 +201,24 @@
     clear: both;
     display: table;
   }
+
+  .hide-bottom-border {
+    border-bottom: 2px solid white;
+  }
 </style>
 {% block javascript %}
 <script>
   /* AJAX!! */
   // [DONE] Process Spinner
   $(document).ajaxSend(function() {
-		  $("#overlay").fadeIn(300);　
+      $("#overlay").fadeIn(300);　
     });
 
   $( ".accordion" ).click(function() {
     $(this).text(function(i, text){
-          return text === "show changed records" ? "hide changed records" : "show changed records";
+          return text === "show changed records ("+$(this).attr("data-logs-count")+")" ? "hide changed records ("+$(this).attr("data-logs-count")+")" : "show changed records ("+$(this).attr("data-logs-count")+")";
       })
-    $(this).next(".panel").slideToggle("slow");
+    $("#"+$(this).attr("data-panel-id")).slideToggle("slow");
   });
   
   function deleteRecords() {
