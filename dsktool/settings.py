@@ -80,6 +80,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'dsktool',
+    'django_extensions',
+    'bootstrap5',
+    'mathfilters',
 ]
 
 MIDDLEWARE = [
