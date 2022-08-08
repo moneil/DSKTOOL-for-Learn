@@ -12,3 +12,5 @@ dsktool/bin/__pycache__/*
 cert.crt
 cert.key
 dsktool/migrations/__pycache__/*
+.DS_Store
+db.sqlite3
