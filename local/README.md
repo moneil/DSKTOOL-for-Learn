@@ -24,7 +24,7 @@ Basically, if you wish to contribute to the project please fork to a DSKTool pro
 
 If you are unsure which action to take, a clone is a good starting point as you may refresh/sync your local copy  with the main project to take future releases with a Fetch request.
 
-Once you have retrieve the source you should cd into the directory, you will perform most commands in this terminal window.
+Once you have retrieved the source you should cd into the directory where you will perform most commands in this terminal window.
 
 ### Set up ngrok or similar tunneling application
 First you will install support for TLS using ngrok (or similar tunneling application), then you will install Docker and run your edited version of the project docker-compose.yaml file.
