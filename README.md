@@ -1,4 +1,4 @@
-# DSKTOOL for Learn v1.2.7 DEVELOPMENT (07/05/2022)
+# DSKTOOL for Learn v1.2.8 DEVELOPMENT (11/01/2022)
 
 See [Release Notes](#Release-Notes) below.
 
@@ -46,12 +46,12 @@ Clicking any of the below 'Deploy to Heroku' buttons will open Heroku to your ap
 
 Note: if you do not have a Heroku account you will be prompted to create one and you will be directed to the setup screen on account create completion.
 
-### Deploy Latest Stable Release (v1.2.6): 
+### Deploy Latest Stable Release (v1.2.8): 
 <a href="https://heroku.com/deploy?template=https://github.com/moneil/DSKTOOL-for-Learn/tree/main">
   <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy"> 
 </a>
 
-### Deploy Latest Development Branch (v1.2.7 - note version on Heroku Create App Page):
+### Deploy Latest Development Branch (v1.2.9 - note version on Heroku Create App Page):
 
 <a href="https://heroku.com/deploy?template=https://github.com/moneil/DSKTOOL-for-Learn/tree/dev">
   <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy"> 
@@ -88,17 +88,10 @@ Additionally, it appears that your 3LO session may expire hourly (check the "Who
 
 ## Release Notes
 
-### v1.2.6 (07/05/2022)
+### v1.2.8 (11/01/2022)
 <ul>
-  <li>Fixed Heroku deployment</li>
-  <li>Fixed Docker deployment</li>
-  <li>Upgraded Python to 3.10.5</li>
-  <li>Upgraded Django to latest stable (4.0.6 as of this release).</li>
-  <li>Removed OSCELOT references</li>
-  <li>Fixed change report error on empty database.</li>
-  <li>Added capability to clear report database.</li>
-  <li>Added capability to download .zip of report database</li>
-  <li>Released comparable v1.2.6 docker image to https://hub.docker.com/r/oscelot/oscelot-dsktool/tags</li>
+  <li>Added JWT page and api authorization</li>
+  <li>Released comparable v1.2.8 docker image to https://hub.docker.com/r/oscelot/oscelot-dsktool/tags</li>
 </ul>
 
 ### Project URL changes:
@@ -115,6 +108,20 @@ I will also be changing the the docker hub URL. Watch release notes and docker-c
 </ul>
 
 ## Prior Releases
+
+### v1.2.6 (07/05/2022)
+<ul>
+  <li>Fixed Heroku deployment</li>
+  <li>Fixed Docker deployment</li>
+  <li>Upgraded Python to 3.10.5</li>
+  <li>Upgraded Django to latest stable (4.0.6 as of this release).</li>
+  <li>Removed OSCELOT references</li>
+  <li>Fixed change report error on empty database.</li>
+  <li>Added capability to clear report database.</li>
+  <li>Added capability to download .zip of report database</li>
+  <li>Released comparable v1.2.6 docker image to https://hub.docker.com/r/oscelot/oscelot-dsktool/tags</li>
+</ul>
+
 ### v1.2.5 (04/11/2022) ###
 <ul>
   <li>Removed token expiration time from index page.</li>
