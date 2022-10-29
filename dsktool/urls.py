@@ -18,6 +18,7 @@ from django.urls import path, re_path
 from dsktool import views
 from dsktool import rfc
 from dsktool.views import exportcsv
+import dsktool.authn_util
 
 # from django.conf.urls import url
 
@@ -38,6 +39,10 @@ urlpatterns = [
     path('whoami', views.whoami, name='whoami'),
     path('rfcreport', views.rfcreport, name='rfcreport'),
     path('exportcsvzip/', views.exportcsvzip, name="exportcsvzip"),
+
+    path('authzpage', views.authzpage, name='authzpage'),
+    path('authn_get_3LO_token', dsktool.authn_util.authn_get_3LO_token, name='authn_get_3LO_token'),
+    path('authn_get_API_token', dsktool.authn_util.authn_get_API_token, name='authn_get_API_token'),
 
     path('exportcsv/', views.exportcsv, name='exportcsv'),
     path('exportmessagescsv/', views.exportmessagescsv, name='exportmessagescsv'),

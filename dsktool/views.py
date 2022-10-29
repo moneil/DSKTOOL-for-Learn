@@ -2,18 +2,18 @@ from urllib import response
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 # from django.http import HttpRequest
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.decorators.cache import never_cache
-import bbrest
+from django.template import loader, Template
+from django.http import StreamingHttpResponse
+
+
 from bbrest import BbRest
 import jsonpickle
 import json
-import os
-import uuid
-import time
-import logging
 from datetime import datetime, timedelta
 import time
 import pytz
@@ -22,14 +22,26 @@ from dsktool.models import Messages
 from dsktool.models import Logs
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-
-from django.http import JsonResponse
-
+# python imports
+import logging
+from datetime import datetime, timedelta, timezone
+import time
+import os
+import uuid
+import requests
+import socket
 import csv
 from zipfile import *
 import io
 from wsgiref.util import FileWrapper
-from django.http import StreamingHttpResponse
+
+
+# my modules
+from dsktool.jwt_token_util import  Jwt_token_util
+# from dsktool.authn_util import Authn_util
+import dsktool.authn_util
+from config import adict
+from dsktool.authn_util import authN, authn_get_API_token, authn_get_3LO_token, isAUTHNValidRole, isAUTHNGuestUser
 
 
 
@@ -44,6 +56,7 @@ global ISGUESTUSER
 global ISVALIDROLE
 global EXPIRE_AT
 global START_EXPIRE
+global ROLE
 
 BB = None
 BB_JSON = None
@@ -52,6 +65,7 @@ ISGUESTUSER = True
 bb_refreshToken = None
 EXPIRE_AT = None
 START_EXPIRE = None
+ROLE = None
 
 # Pull configuration... use env settings if no local config file
 try:
@@ -141,6 +155,7 @@ def BbRestSetup(request, targetView=None, redirectRequired=False):
 
 def isValidRole(BB_JSON):
     global ISVALIDROLE
+    global ROLE
 
     ISVALIDROLE=False
 
@@ -158,6 +173,7 @@ def isValidRole(BB_JSON):
         if role in validRoles:
             logging.debug("ISVALIDROLE: ValidRole: " + role)
             VALIDROLE=True
+            ROLE= role
 
     ISVALIDROLE=VALIDROLE
     logging.debug("ISVALIDROLE: boolean: " + str(ISVALIDROLE))
@@ -849,7 +865,6 @@ def get_3LO_token(request):
 
     BB_JSON = jsonpickle.encode(BB)
     request.session['BB_JSON'] = BB_JSON
-
     
     return HttpResponseRedirect(authcodeurl)
 
@@ -2887,3 +2902,198 @@ def build_multiple_csv_files():
         
         csv_files = [messagesCSV, logsCSV]
         return csv_files
+
+def authzpage(request):
+    global BB
+    global BB_JSON
+    global ISVALIDROLE
+    global ISGUESTUSER
+    global EXPIRE_AT
+    global START_EXPIRE
+    global ROLE
+
+    jwt_token = ''
+    jwtClaims = ''
+
+    logging.info('AUTHZPAGE: ENTER.')
+
+    jwt_token = dsktool.authn_util.isAUTHNAuthorized(request)
+
+    jwt_utils = Jwt_token_util()
+
+    # print("AUTHZPAGE: JWT_TOKEN: ", jwt_token)
+
+    if jwt_token: #set context and return page
+        context = {
+            'jwt_token': jwt_token,
+            'decoded_token': jwt_utils.decodeJWT(jwt_token)
+        }
+
+        # print("AUTHZPAGE: JWT_TOKEN: ", jwt_token)
+        logging.info('AUTHZPAGE: AUTHN CHECK PASSED...')
+        logging.info('AUTHZPAGE: YOU SHOULD BE SEEING THE AUTHORIZED PAGE NOW.')
+
+        template = loader.get_template('authzpage.html')
+        response = HttpResponse(template.render(context))
+        return response
+
+    else: # jwt_token == None
+        # authenticate and get a jwt_token
+        # template = loader.get_template('notauthorized.html')
+        # response = HttpResponse(template.render())
+        print("AUTHZPAGE: AUTHN CHECK FAILED...")
+        print("AUTHZPAGE: NO or INVALID JWT_TOKEN: ", jwt_token)
+        print("AUTHZPAGE: CALLING AUTH_UTIL FOR AUTHN AND NEW TOKEN...")
+
+        
+
+        if "BB_JSON" not in request.session.keys() or BB_JSON is None:
+            logging.info('AUTHZPAGE: BbRest not found in session')
+            logging.info('AUTHZPAGE: KEY:' + str(KEY))
+            logging.info('AUTHZPAGE: SECRET:' + str(SECRET))
+
+            try:
+                BB = BbRest(str(KEY), str(SECRET), f"https://{LEARNFQDN}")
+                BB_JSON = jsonpickle.encode(BB)
+                logging.info('AUTHZPAGE: Pickled BbRest added to session.')
+                request.session['BB_JSON'] = BB_JSON
+                request.session['target_view'] = 'authzpage'
+                return HttpResponseRedirect(reverse('get_3LO_token'))
+            except BaseException as err:
+                logging.critical(
+                    'AUTHZPAGE: Could not set BbREST in Session, Check Configuration KEY and SECRET.')
+                print(f"Unexpected {err=}, {type(err)=}")
+
+        else:
+            logging.info('AUTHZPAGE: Found BbRest in session')
+            BB = jsonpickle.decode(BB_JSON)
+            logging.debug("AUTHZPAGE: BB_JSON: Original Token Info: " +
+                        str(BB.token_info))
+            if ISVALIDROLE is None:
+                logging.info('AUTHZPAGE: NO VALID ROLE - Get 3LO and confirm role.')
+                logging.info('AUTHZPAGE: CALL get_3LO_token')
+                logging.debug(
+                    "AUTHZPAGE: ISVALIDROLE=FALSE: Updated Token Info: " + str(BB.token_info))
+                return HttpResponseRedirect(reverse('get_3LO_token'))
+            
+            if BB.is_expired():
+                logging.info('AUTHZPAGE: Expired API Auth Token.')
+                logging.info('AUTHZPAGE: GET A NEW API Auth Token')
+                # BB.expiration()
+                BB.refresh_token()
+                # EXPIRE_AT = None
+                BB_JSON = jsonpickle.encode(BB)
+                request.session['BB_JSON'] = BB_JSON
+                request.session['target_view'] = 'authzpage'
+            BB.supported_functions()  # This and the following are required after
+            BB.method_generator()    # unpickling the pickled object.
+        logging.debug("AUTHZPAGE: BB_JSON: Final Token Info: " + str(BB.token_info))
+        logging.info(f'AUTHZPAGE: Token expiration: {BB.expiration()}')
+        resp = BB.GetVersion()
+        access_token = BB.token_info['access_token']
+        refresh_token = BB.token_info.get('refresh_token')
+        token_expiry = str(BB.expiration())[3:]
+        version_json = resp.json()
+
+        print("GET SYSTEM ROLE")
+        resp = BB.call('GetUser', userId="me", params={
+            'fields': 'userName, uuid, externalId, systemRoleIds, contact.email'}, sync=True)
+        user_json = resp.json()
+        if "SystemAdmin" in user_json['systemRoleIds']:
+            print("USER HAS SYSTEMADMIN ROLE")
+        print("SYSTEMROLEIDS: ", user_json['systemRoleIds'])
+
+        context = {
+            'learn_server': LEARNFQDN,
+            'version_json': version_json,
+            'access_token': access_token,
+            'refresh_token': refresh_token,
+            'token_expiry': token_expiry,
+            'expire_from': EXPIRE_AT,
+            'jwt_token': "No Token",
+        }
+
+        logging.info(f'AUTHZPAGE:: ISGUESTUSER: {ISGUESTUSER}...ISVALIDROLE: {ISVALIDROLE}')
+        jwt_utils = Jwt_token_util()
+
+        if (not ISGUESTUSER and ISVALIDROLE):
+            logging.info('AUTHZPAGE: VALID USER SET JWT')
+
+            resp = BB.call('GetUser', userId="me", params={
+                        'fields': 'userName, uuid, externalId, systemRoleIds, contact.email'}, sync=True)
+            user_json = resp.json()
+
+            logging.info(user_json)
+
+            # Get the fully qualified domain name.
+            fqdn = socket.getfqdn()
+            logging.info(f"FQDN:{fqdn}")
+            HTTP_X_REAL_IP = request.META.get('HTTP_X_REAL_IP')
+            logging.info(f"HTTP_X_REAL_IP:{HTTP_X_REAL_IP}")
+
+            REMOTE_ADDR = str(request.META.get('REMOTE_ADDR'))
+            logging.info(f"REMOTE_ADDR:{REMOTE_ADDR}")
+
+            jwtClaims = {
+                'iss': 'DSKTool for Learn',
+                'system': REMOTE_ADDR,
+                'exp': datetime.now(tz=timezone.utc) + timedelta(minutes=10),
+                'iat': datetime.now(tz=timezone.utc),
+                'xsrfToken': uuid.uuid4().hex,
+                'jti': uuid.uuid4().hex,
+                'sub': user_json['uuid'],
+                'userName': user_json['userName'],
+                'userRole': ROLE,
+                'userUuid': user_json['uuid'],
+                'userEmail': user_json['contact']['email'],
+            }
+
+            logging.info(f"AUTHZPAGE:JWTCLAIMS:")
+            logging.info(f"{jwtClaims}")
+
+            jwt_token = jwt_utils.create_jwt(jwtClaims)
+
+            context = {
+                'learn_server': LEARNFQDN,
+                'version_json': version_json,
+                'access_token': access_token,
+                'refresh_token': refresh_token,
+                'token_expiry': token_expiry,
+                'expire_from': EXPIRE_AT,
+                'jwt_token': jwt_token,
+                'decoded_token': jwt_utils.decodeJWT(jwt_token)
+            }
+
+        # The above updates the JWT every time vs only once if it exists.
+        template = loader.get_template('authzpage.html')
+        response = HttpResponse(template.render(context))
+
+        jwt_token = jwt_utils.create_jwt(jwtClaims)
+
+        jwtSessionCookies = request.COOKIES
+        logging.info(f"AUTHZPAGE:SESSION:COOKIES")
+        logging.info(f"{jwtSessionCookies}")
+
+        if (not 'JWT' in request.COOKIES):
+            logging.info(f"AUTHZPAGE:SESSION:NO JWT ADD IT")
+            logging.info(f"JWTTOKENTOADD:{jwt_token}")
+            response.set_cookie('JWT', jwt_token)
+        else:
+            # add validation code for refresh if require and update if necessary, for now roll with what we have..,
+            token_from_cookies = request.COOKIES['JWT']
+
+            logging.info(f"AUTHZPAGE:SESSIONJWT:{token_from_cookies}")
+            logging.info(f'CONTEXTJWTTOKEN:{context["jwt_token"]}')
+            response.set_cookie('JWT', jwt_token)
+
+        logging.info(f'JWTTOKEN-ISSUED:{jwtClaims["iat"]}')
+        logging.info(f'JWTTOKEN-EXPIRES:{jwtClaims["exp"]}')
+        timeremaining = (jwtClaims["iat"]+timedelta(minutes=1)
+                        )-datetime.now(tz=timezone.utc)
+        logging.info(f'TIME REMAINING: {timeremaining}')
+        logging.info('AUTHZPAGE: Exiting authzpage block... ')
+
+        logging.info(f'ONE MORE THING>>>ISGUESTUSER: {ISGUESTUSER}...ISVALIDROLE: {ISVALIDROLE}')
+
+
+        return response  # render(request, 'authzpage.html', context)
