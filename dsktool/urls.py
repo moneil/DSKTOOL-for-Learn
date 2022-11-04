@@ -19,7 +19,8 @@ from dsktool import views
 from dsktool import rfc
 from dsktool.views import exportcsv
 import dsktool.authn_util
-
+import dsktool.authn_authz_utils
+from dsktool.authn_authz_utils import authnz_get_3LO_token, authnz_get_API_token
 # from django.conf.urls import url
 
 
@@ -43,6 +44,10 @@ urlpatterns = [
     path('authzpage', views.authzpage, name='authzpage'),
     path('authn_get_3LO_token', dsktool.authn_util.authn_get_3LO_token, name='authn_get_3LO_token'),
     path('authn_get_API_token', dsktool.authn_util.authn_get_API_token, name='authn_get_API_token'),
+
+    path('authnzpage', views.authnzpage, name='authnzpage'),
+    path('authnz_get_3LO_token', dsktool.authn_authz_utils.authnz_get_3LO_token, name='authnz_get_3LO_token'),
+    path('authnz_get_API_token', dsktool.authn_authz_utils.authnz_get_API_token, name='authnz_get_API_token'),
 
     path('exportcsv/', views.exportcsv, name='exportcsv'),
     path('exportmessagescsv/', views.exportmessagescsv, name='exportmessagescsv'),

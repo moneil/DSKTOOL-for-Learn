@@ -335,7 +335,7 @@ def isAUTHNAuthorized(request):
         if (token_utils.isVerified(request.COOKIES['JWT'])):
             token = request.COOKIES['JWT']
         else:
-            print("AUTHN: ISAUTHORIZED TOKEN INVALID")
+            print("AUTHN: ISAUTHORIZED: TOKEN INVALID")
     else:
         # not authenticated (no jwt)
         # perform 3LO:
@@ -345,7 +345,7 @@ def isAUTHNAuthorized(request):
         #   else
         #       user cannot authenticate or has an invalid role
         #       return empty token indicating not authorized.
-        print("OF COURSE THIS IS GOING TO FAIL THERE IS NO TOKEN")
+        print("AUTHN: OF COURSE THIS IS GOING TO FAIL THERE IS NO TOKEN")
 
         # return "GETTING NEW TOKEN"
 
@@ -438,7 +438,7 @@ def authn_get_3LO_token(request):
         # sideways session go to index page and force authn_get_API_token
         logging.info(
             f"authn_get_3LO_token: Something went sideways with AUTHN_BB session, reverse to target e.g. 'index', maybe you should have thrown an error here.")
-        return HttpResponseRedirect(reverse('target_view'))
+        return HttpResponseRedirect(reverse('authzpage'))
 
     AUTHN_BB.supported_functions()  # This and the following are required after
     AUTHN_BB.method_generator()    # unpickling the pickled object.

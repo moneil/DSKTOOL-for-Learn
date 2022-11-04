@@ -42,16 +42,19 @@ from dsktool.jwt_token_util import  Jwt_token_util
 import dsktool.authn_util
 from config import adict
 from dsktool.authn_util import authN, authn_get_API_token, authn_get_3LO_token, isAUTHNValidRole, isAUTHNGuestUser
+from dsktool.authn_authz_utils import Auth_Utils
+import dsktool.authn_authz_utils
+
 
 
 
 # Globals
 # BB: BbRest object - required for all BbRest requests
-# BB_JSON: BbRest session details
+# AUTHN_BB_JSON: BbRest session details
 # ISGUESTUSER: 3LO'd as a guest user
 
 global BB
-global BB_JSON
+global AUTHN_BB_JSON
 global ISGUESTUSER
 global ISVALIDROLE
 global EXPIRE_AT
@@ -59,7 +62,7 @@ global START_EXPIRE
 global ROLE
 
 BB = None
-BB_JSON = None
+AUTHN_BB_JSON = None
 ISVALIDROLE = False
 ISGUESTUSER = True
 bb_refreshToken = None
@@ -101,7 +104,7 @@ class makeRequestHTTPError(Exception):
 # identifies whether bbrest and tokens are setup for processing the request.
 def BbRestSetup(request, targetView=None, redirectRequired=False):
     global BB
-    global BB_JSON
+    global AUTHN_BB_JSON
     global ISGUESTUSER
     global ISVALIDROLE
 
@@ -111,23 +114,23 @@ def BbRestSetup(request, targetView=None, redirectRequired=False):
     logging.debug(f'BBRESTSETUP INPUTS: redirectRequired: {redirectRequired}')
     logging.info('BBRESTSETUP: ISVALIDROLE: ' + str(ISVALIDROLE))
     
-    BB_JSON = request.session.get('BB_JSON')
+    AUTHN_BB_JSON = request.session.get('AUTHN_BB_JSON')
 
-    if (BB_JSON is None):
+    if (AUTHN_BB_JSON is None):
         logging.info('BBRESTSETUP: BbRest not found in session')
         try:
             BB = BbRest(KEY, SECRET, f"https://{LEARNFQDN}" )
-            BB_JSON = jsonpickle.encode(BB)
+            AUTHN_BB_JSON = jsonpickle.encode(BB)
             logging.info('BBRESTSETUP: Pickled BbRest added to session.')
-            request.session['BB_JSON'] = BB_JSON
+            request.session['AUTHN_BB_JSON'] = AUTHN_BB_JSON
             request.session['target_view'] = targetView 
             return HttpResponseRedirect(reverse('get_3LO_token'))
         except:
             logging.critical('BBRESTSETUP: Could not set BbREST in Session, Check Configuration KEY and SECRET.')
     else:
         logging.info('BBRESTSETUP: Found BbRest in session')
-        BB = jsonpickle.decode(BB_JSON)
-        logging.debug("BBRESTSETUP: BB_JSON: Original Token Info: " + str(BB.token_info))
+        BB = jsonpickle.decode(AUTHN_BB_JSON)
+        logging.debug("BBRESTSETUP: AUTHN_BB_JSON: Original Token Info: " + str(BB.token_info))
         if (ISVALIDROLE is None or ISVALIDROLE is False): 
             logging.info('BBRESTSETUP: NO VALID ROLE - Get 3LO and confirm role.')
             logging.info('BBRESTSETUP: CALL get_3LO_token')
@@ -136,12 +139,12 @@ def BbRestSetup(request, targetView=None, redirectRequired=False):
             logging.info('BBRESTSETUP: Expired API Auth Token.')
             logging.info('BBRESTSETUP: GET A NEW API Auth Token')
             BB.refresh_token()
-            BB_JSON = jsonpickle.encode(BB)
-            request.session['BB_JSON'] = BB_JSON
+            AUTHN_BB_JSON = jsonpickle.encode(BB)
+            request.session['AUTHN_BB_JSON'] = AUTHN_BB_JSON
             request.session['target_view'] = targetView
         BB.supported_functions() # This and the following are required after
         BB.method_generator()    # unpickling the pickled object.    
-    logging.debug("BBRESTSETUP: BB_JSON: Final Token Info: " + str(BB.token_info))
+    logging.debug("BBRESTSETUP: AUTHN_BB_JSON: Final Token Info: " + str(BB.token_info))
     logging.info(f'BBRESTSETUP: Token expiration: {BB.expiration()}')
 
     # if ISGUESTUSER:
@@ -153,7 +156,7 @@ def BbRestSetup(request, targetView=None, redirectRequired=False):
     logging.info('BBRESTSETUP: EXIT')
 # end BbRestSetup
 
-def isValidRole(BB_JSON):
+def isValidRole(AUTHN_BB_JSON):
     global ISVALIDROLE
     global ROLE
 
@@ -162,7 +165,7 @@ def isValidRole(BB_JSON):
     validRoles=['SystemAdmin']
     VALIDROLE=False
 
-    BB = jsonpickle.decode(BB_JSON)
+    BB = jsonpickle.decode(AUTHN_BB_JSON)
     resp = BB.call('GetUser', userId = "me", params = {'fields':'userName, systemRoleIds'}, sync=True ) 
     
     user_json = resp.json()
@@ -181,12 +184,12 @@ def isValidRole(BB_JSON):
     return VALIDROLE
 
 # [DONE]
-def isGuestUser(BB_JSON):
+def isGuestUser(AUTHN_BB_JSON):
     global ISGUESTUSER
 
     guestStatus = False
 
-    BB = jsonpickle.decode(BB_JSON)
+    BB = jsonpickle.decode(AUTHN_BB_JSON)
     resp = BB.call('GetUser', userId = "me", params = {'fields':'userName'}, sync=True ) 
     
     user_json = resp.json()
@@ -208,7 +211,7 @@ def isGuestUser(BB_JSON):
 #       get_auth_code - for API Auth
 #       get_access_token - for 3LO setup.
 #   on loading index (same for every page):
-#   if there is no BbREST instance (BB) on the session as identified by BB_JSON then
+#   if there is no BbREST instance (BB) on the session as identified by AUTHN_BB_JSON then
 #       instantiate BbREST which sets two things: 3LO and access_token for API use:
 #           1. Validate 3LO for user
 #               if there is no valid refresh_token then the user is directed to log 
@@ -216,13 +219,13 @@ def isGuestUser(BB_JSON):
 #           2. Validate that the user is a System Admin and set VALIDROLE True||False
 #               2.1 This validation makes a user request - BbREST should set a valid 
 #                   API access token on the session as a result of this request.
-#   if there is a valid BbREST instance: session BB!=None as indicated by BB_JSON!=None then
+#   if there is a valid BbREST instance: session BB!=None as indicated by AUTHN_BB_JSON!=None then
 #            1. We /should/ not have to do anything because BbREST /should/ update expired
 #               access_tokens automatically on subsequent REST requests.
 #            But 1. does not appear to be working - immediately log expired tokens and make
 #            a system request to try and get a new token.
-# BbREST object and BB_JSON:
-#   We need a valid instantiation of BbREST and a valid BB_JSON...
+# BbREST object and AUTHN_BB_JSON:
+#   We need a valid instantiation of BbREST and a valid AUTHN_BB_JSON...
 #   1. instantiate BbREST and set a global variable via: 
 #      BB = BbRest(KEY, SECRET, f"https://{LEARNFQDN}" ) 
 #      OR
@@ -233,31 +236,36 @@ def isGuestUser(BB_JSON):
 @never_cache
 def index(request):
     global BB
-    global BB_JSON
+    global AUTHN_BB_JSON
     global ISVALIDROLE
     global EXPIRE_AT
     global START_EXPIRE
     
     logging.info('INDEX: ENTER.')
     logging.info('INDEX: ISVALIDROLE: ' + str(ISVALIDROLE))
+    logging.info(f'INDEX: session.keys: {request.session.keys()}')
+
 
     # BbRestSetup(request, 'index', True)
     obj_now = datetime.utcnow()
-    if "BB_JSON" not in request.session.keys() or BB_JSON is None:
+    if "AUTHN_BB_JSON" not in request.session.keys(): # or AUTHN_BB_JSON is None:
         logging.info('INDEX: BbRest not found in session')
         try:
             BB = BbRest(KEY, SECRET, f"https://{LEARNFQDN}" )
-            BB_JSON = jsonpickle.encode(BB)
-            logging.info('INDEX: Pickled BbRest added to session.')
-            request.session['BB_JSON'] = BB_JSON
+            AUTHN_BB_JSON = jsonpickle.encode(BB)
+            request.session['AUTHN_BB_JSON'] = AUTHN_BB_JSON
+            logging.info('INDEX: Pickled BbRest added to session as AUTHN_BB_JSON.')
             request.session['target_view'] = 'index' 
+            logging.info('INDEX: target_view added to session as target_view.')
+            logging.info(f'INDEX: session.keys: {request.session.keys()}')
             return HttpResponseRedirect(reverse('get_3LO_token'))
         except:
             logging.critical('INDEX: Could not set BbREST in Session, Check Configuration KEY and SECRET.')
     else:
+        AUTHN_BB_JSON = request.session['AUTHN_BB_JSON']
         logging.info('INDEX: Found BbRest in session')
-        BB = jsonpickle.decode(BB_JSON)
-        logging.debug("INDEX: BB_JSON: Original Token Info: " + str(BB.token_info))
+        BB = jsonpickle.decode(AUTHN_BB_JSON)
+        logging.debug("INDEX: AUTHN_BB_JSON: Original Token Info: " + str(BB.token_info))
         if ISVALIDROLE is None: 
             logging.info('INDEX: NO VALID ROLE - Get 3LO and confirm role.')
             logging.info('INDEX: CALL get_3LO_token')
@@ -269,12 +277,15 @@ def index(request):
             #BB.expiration()
             BB.refresh_token()
             # EXPIRE_AT = None
-            BB_JSON = jsonpickle.encode(BB)
-            request.session['BB_JSON'] = BB_JSON
-            request.session['target_view'] = 'index'
+            AUTHN_BB_JSON = jsonpickle.encode(BB)
+            request.session['AUTHN_BB_JSON'] = AUTHN_BB_JSON
+            logging.info('INDEX: Pickled BbRest added to session as AUTHN_BB_JSON.')
+            request.session['target_view'] = 'index' 
+            logging.info('INDEX: target_view added to session as target_view.')
+            logging.info(f'INDEX: BB.is_expired session.keys: {request.session.keys()}')
         BB.supported_functions() # This and the following are required after
         BB.method_generator()    # unpickling the pickled object.    
-    logging.debug("INDEX: BB_JSON: Final Token Info: " + str(BB.token_info))
+    logging.debug("INDEX: AUTHN_BB_JSON: Final Token Info: " + str(BB.token_info))
     logging.info(f'INDEX: Token expiration: {BB.expiration()}')
     resp = BB.GetVersion()
     access_token = BB.token_info['access_token']
@@ -290,6 +301,8 @@ def index(request):
         'token_expiry' : token_expiry,
         'expire_from' : EXPIRE_AT,
     }
+    logging.info(f'INDEX: session.keys: {request.session.keys()}')
+
     logging.info('INDEX: Exiting index block... ')
     return render(request, 'index.html', context)
 
@@ -297,28 +310,28 @@ def index(request):
 @never_cache
 def whoami(request):
     global BB
-    global BB_JSON
+    global AUTHN_BB_JSON
     global ISVALIDROLE
     global EXPIRE_AT
 
     # View function for site whoami page.
     logging.info('WHOAMI: ENTER.')
     logging.info('WHOAMI: ISVALIDROLE: ' + str(ISVALIDROLE))
-    if "BB_JSON" not in request.session.keys() or BB_JSON is None:
+    if "AUTHN_BB_JSON" not in request.session.keys() or AUTHN_BB_JSON is None:
         logging.info('WHOAMI: BbRest not found in session')
         try:
             BB = BbRest(KEY, SECRET, f"https://{LEARNFQDN}" )
-            BB_JSON = jsonpickle.encode(BB)
+            AUTHN_BB_JSON = jsonpickle.encode(BB)
             logging.info('WHOAMI: Pickled BbRest added to session.')
-            request.session['BB_JSON'] = BB_JSON
+            request.session['AUTHN_BB_JSON'] = AUTHN_BB_JSON
             request.session['target_view'] = 'whoami' 
             return HttpResponseRedirect(reverse('get_3LO_token'))
         except:
             logging.critical('WHOAMI: Could not set BbREST in Session, Check Configuration KEY and SECRET.')
     else:
         logging.info('WHOAMI: Found BbRest in session')
-        BB = jsonpickle.decode(BB_JSON)
-        logging.debug("WHOAMI: BB_JSON: Original Token Info: " + str(BB.token_info))
+        BB = jsonpickle.decode(AUTHN_BB_JSON)
+        logging.debug("WHOAMI: AUTHN_BB_JSON: Original Token Info: " + str(BB.token_info))
         if ISVALIDROLE is None: 
             logging.info('WHOAMI: NO VALID ROLE - Get 3LO and confirm role.')
             logging.info('WHOAMI: CALL get_3LO_token')
@@ -329,12 +342,12 @@ def whoami(request):
             logging.info('WHOAMI: GET A NEW API Auth Token')
             BB.refresh_token()
             # EXPIRE_AT = None
-            BB_JSON = jsonpickle.encode(BB)
-            request.session['BB_JSON'] = BB_JSON
+            AUTHN_BB_JSON = jsonpickle.encode(BB)
+            request.session['AUTHN_BB_JSON'] = AUTHN_BB_JSON
             request.session['target_view'] = 'whoami'
         BB.supported_functions() # This and the following are required after
         BB.method_generator()    # unpickling the pickled object.    
-    logging.debug("WHOAMI: BB_JSON: Final Token Info: " + str(BB.token_info))
+    logging.debug("WHOAMI: AUTHN_BB_JSON: Final Token Info: " + str(BB.token_info))
     logging.info(f'WHOAMI: Token expiration: {BB.expiration()}')    
 
     try:
@@ -368,28 +381,28 @@ def whoami(request):
 @never_cache
 def courses(request):
     global BB
-    global BB_JSON
+    global AUTHN_BB_JSON
     global ISVALIDROLE
     global EXPIRE_AT
 
     # View function for site courses page.
     logging.info('COURSES: ENTER ')
     logging.info('COURSES: ISVALIDROLE: ' + str(ISVALIDROLE))
-    if "BB_JSON" not in request.session.keys() or BB_JSON is None:
+    if "AUTHN_BB_JSON" not in request.session.keys() or AUTHN_BB_JSON is None:
         logging.info('COURSES: BbRest not found in session')
         try:
             BB = BbRest(KEY, SECRET, f"https://{LEARNFQDN}" )
-            BB_JSON = jsonpickle.encode(BB)
+            AUTHN_BB_JSON = jsonpickle.encode(BB)
             logging.info('COURSES: Pickled BbRest added to session.')
-            request.session['BB_JSON'] = BB_JSON
+            request.session['AUTHN_BB_JSON'] = AUTHN_BB_JSON
             request.session['target_view'] = 'courses' 
             return HttpResponseRedirect(reverse('get_3LO_token'))
         except:
             logging.critical('COURSES: Could not set BbREST in Session, Check Configuration KEY and SECRET.')
     else:
         logging.info('COURSES: Found BbRest in session')
-        BB = jsonpickle.decode(BB_JSON)
-        logging.debug("COURSES: BB_JSON: Original Token Info: " + str(BB.token_info))
+        BB = jsonpickle.decode(AUTHN_BB_JSON)
+        logging.debug("COURSES: AUTHN_BB_JSON: Original Token Info: " + str(BB.token_info))
         if ISVALIDROLE is None: 
             logging.info('COURSES: NO VALID ROLE - Get 3LO and confirm role.')
             logging.info('COURSES: CALL get_3LO_token')
@@ -400,12 +413,12 @@ def courses(request):
             logging.info('COURSES: GET A NEW API Auth Token')
             BB.refresh_token()
             # EXPIRE_AT = None
-            BB_JSON = jsonpickle.encode(BB)
-            request.session['BB_JSON'] = BB_JSON
+            AUTHN_BB_JSON = jsonpickle.encode(BB)
+            request.session['AUTHN_BB_JSON'] = AUTHN_BB_JSON
             request.session['target_view'] = 'courses'
         BB.supported_functions() # This and the following are required after
         BB.method_generator()    # unpickling the pickled object.    
-    logging.debug("COURSES: BB_JSON: Final Token Info: " + str(BB.token_info))
+    logging.debug("COURSES: AUTHN_BB_JSON: Final Token Info: " + str(BB.token_info))
     logging.info(f'COURSES: Token expiration: {BB.expiration()}')
 
     task = request.GET.get('task')
@@ -526,28 +539,28 @@ def courses(request):
 @never_cache
 def enrollments(request):
     global BB
-    global BB_JSON
+    global AUTHN_BB_JSON
     global ISVALIDROLE
     global EXPIRE_AT
 
     # View function for site enrollments page.
     logging.info('ENROLLMENTS: ENTER ')
     logging.info('ENROLLMENTS: ISVALIDROLE: ' + str(ISVALIDROLE))
-    if "BB_JSON" not in request.session.keys() or BB_JSON is None:
+    if "AUTHN_BB_JSON" not in request.session.keys() or AUTHN_BB_JSON is None:
         logging.info('ENROLLMENTS: BbRest not found in session')
         try:
             BB = BbRest(KEY, SECRET, f"https://{LEARNFQDN}" )
-            BB_JSON = jsonpickle.encode(BB)
+            AUTHN_BB_JSON = jsonpickle.encode(BB)
             logging.info('ENROLLMENTS: Pickled BbRest added to session.')
-            request.session['BB_JSON'] = BB_JSON
+            request.session['AUTHN_BB_JSON'] = AUTHN_BB_JSON
             request.session['target_view'] = 'enrollments' 
             return HttpResponseRedirect(reverse('get_3LO_token'))
         except:
             logging.critical('ENROLLMENTS: Could not set BbREST in Session, Check Configuration KEY and SECRET.')
     else:
         logging.info('ENROLLMENTS: Found BbRest in session')
-        BB = jsonpickle.decode(BB_JSON)
-        logging.debug("ENROLLMENTS: BB_JSON: Original Token Info: " + str(BB.token_info))
+        BB = jsonpickle.decode(AUTHN_BB_JSON)
+        logging.debug("ENROLLMENTS: AUTHN_BB_JSON: Original Token Info: " + str(BB.token_info))
         if ISVALIDROLE is None: 
             logging.info('ENROLLMENTS: NO VALID ROLE - Get 3LO and confirm role.')
             logging.info('ENROLLMENTS: CALL get_3LO_token')
@@ -558,12 +571,12 @@ def enrollments(request):
             logging.info('ENROLLMENTS: GET A NEW API Auth Token')
             BB.refresh_token()
             # EXPIRE_AT = None
-            BB_JSON = jsonpickle.encode(BB)
-            request.session['BB_JSON'] = BB_JSON
+            AUTHN_BB_JSON = jsonpickle.encode(BB)
+            request.session['AUTHN_BB_JSON'] = AUTHN_BB_JSON
             request.session['target_view'] = 'enrollments'
         BB.supported_functions() # This and the following are required after
         BB.method_generator()    # unpickling the pickled object.    
-    logging.debug("ENROLLMENTS: BB_JSON: Final Token Info: " + str(BB.token_info))
+    logging.debug("ENROLLMENTS: AUTHN_BB_JSON: Final Token Info: " + str(BB.token_info))
     logging.info(f'ENROLLMENTS: Token expiration: {BB.expiration()}')
 
     task = request.GET.get('task')
@@ -720,28 +733,28 @@ def enrollments(request):
 @never_cache
 def users(request):
     global BB
-    global BB_JSON
+    global AUTHN_BB_JSON
     global ISVALIDROLE
     global EXPIRE_AT
 
     # View function for site enrollments page.
     logging.info('USERS: ENTER ')
     logging.info('USERS: ISVALIDROLE: ' + str(ISVALIDROLE))
-    if "BB_JSON" not in request.session.keys() or BB_JSON is None:
+    if "AUTHN_BB_JSON" not in request.session.keys() or AUTHN_BB_JSON is None:
         logging.info('USERS: BbRest not found in session')
         try:
             BB = BbRest(KEY, SECRET, f"https://{LEARNFQDN}" )
-            BB_JSON = jsonpickle.encode(BB)
+            AUTHN_BB_JSON = jsonpickle.encode(BB)
             logging.info('USERS: Pickled BbRest added to session.')
-            request.session['BB_JSON'] = BB_JSON
+            request.session['AUTHN_BB_JSON'] = AUTHN_BB_JSON
             request.session['target_view'] = 'users' 
             return HttpResponseRedirect(reverse('get_3LO_token'))
         except:
             logging.critical('USERS: Could not set BbREST in Session, Check Configuration KEY and SECRET.')
     else:
         logging.info('USERS: Found BbRest in session')
-        BB = jsonpickle.decode(BB_JSON)
-        logging.debug("USERS: BB_JSON: Original Token Info: " + str(BB.token_info))
+        BB = jsonpickle.decode(AUTHN_BB_JSON)
+        logging.debug("USERS: AUTHN_BB_JSON: Original Token Info: " + str(BB.token_info))
         if ISVALIDROLE is None: 
             logging.info('USERS: NO VALID ROLE - Get 3LO and confirm role.')
             logging.info('USERS: CALL get_3LO_token')
@@ -752,12 +765,12 @@ def users(request):
             logging.info('USERS: GET A NEW API Auth Token')
             BB.refresh_token()
             # EXPIRE_AT = None
-            BB_JSON = jsonpickle.encode(BB)
-            request.session['BB_JSON'] = BB_JSON
+            AUTHN_BB_JSON = jsonpickle.encode(BB)
+            request.session['AUTHN_BB_JSON'] = AUTHN_BB_JSON
             request.session['target_view'] = 'users'
         BB.supported_functions() # This and the following are required after
         BB.method_generator()    # unpickling the pickled object.    
-    logging.debug("USERS: BB_JSON: Final Token Info: " + str(BB.token_info))
+    logging.debug("USERS: AUTHN_BB_JSON: Final Token Info: " + str(BB.token_info))
     logging.info(f'USERS: Token expiration: {BB.expiration()}')
 
     # View function for users page of site.
@@ -774,7 +787,7 @@ def users(request):
 
 # [DONE]
 def get_API_token(request):
-    global BB_JSON
+    global AUTHN_BB_JSON
     global BB
     global EXPIRE_AT
     global START_EXPIRE
@@ -782,10 +795,10 @@ def get_API_token(request):
     
     # Happens when the user hits index the first time and hasn't authenticated on Learn
     # Part II. Get an access token for the user that logged in. Put that on their session.
-    BB_JSON = request.session.get('BB_JSON')
+    AUTHN_BB_JSON = request.session.get('AUTHN_BB_JSON')
     target_view = request.session.get('target_view')
     logging.info('get_API_token: got BbRest from session')
-    BB = jsonpickle.decode(BB_JSON)
+    BB = jsonpickle.decode(AUTHN_BB_JSON)
     BB.supported_functions() # This and the following are required after
     BB.method_generator()    # unpickling the pickled object.
     # Next, get the code parameter value from the request
@@ -804,16 +817,16 @@ def get_API_token(request):
         exit()
 
     user_bb = BbRest(KEY, SECRET, f"https://{LEARNFQDN}", code=code, redirect_uri=absolute_redirect_uri )    
-    BB_JSON = jsonpickle.encode(user_bb)
-    request.session['BB_JSON'] = BB_JSON
+    AUTHN_BB_JSON = jsonpickle.encode(user_bb)
+    request.session['AUTHN_BB_JSON'] = AUTHN_BB_JSON
 
-    if (isGuestUser(BB_JSON)):
+    if (isGuestUser(AUTHN_BB_JSON)):
         context = {
             'learn_server': LEARNFQDN,
         }   
         return render(request, 'guestusernotallowed.html', context=context )
 
-    if (not isValidRole(BB_JSON)):
+    if (not isValidRole(AUTHN_BB_JSON)):
         # return notauthorized page
         return render(request, 'notauthorized.html')
     
@@ -830,21 +843,21 @@ def get_API_token(request):
     EXPIRE_AT = str(expireTime.hour).zfill(2) + ":" + str(expireTime.minute).zfill(2) + " (UTC)"
 
     logging.info('get_API_token: pickled BbRest and putting it on session')
-    request.session['BB_JSON'] = BB_JSON
+    request.session['AUTHN_BB_JSON'] = AUTHN_BB_JSON
     return HttpResponseRedirect(reverse(f'{target_view}'))
 
 # [DONE]
 def get_3LO_token(request):
-    global BB_JSON
+    global AUTHN_BB_JSON
     global BB
     
     # Happens when the user hits index the first time and hasn't authenticated on Learn
     # Part I. Request an authorization code oauth2/authorizationcode
     logging.info(f"get_3LO_token: REQUEST URI:{request.build_absolute_uri()}")
     try: 
-        BB_JSON = request.session.get('BB_JSON')
+        AUTHN_BB_JSON = request.session.get('AUTHN_BB_JSON')
         logging.info('get_3LO_token: got BbRest from session')
-        BB = jsonpickle.decode(BB_JSON)
+        BB = jsonpickle.decode(AUTHN_BB_JSON)
     except:
         #sideways session go to index page and force get_API_token
         logging.info(f"get_3LO_token: Something went sideways with BB session, reverse to target e.g. 'index', maybe you should have thrown an error here.")
@@ -863,8 +876,8 @@ def get_3LO_token(request):
     logging.info(f"get_3LO_token: AUTHCODEURL:{authcodeurl}")
     logging.info(f"get_3LO_token: And now the app is setup to act on behalf of the user.")
 
-    BB_JSON = jsonpickle.encode(BB)
-    request.session['BB_JSON'] = BB_JSON
+    AUTHN_BB_JSON = jsonpickle.encode(BB)
+    request.session['AUTHN_BB_JSON'] = AUTHN_BB_JSON
     
     return HttpResponseRedirect(authcodeurl)
 
@@ -875,28 +888,28 @@ def isup(request):
 # [DONE]
 def learnlogout(request):
     global BB
-    global BB_JSON
+    global AUTHN_BB_JSON
     global ISVALIDROLE
 
     logging.info("LEARNLOGOUT: Flushing session and redirecting to Learn for logout")
     site_domain = request.META['HTTP_HOST']
     response = HttpResponse("Cookies Cleared")
     response.delete_cookie(site_domain)
-    # request.session['BB_JSON'] = None
-    if "BB_JSON" in request.session.keys():
-        logging.info('LEARNLOGOUT: Deleting session key BB_JSON')
-        del request.session["BB_JSON"]
-        # del request.session['BB_JSON']
+    # request.session['AUTHN_BB_JSON'] = None
+    if "AUTHN_BB_JSON" in request.session.keys():
+        logging.info('LEARNLOGOUT: Deleting session key AUTHN_BB_JSON')
+        del request.session["AUTHN_BB_JSON"]
+        # del request.session['AUTHN_BB_JSON']
         request.session.modified = True
-        if "BB_JSON" in request.session.keys():
-            logging.info('LEARNLOGOUT: BB_JSON not deleted?')
+        if "AUTHN_BB_JSON" in request.session.keys():
+            logging.info('LEARNLOGOUT: AUTHN_BB_JSON not deleted?')
             for key, value in request.session.items():
                 print('{} => {}'.format(key, value))
     ISVALIDROLE = False
     BB = None
     # try:
-    #     request.session.get(['BB_JSON'] is None:
-    #     logging.info('LEARNLOGOUT: Session BB_JSON == None')
+    #     request.session.get(['AUTHN_BB_JSON'] is None:
+    #     logging.info('LEARNLOGOUT: Session AUTHN_BB_JSON == None')
     # logging.info('LEARNLOGOUT: ISVALIDROLE: ' + str(ISVALIDROLE))
     request.session.clear()
     request.session.flush()
@@ -1403,18 +1416,18 @@ def getCourseMemberships(request):
 
     #BbRestSetup(request)
     
-    # BB_JSON = request.session.get('BB_JSON')
-    # if (BB_JSON is None):
+    # AUTHN_BB_JSON = request.session.get('AUTHN_BB_JSON')
+    # if (AUTHN_BB_JSON is None):
     #     BB = BbRest(KEY, SECRET, f"https://{LEARNFQDN}" )
-    #     BB_JSON = jsonpickle.encode(BB)
+    #     AUTHN_BB_JSON = jsonpickle.encode(BB)
     #     print('pickled BbRest putting it on session')
-    #     request.session['BB_JSON'] = BB_JSON
+    #     request.session['AUTHN_BB_JSON'] = AUTHN_BB_JSON
     # else:
     #     print('got BbRest from session')
-    #     BB = jsonpickle.decode(BB_JSON)
+    #     BB = jsonpickle.decode(AUTHN_BB_JSON)
     #     if BB.is_expired():
     #         print('expired token')
-    #         request.session['BB_JSON'] = None
+    #         request.session['AUTHN_BB_JSON'] = None
     #     BB.supported_functions() # This and the following are required after
     #     BB.method_generator()    # unpickling the pickled object.
     #     print(f'expiration: {BB.expiration()}')
@@ -2199,20 +2212,20 @@ def updateCourse(request):
 
     #BbRestSetup(request, 'courses', redirectRequired=True)
 
-    # BB_JSON = request.session.get('BB_JSON')
-    # if (BB_JSON is None):
+    # AUTHN_BB_JSON = request.session.get('AUTHN_BB_JSON')
+    # if (AUTHN_BB_JSON is None):
     #     BB = BbRest(KEY, SECRET, f"https://{LEARNFQDN}" )
-    #     BB_JSON = jsonpickle.encode(BB)
+    #     AUTHN_BB_JSON = jsonpickle.encode(BB)
     #     print('pickled BbRest putting it on session')
-    #     request.session['BB_JSON'] = BB_JSON
+    #     request.session['AUTHN_BB_JSON'] = AUTHN_BB_JSON
     #     request.session['target_view'] = 'users'
     #     return HttpResponseRedirect(reverse('get_3LO_token'))
     # else:
     #     print('got BbRest from session')
-    #     BB = jsonpickle.decode(BB_JSON)
+    #     BB = jsonpickle.decode(AUTHN_BB_JSON)
     #     if BB.is_expired():
     #         print('expired token')
-    #         request.session['BB_JSON'] = None
+    #         request.session['AUTHN_BB_JSON'] = None
     #         whoami(request)
     #     BB.supported_functions() # This and the following are required after
     #     BB.method_generator()    # unpickling the pickled object.
@@ -2428,20 +2441,20 @@ def updateCourses(request):
 
     #BbRestSetup(request, 'courses', True)
 
-    # BB_JSON = request.session.get('BB_JSON')
-    # if (BB_JSON is None):
+    # AUTHN_BB_JSON = request.session.get('AUTHN_BB_JSON')
+    # if (AUTHN_BB_JSON is None):
     #     BB = BbRest(KEY, SECRET, f"https://{LEARNFQDN}" )
-    #     BB_JSON = jsonpickle.encode(BB)
+    #     AUTHN_BB_JSON = jsonpickle.encode(BB)
     #     print('pickled BbRest putting it on session')
-    #     request.session['BB_JSON'] = BB_JSON
+    #     request.session['AUTHN_BB_JSON'] = AUTHN_BB_JSON
     #     request.session['target_view'] = 'courses'
     #     return HttpResponseRedirect(reverse('get_3LO_token'))
     # else:
     #     print('got BbRest from session')
-    #     BB = jsonpickle.decode(BB_JSON)
+    #     BB = jsonpickle.decode(AUTHN_BB_JSON)
     #     if BB.is_expired():
     #         print('expired token')
-    #         request.session['BB_JSON'] = None
+    #         request.session['AUTHN_BB_JSON'] = None
     #         whoami(request)
     #     BB.supported_functions() # This and the following are required after
     #     BB.method_generator()    # unpickling the pickled object.
@@ -2633,28 +2646,28 @@ def availabilityPurge(resp, searchAvailabilityOption):
 
 def rfcreport(request):
     global BB
-    global BB_JSON
+    global AUTHN_BB_JSON
     global ISVALIDROLE
     global EXPIRE_AT
 
-    # BB_JSON = request.session.get('BB_JSON')
+    # AUTHN_BB_JSON = request.session.get('AUTHN_BB_JSON')
     logging.info('RFCREPORT: ENTER ')
     logging.info('RFCREPORT: ISVALIDROLE: ' + str(ISVALIDROLE))
-    if "BB_JSON" not in request.session.keys() or BB_JSON is None:
+    if "AUTHN_BB_JSON" not in request.session.keys() or AUTHN_BB_JSON is None:
         logging.info('RFCREPORT: BbRest not found in session')
         try:
             BB = BbRest(KEY, SECRET, f"https://{LEARNFQDN}" )
-            BB_JSON = jsonpickle.encode(BB)
+            AUTHN_BB_JSON = jsonpickle.encode(BB)
             logging.info('RFCREPORT: Pickled BbRest added to session.')
-            request.session['BB_JSON'] = BB_JSON
+            request.session['AUTHN_BB_JSON'] = AUTHN_BB_JSON
             request.session['target_view'] = 'rfcreport' 
             return HttpResponseRedirect(reverse('get_3LO_token'))
         except:
             logging.critical('RFCREPORT: Could not set BbREST in Session, Check Configuration KEY and SECRET.')
     else:
         logging.info('RFCREPORT: Found BbRest in session')
-        BB = jsonpickle.decode(BB_JSON)
-        logging.debug("RFCREPORT: BB_JSON: Original Token Info: " + str(BB.token_info))
+        BB = jsonpickle.decode(AUTHN_BB_JSON)
+        logging.debug("RFCREPORT: AUTHN_BB_JSON: Original Token Info: " + str(BB.token_info))
         if ISVALIDROLE is None: 
             logging.info('RFCREPORT: NO VALID ROLE - Get 3LO and confirm role.')
             logging.info('RFCREPORT: CALL get_3LO_token')
@@ -2665,15 +2678,15 @@ def rfcreport(request):
             logging.info('RFCREPORT: GET A NEW API Auth Token')
             BB.refresh_token()
             # EXPIRE_AT = None
-            BB_JSON = jsonpickle.encode(BB)
-            request.session['BB_JSON'] = BB_JSON
+            AUTHN_BB_JSON = jsonpickle.encode(BB)
+            request.session['AUTHN_BB_JSON'] = AUTHN_BB_JSON
             request.session['target_view'] = 'rfcreport'
         BB.supported_functions() # This and the following are required after
         BB.method_generator()    # unpickling the pickled object.    
-    logging.debug("RFCREPORT: BB_JSON: Final Token Info: " + str(BB.token_info))
+    logging.debug("RFCREPORT: AUTHN_BB_JSON: Final Token Info: " + str(BB.token_info))
     logging.info(f'RFCREPORT: Token expiration: {BB.expiration()}')
 
-    if not isValidRole(request.session.get('BB_JSON')):
+    if not isValidRole(request.session.get('AUTHN_BB_JSON')):
         context = {
         }
         return render(request, 'guestusernotallowed.html', context=context )
@@ -2905,25 +2918,27 @@ def build_multiple_csv_files():
 
 def authzpage(request):
     global BB
-    global BB_JSON
+    global AUTHN_BB_JSON
     global ISVALIDROLE
     global ISGUESTUSER
     global EXPIRE_AT
     global START_EXPIRE
     global ROLE
 
-    jwt_token = ''
-    jwtClaims = ''
-
-    logging.info('AUTHZPAGE: ENTER.')
+    global jwt_token
+    global jwtClaims
+    
+    logging.info('AUTHZPAGE: ENTER....')
+    logging.info('Check if previously authenticated and load page if so...')
+    logging.info('AUTHZPAGE: calling jwt_utils = Jwt_token_util()')
+    jwt_utils = Jwt_token_util()
+    logging.info('AUTHZPAGE: calling dsktool.authn_util.isAUTHNAuthorized(request)')
 
     jwt_token = dsktool.authn_util.isAUTHNAuthorized(request)
-
-    jwt_utils = Jwt_token_util()
-
-    # print("AUTHZPAGE: JWT_TOKEN: ", jwt_token)
+    logging.info(f'AUTHZPAGE: JWT_TOKEN: {jwt_token}')
 
     if jwt_token: #set context and return page
+        #set context
         context = {
             'jwt_token': jwt_token,
             'decoded_token': jwt_utils.decodeJWT(jwt_token)
@@ -2932,8 +2947,9 @@ def authzpage(request):
         # print("AUTHZPAGE: JWT_TOKEN: ", jwt_token)
         logging.info('AUTHZPAGE: AUTHN CHECK PASSED...')
         logging.info('AUTHZPAGE: YOU SHOULD BE SEEING THE AUTHORIZED PAGE NOW.')
-
+        #set template
         template = loader.get_template('authzpage.html')
+        #set response
         response = HttpResponse(template.render(context))
         return response
 
@@ -2944,19 +2960,18 @@ def authzpage(request):
         print("AUTHZPAGE: AUTHN CHECK FAILED...")
         print("AUTHZPAGE: NO or INVALID JWT_TOKEN: ", jwt_token)
         print("AUTHZPAGE: CALLING AUTH_UTIL FOR AUTHN AND NEW TOKEN...")
-
-        
-
-        if "BB_JSON" not in request.session.keys() or BB_JSON is None:
+#HERE
+        # check for BBJSON in request or if already locally set...
+        if "AUTHN_BB_JSON" not in request.session.keys() or AUTHN_BB_JSON is None:
             logging.info('AUTHZPAGE: BbRest not found in session')
             logging.info('AUTHZPAGE: KEY:' + str(KEY))
             logging.info('AUTHZPAGE: SECRET:' + str(SECRET))
 
             try:
                 BB = BbRest(str(KEY), str(SECRET), f"https://{LEARNFQDN}")
-                BB_JSON = jsonpickle.encode(BB)
+                AUTHN_BB_JSON = jsonpickle.encode(BB)
                 logging.info('AUTHZPAGE: Pickled BbRest added to session.')
-                request.session['BB_JSON'] = BB_JSON
+                request.session['AUTHN_BB_JSON'] = AUTHN_BB_JSON
                 request.session['target_view'] = 'authzpage'
                 return HttpResponseRedirect(reverse('get_3LO_token'))
             except BaseException as err:
@@ -2966,8 +2981,9 @@ def authzpage(request):
 
         else:
             logging.info('AUTHZPAGE: Found BbRest in session')
-            BB = jsonpickle.decode(BB_JSON)
-            logging.debug("AUTHZPAGE: BB_JSON: Original Token Info: " +
+            AUTHN_BB_JSON = request.session['AUTHN_BB_JSON']
+            BB = jsonpickle.decode(AUTHN_BB_JSON)
+            logging.debug("AUTHZPAGE: AUTHN_BB_JSON: Original Token Info: " +
                         str(BB.token_info))
             if ISVALIDROLE is None:
                 logging.info('AUTHZPAGE: NO VALID ROLE - Get 3LO and confirm role.')
@@ -2982,13 +2998,13 @@ def authzpage(request):
                 # BB.expiration()
                 BB.refresh_token()
                 # EXPIRE_AT = None
-                BB_JSON = jsonpickle.encode(BB)
-                request.session['BB_JSON'] = BB_JSON
+                AUTHN_BB_JSON = jsonpickle.encode(BB)
+                request.session['AUTHN_BB_JSON'] = AUTHN_BB_JSON
                 request.session['target_view'] = 'authzpage'
             BB.supported_functions()  # This and the following are required after
             BB.method_generator()    # unpickling the pickled object.
-        logging.debug("AUTHZPAGE: BB_JSON: Final Token Info: " + str(BB.token_info))
-        logging.info(f'AUTHZPAGE: Token expiration: {BB.expiration()}')
+        logging.debug("AUTHZPAGE: AUTHN_BB_JSON: Final Token Info: " + str(BB.token_info))
+        logging.info(f'AUTHZPAGE: API Token expiration: {BB.expiration()}')
         resp = BB.GetVersion()
         access_token = BB.token_info['access_token']
         refresh_token = BB.token_info.get('refresh_token')
@@ -3037,7 +3053,7 @@ def authzpage(request):
             jwtClaims = {
                 'iss': 'DSKTool for Learn',
                 'system': REMOTE_ADDR,
-                'exp': datetime.now(tz=timezone.utc) + timedelta(minutes=10),
+                'exp': datetime.now(tz=timezone.utc) + timedelta(minutes=2),
                 'iat': datetime.now(tz=timezone.utc),
                 'xsrfToken': uuid.uuid4().hex,
                 'jti': uuid.uuid4().hex,
@@ -3065,31 +3081,34 @@ def authzpage(request):
             }
 
         # The above updates the JWT every time vs only once if it exists.
-        template = loader.get_template('authzpage.html')
+        template = loader.get_template('authnzpage.html')
         response = HttpResponse(template.render(context))
 
-        jwt_token = jwt_utils.create_jwt(jwtClaims)
+        logging.info(f'AUTHZPAGE: session.keys: {request.session.keys()}')
 
         jwtSessionCookies = request.COOKIES
         logging.info(f"AUTHZPAGE:SESSION:COOKIES")
         logging.info(f"{jwtSessionCookies}")
-
+#HERE
         if (not 'JWT' in request.COOKIES):
             logging.info(f"AUTHZPAGE:SESSION:NO JWT ADD IT")
             logging.info(f"JWTTOKENTOADD:{jwt_token}")
             response.set_cookie('JWT', jwt_token)
         else:
             # add validation code for refresh if require and update if necessary, for now roll with what we have..,
-            token_from_cookies = request.COOKIES['JWT']
+            jwt_token = request.COOKIES['JWT']
 
-            logging.info(f"AUTHZPAGE:SESSIONJWT:{token_from_cookies}")
+            logging.info(f"AUTHZPAGE:SESSIONJWT:{jwt_token}")
+            context["jwt_token"] = jwt_token
             logging.info(f'CONTEXTJWTTOKEN:{context["jwt_token"]}')
             response.set_cookie('JWT', jwt_token)
 
-        logging.info(f'JWTTOKEN-ISSUED:{jwtClaims["iat"]}')
-        logging.info(f'JWTTOKEN-EXPIRES:{jwtClaims["exp"]}')
+        decoded_jwt = jwt_utils.decodeJWT(jwt_token)
+        logging.info(f'DECODED_JWT: {decoded_jwt}')
+    
         timeremaining = (jwtClaims["iat"]+timedelta(minutes=1)
                         )-datetime.now(tz=timezone.utc)
+
         logging.info(f'TIME REMAINING: {timeremaining}')
         logging.info('AUTHZPAGE: Exiting authzpage block... ')
 
@@ -3097,3 +3116,33 @@ def authzpage(request):
 
 
         return response  # render(request, 'authzpage.html', context)
+
+# AUTHZ page using Auth_Utils class...
+def authnzpage(request):
+    logging.info('AUTHNZPAGE: ENTER....')
+    logging.info('Check if previously authenticated and load page if so...')
+    response = None
+    context = None
+
+    logging.info(f'isAuthenticated: {dsktool.authn_authz_utils.isAuthenticated(request)} and isAuthorized: {dsktool.authn_authz_utils.isAuthorized(request)}')
+
+    if dsktool.authn_authz_utils.isAuthenticated(request) and dsktool.authn_authz_utils.isAuthorized(request): 
+        jwt_utils = Jwt_token_util()
+        jwt_token = jwt_utils.getSessionJWT(request)
+        logging.info(f'VALID JWT_TOKEN FOUND!')
+        # setup and return page - that simple.
+        context = {
+            'jwt_token': jwt_token,
+            'decoded_token': jwt_utils.decodeJWT(jwt_token),
+        }
+        template = loader.get_template('authzpage.html')
+        response = HttpResponse(template.render(context))
+        jwt_utils = None
+    else:
+        logging.info(f'NO AUTHN TOKEN FOUND...AUTHENTICATING!')
+        response = dsktool.authn_authz_utils.authenticate(request, target='authnzpage')
+
+        # template = loader.get_template('authzpage.html')
+        # response = HttpResponse(template.render(context))
+
+    return response

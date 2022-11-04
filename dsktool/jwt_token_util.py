@@ -12,15 +12,18 @@ logging.basicConfig(
 
 class Jwt_token_util:
 
-    JWT_SECRET = 'ca6dfabd-77e7-452a-8888-84c0d89edf76'
-    JWT_ALGORITHM = "HS256"
+    def __init__(self) -> None:
+        logging.info('JWT_TOKEN_UTIL INIT CALLED')
+
+        self.JWT_SECRET = 'ca6dfabd-77e7-452a-8888-84c0d89edf76'
+        self.JWT_ALGORITHM = "HS256"
 
     def __del__(self):
-        print("JWT_TOKEN_UTIL DESTRUCTOR CALLED")
+        logging.info('JWT_TOKEN_UTIL DESTRUCTOR CALLED')
 
     def create_jwt(self, jwtClaims):
         # print("JWT_UTILS: CREATE_JWT: CLAIMS:", jwtClaims)
-        logging.info('JWT_UTILS: CREATE_JWT: CLAIMS: {jwtClaims}')
+        logging.info(f'JWT_UTILS: CREATE_JWT: CLAIMS: {jwtClaims}')
         token = None
         try:
             token = jwt.encode(
@@ -42,25 +45,26 @@ class Jwt_token_util:
             # print("JWT_UTILS: isVerified:in-token",token)
             # print("JWT_UTILS: isVerified:secret:", self.JWT_SECRET)
             # print("JWT_UTILS: isVerified:algorithm:", self.JWT_ALGORITHM)
-            logging.info('JWT_UTILS: isVerified:in-token: ' + str(token))
+            # logging.info(f'JWT_UTILS: isVerified:in-token: {token}')
             
             decoded = json.loads(json.dumps(
                 jwt.decode(token, self.JWT_SECRET, self.JWT_ALGORITHM)))
             if (decoded['userRole'] == 'SystemAdmin'): 
                 isVerified=True
             else:
-                logging.info('JWT_UTILS: isVerified:isVerified: ' + str(isVerified))
+                logging.info(f'JWT_UTILS: isVerified:isVerified: {isVerified}')
             print("isVerified: ", isVerified)
-            logging.info('JWT_UTILS: decoded token: ' + str(decoded))
+            logging.info(f'JWT_UTILS: isVerified token: {decoded}')
+            logging.info(f'JWT_UTILS: decoded token!')
 
         except jwt.ExpiredSignatureError:
             # decoded = jwt.decode(token, self.JWT_ALGORITHM, options={"verify_signature": False})
-            print("decodeJWT:decode expired token:ExpiredSignatureError")
+            logging.info('JWT_UTILS: decodeJWT: decode expired token:ExpiredSignatureError!')
 
         # except:
         #     print("ERROR DECODING TOKEN")
 
-        logging.info('JWT_UTILS: returning isVerified: ' + str(isVerified))
+        logging.info(f'JWT_UTILS: isVerified returning isVerified: {isVerified}')
 
         return isVerified
 
@@ -72,6 +76,18 @@ class Jwt_token_util:
 
         except jwt.ExpiredSignatureError:
             decoded = jwt.decode(token, self.JWT_ALGORITHM, options={"verify_signature": False})
-            print("decodeJWT:decode expired token:", decoded)
-        
+            logging.info(f'JWT_UTILS: decodeJWT: expired token: {decoded}')
+            logging.info(f'JWT_UTILS: decodeJWT:decode expired token!')
+
         return decoded
+
+    def setSessionJWT(self, request):
+        print ("SETTING SESSION JWT")
+
+    def getSessionJWT(self, request):
+        jwt = None
+
+        if ('JWT' in request.COOKIES):
+           jwt = request.COOKIES['JWT']
+        #    logging.info(f"JWTTOKEN:{jwt}")
+        return jwt
