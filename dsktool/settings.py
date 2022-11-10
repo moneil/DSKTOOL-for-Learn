@@ -96,9 +96,7 @@ MIDDLEWARE = [
 ]
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-# SESSION_COOKIE_AGE = 900 #15 minutes
-# SESSION_COOKIE_AGE = 1800 # 30 minutes. "1209600(2 weeks)" by default
-
+SESSION_COOKIE_AGE = 28800 # 8 hours. "1209600(2 weeks)" by default
 SESSION_SAVE_EVERY_REQUEST = True
 
 ROOT_URLCONF = 'dsktool.urls'
