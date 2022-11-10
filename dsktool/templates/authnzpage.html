@@ -7,17 +7,13 @@
   </p>
   <p>Otherwise you should never see this page...</p>
 </div>
-{% if jwt_token %}
 <div>
   <strong>JWT_TOKEN:</strong><br />
   {{ jwt_token }}
 </div>
-{% endif %}
-{% if decoded_token %}
 <div>
   <strong>DECODED TOKEN:</strong><br />
   {{ decoded_token }}
 </div>
-{% endif %}
 
 {% load static %} {% endblock %}

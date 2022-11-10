@@ -412,18 +412,20 @@ $("#searchValueUsrtoSearch").change(function(){
   }
 
   console.log("VALIDATE ENTERED USER IDENTIFIER:searchUserForm:\n" + JSON.stringify(data));
-
   $.ajax({
     //type: 'POST',
     url: '/ajax/validate_userIdentifier/',
     data: data, //$('#selectCourseForm').serialize(),
     dataType: 'json',
     success: function (data) {
-      if (!data.is_found) {
-        alert("A user with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
-        document.getElementById("searchUserForm").searchValueUsrtoSearch.value="";
+      if (data.notauthorized) {
+        alert("You are not authorized to use this application. Close your browser and relogin.");
+      } else {
+        if (!data.is_found) {
+          alert("A user with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+          document.getElementById("searchUserForm").searchValueUsrtoSearch.value="";
+        }
       }
-      
     }
   }).done(function() {
     // console.log("OVERLAY TIME")
@@ -754,7 +756,7 @@ $('#processUserForm').on('submit', function(e) {
     data: updateData,
     success: function (data) {
       if (!data.is_found) {
-        alert("There was an error processing this request. Reload page and try again.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+        alert("There was an error processing this request. Try submitting again, if that fails reload page and try again.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
       } else {
         // process selected records
         //console.log(newResults[row]);
@@ -1018,7 +1020,7 @@ function getDataSourceKeys() {
     //data: data,
     success: function (data) {
       if (!data.is_found) {
-        alert("Data Sources could not be loaded. Reload page and try again.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+        alert("Data Sources could not be loaded. Try submitting again, if that fails reload page and try again.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
       } else {            
         let dskOptions = ""
         newResults = data["result_json"];

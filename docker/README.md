@@ -1,4 +1,4 @@
-# DSKTOOL for Learn on Docker v1.2.7 (....)
+# DSKTOOL for Learn on Docker v1.2.8 (11/12/2022)
 
 See below [Docker Release Notes](#Release-Notes).
 
@@ -82,6 +82,8 @@ NOTE: the above generator adds single quotes. Remove remove them after pasting. 
 > `APPLICATION\_KEY: "your application key"`
 > 
 > `APPLICATION\_SECRET: "your application secret"`
+>
+> `JWT_SECRET: "Paste your JWT SECRET from this website: https://www.uuidgenerator.net/version4"`
 >
 > Note if you want to always run the latest image you may also edit:
 > 

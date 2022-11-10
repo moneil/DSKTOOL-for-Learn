@@ -406,11 +406,14 @@ $("#searchValueCrstoSearch").change(function(){
     data: data, //$('#selectCourseForm').serialize(),
     dataType: 'json',
     success: function (data) {
-      if (!data.is_found) {
-        alert("A course with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
-        document.getElementById("searchEnrollmentByCrsandUsrForm").searchValueCrstoSearch.value="";
+      if (data.notauthorized) {
+        alert("You are not authorized to use this application. Close your browser and relogin.");
+      } else {
+        if (!data.is_found) {
+          alert("A user with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+          document.getElementById("searchUserForm").searchValueUsrtoSearch.value="";
+        }
       }
-      
     }
   }).done(function() {
     $("#overlay").fadeOut(300);
@@ -450,11 +453,14 @@ $("#searchValueUsrtoSearch").change(function(){
     data: data, //$('#selectCourseForm').serialize(),
     dataType: 'json',
     success: function (data) {
-      if (!data.is_found) {
-        alert("A user with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
-        document.getElementById("searchEnrollmentByCrsandUsrForm").searchValueUsrtoSearch.value="";
+      if (data.notauthorized) {
+        alert("You are not authorized to use this application. Close your browser and relogin.");
+      } else {
+        if (!data.is_found) {
+          alert("A user with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+          document.getElementById("searchUserForm").searchValueUsrtoSearch.value="";
+        }
       }
-      
     }
   }).done(function() {
     $("#overlay").fadeOut(300);
@@ -486,8 +492,13 @@ $("#searchValue").change(function () {
         data: $('#selectCourseForm').serialize(),
         dataType: 'json',
         success: function (data) {
-          if (!data.is_found) {
-            alert("A course with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+          if (data.notauthorized) {
+            alert("You are not authorized to use this application. Close your browser and relogin.");
+          } else {
+            if (!data.is_found) {
+              alert("A user with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+              document.getElementById("searchUserForm").searchValueUsrtoSearch.value="";
+            }
           }
         }
       }).done(function() {
@@ -543,14 +554,18 @@ $("#searchValueCrs").change(function(){
     data: data, // $('#selectCourseForm').serialize(),
     dataType: 'json',
     success: function (data) {
-      if (!data.is_found) {
-        alert("A course with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
-        toggleDivs(activeDiv);
+      if (data.notauthorized) {
+        alert("You are not authorized to use this application. Close your browser and relogin.");
+      } else {
+        if (!data.is_found) {
+          alert("A user with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+          document.getElementById("searchUserForm").searchValueUsrtoSearch.value="";
+        }
       }
     }
-    }).done(function() {
-          $("#overlay").fadeOut(300);
-    });
+  }).done(function() {
+        $("#overlay").fadeOut(300);
+  });
 });
 
 // ===== USER ===== //
@@ -590,9 +605,9 @@ $("#searchValueUsr").change(function(){
         toggleDivs(activeDiv);
       }
     }
-    }).done(function() {
-          $("#overlay").fadeOut(300);
-    });
+  }).done(function() {
+        $("#overlay").fadeOut(300);
+  });
 });
 
 // ===== Searches and Updates AJAX!!!
@@ -1261,8 +1276,13 @@ $("#searchValue").change(function () {
         data: $('#selectCourseForm').serialize(),
         dataType: 'json',
         success: function (data) {
-          if (!data.is_found) {
-            alert("A course with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+          if (data.notauthorized) {
+            alert("You are not authorized to use this application. Close your browser and relogin.");
+          } else {
+            if (!data.is_found) {
+              alert("A user with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+              document.getElementById("searchUserForm").searchValueUsrtoSearch.value="";
+            }
           }
         }
       }).done(function() {

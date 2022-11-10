@@ -1,4 +1,4 @@
-# DSKTOOL for Learn v1.2.8 DEVELOPMENT (11/01/2022)
+# DSKTOOL for Learn v1.2.8 DEVELOPMENT (11/12/2022)
 
 See [Release Notes](#Release-Notes) below.
 
@@ -88,19 +88,28 @@ Additionally, it appears that your 3LO session may expire hourly (check the "Who
 
 ## Release Notes
 
-### v1.2.8 (11/01/2022)
+### v1.2.8 (11/12/2022)
 <ul>
-  <li>Added JWT page and api authorization</li>
+  <li>Added session-based JWT page authorization <br />
+Once authenticateded via 3LO, your 3LO session lasts as long as your browser is open. <br />
+<strong>Note: You must quit your browser to expire 3LO authentication tokens.</strong> <br />
+JWT authorization tokens last for 15 minutes. Authorization tokens are refreshed on expiration.
+API Tokens expire very 60 minutes from first use and are refreshed on expiration.
+  </li>
+  <li>Added authorization check to run top-level application APIs.<br />
+  In this case 'top-level' means any api used before being able to perform a search/submit workflow.
+  </li>
   <li>Released comparable v1.2.8 docker image to https://hub.docker.com/r/oscelot/oscelot-dsktool/tags</li>
 </ul>
 
 ### Project URL changes:
-As I continue to migrate away from OSCELOT naming, I will be moving to a yet to be available new github site with the new project name of [DSKTOOL for Learn](https://github.com/moneil/DSKTOOL-for-Learn).
-I will also be changing the the docker hub URL. Watch release notes and docker-compose.yml file.
+As part of the move away from OSCELOT naming, I have made available a new github site with the new project name of [DSKTOOL for Learn](https://github.com/moneil/DSKTOOL-for-Learn).
+With this release I have also changed the the docker hub URL. Watch release notes and docker-compose.yml file.
 
 
 ## ToDo
 <ul>
+  <li>Complete authorization check to run all internal application APIs.</li>
   <li>Add Availability option to Enrollments Course/User searches</li>
   <li>Add Date option to Enrollments Course/User searches</li>
   <li>Add Role option to Course Membership updates</li>

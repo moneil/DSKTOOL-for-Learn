@@ -6,4 +6,5 @@ adict = {
     "disable_collectstatic" : "1",
     "django_allowed_hosts" : "127.0.0.1 localhost .ngrok.io .herokuapp.com [::1]",
     "django_debug" : "False",
+    "JWT_SECRET": ""
 }

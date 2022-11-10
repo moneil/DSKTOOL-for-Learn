@@ -18,7 +18,7 @@ from django.urls import path, re_path
 from dsktool import views
 from dsktool import rfc
 from dsktool.views import exportcsv
-import dsktool.authn_util
+# import dsktool.authn_util
 import dsktool.authn_authz_utils
 from dsktool.authn_authz_utils import authnz_get_3LO_token, authnz_get_API_token
 # from django.conf.urls import url
@@ -30,8 +30,8 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('courses', views.courses, name='courses'),
     path('enrollments', views.enrollments, name='enrollments'),
-    path('get_3LO_token', views.get_3LO_token, name='get_3LO_token'),
-    path('get_API_token', views.get_API_token, name='get_API_token'),
+    # path('get_3LO_token', views.get_3LO_token, name='get_3LO_token'),
+    # path('get_API_token', views.get_API_token, name='get_API_token'),
     path('guestusernotallowed', views.guestusernotallowed, name='guestusernotallowed'),
     path('isup', views.isup, name='isup'),
     path('learnlogout', views.learnlogout, name='learnlogout'),
@@ -41,9 +41,9 @@ urlpatterns = [
     path('rfcreport', views.rfcreport, name='rfcreport'),
     path('exportcsvzip/', views.exportcsvzip, name="exportcsvzip"),
 
-    path('authzpage', views.authzpage, name='authzpage'),
-    path('authn_get_3LO_token', dsktool.authn_util.authn_get_3LO_token, name='authn_get_3LO_token'),
-    path('authn_get_API_token', dsktool.authn_util.authn_get_API_token, name='authn_get_API_token'),
+    # path('authzpage', views.authzpage, name='authzpage'),
+    # path('authn_get_3LO_token', dsktool.authn_util.authn_get_3LO_token, name='authn_get_3LO_token'),
+    # path('authn_get_API_token', dsktool.authn_util.authn_get_API_token, name='authn_get_API_token'),
 
     path('authnzpage', views.authnzpage, name='authnzpage'),
     path('authnz_get_3LO_token', dsktool.authn_authz_utils.authnz_get_3LO_token, name='authnz_get_3LO_token'),

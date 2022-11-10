@@ -6,6 +6,7 @@ import json
 from dsktool.models import Messages
 from dsktool.models import Logs
 from django.shortcuts import render,redirect
+# from dsktool.views import getBBRest
 
 class Rfc(object):
 	"""
@@ -82,20 +83,36 @@ class Rfc(object):
 
 	@staticmethod
 	def get_bb(request):
-		BB_JSON = request.session.get('BB_JSON')
-		if (BB_JSON is None):
-			BB = BbRest(KEY, SECRET, f"https://{LEARNFQDN}" )
-			BB_JSON = jsonpickle.encode(BB)
-			request.session['BB_JSON'] = BB_JSON
-			request.session['target_view'] = 'users'
-			return HttpResponseRedirect(reverse('get_auth_code'))
-		else:
-			BB = jsonpickle.decode(BB_JSON)
-			if BB.is_expired():
-				request.session['BB_JSON'] = None
-				whoami(request)
-			BB.supported_functions() # This and the following are required after
-			BB.method_generator()    # unpickling the pickled object.
+
+		# It used to be that if we got here we may not have had our session setup etc 
+		# - this is now done on any page or API which could call this RFC code
+		# - so we just pull it from the session and push back the updated one if it is
+		# - expired...
+		BB = jsonpickle.decode(request.session['AUTHN_BB_JSON'])
+		BB.supported_functions()  # This and the following are required after
+		BB.method_generator()    # unpickling the pickled object.
+        
+		# logging.info(f'WHOAMI: API Token expiration: {BB.expiration()}')
+		if BB.is_expired():
+			BB.refresh_token()
+			# EXPIRE_AT = None
+			AUTHN_BB_JSON = jsonpickle.encode(BB)
+			request.session['AUTHN_BB_JSON'] = AUTHN_BB_JSON
+
+		# BB_JSON = request.session.get('BB_JSON')
+		# if (BB_JSON is None):
+		# 	BB = BbRest(KEY, SECRET, f"https://{LEARNFQDN}" )
+		# 	BB_JSON = jsonpickle.encode(BB)
+		# 	request.session['BB_JSON'] = BB_JSON
+		# 	request.session['target_view'] = 'users'
+		# 	return HttpResponseRedirect(reverse('get_auth_code'))
+		# else:
+		# 	BB = jsonpickle.decode(BB_JSON)
+		# 	if BB.is_expired():
+		# 		request.session['BB_JSON'] = None
+		# 		whoami(request)
+		# 	BB.supported_functions() # This and the following are required after
+		# 	BB.method_generator()    # unpickling the pickled object.
 
 		return BB
 
