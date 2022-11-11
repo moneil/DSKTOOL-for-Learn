@@ -1,0 +1,29 @@
+#ignored directories
+__pycache__/*
+dsktool/__pycache__/*
+dsktool/lib/*
+dsktool/migrations/__pycache__/*
+
+
+#ignored virtual env directories
+#DSKToolEnv/
+#dsktool/lib/python3.9/site-packages/__pycache__/*
+#dsktool/bin/__pycache__/*
+
+
+#ignored project or system files
+*.pyc
+config.py
+db.sqlite3
+config.py
+.python-version
+.DS_Store
+
+
+#ignored personal dev files (those with PII or Key::Secret data)
+my-docker-compose.yml
+docker/my-docker-compose.yml
+cert.pem
+key.pem
+cert.crt
+cert.key
