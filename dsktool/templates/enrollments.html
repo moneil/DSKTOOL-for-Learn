@@ -271,8 +271,8 @@ var activeDiv = "byCrsUsr";
 
 // [DONE] Process Spinner
 $(document).ajaxSend(function() {
-		  $("#overlay").fadeIn(300);　
-    });
+  $("#overlay").fadeIn(300);　
+});
 
 $(document).ready(function(){
   if ( activeDiv == 'byCrsUsr' ) {
@@ -287,6 +287,7 @@ $(document).ready(function(){
           '<div class="divTableHead">User Last Name</div>' +
           '<div class="divTableHead">User Email</div>' +
           '<div class="divTableHead">Membership Data Source</div>' +
+          '<div class="divTableHead">Date&nbsp;Enrolled</div>' +
           '<div class="divTableHead">Date Membership Modified</div>';
         $("#resp-table-header").append(respTableHdr);
         
@@ -299,6 +300,7 @@ $(document).ready(function(){
           '<div class="divTableHead">User Last Name</div>' +
           '<div class="divTableHead">User Email</div>' +
           '<div class="divTableHead">Membership Data Source</div>' +
+          '<div class="divTableHead">Date&nbsp;Enrolled</div>' +
           '<div class="divTableHead">Date Membership Modified</div>';
         $("#update-table-header").append(updateTableHdr);
   } else {
@@ -309,6 +311,7 @@ $(document).ready(function(){
           '<div class="divTableHead">Course External Id</div>' +
           '<div class="divTableHead">Course Name</div>' +
           '<div class="divTableHead">Membership Data Source</div>' +
+          '<div class="divTableHead">Date&nbsp;Enrolled</div>' +
           '<div class="divTableHead">Date Membership Modified</div>';
         $("#resp-table-header").append(respTableHdr);
 
@@ -317,6 +320,7 @@ $(document).ready(function(){
           '<div class="divTableHead">Course External Id</div>' +
           '<div class="divTableHead">Course Name</div>' +
           '<div class="divTableHead">Membership Data Source</div>' +
+          '<div class="divTableHead">Date&nbsp;Enrolled</div>' +
           '<div class="divTableHead">Date Membership Modified</div>';
         $("#update-table-header").append(updateTableHdr);
   }
