@@ -16,6 +16,8 @@ services:
             APPLICATION_KEY: "your application key"
             APPLICATION_SECRET: "your application secret"
             JWT_SECRET: "Paste your JWT SECRET from this website: https://www.uuidgenerator.net/version4"
+            LOGGING_LEVEL: "INFO"
+
 networks:
     dsktool:
         driver: bridge
