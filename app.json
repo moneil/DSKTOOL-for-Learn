@@ -1,5 +1,5 @@
 {
-    "name": "DSKTOOL v1.2.6 (07/05/2022)",
+    "name": "DSKTOOL v1.2.8 (11/12/2022)",
     "description": "A Django/Python-based RESTful version of the Original York DSK tool for Heroku and Docker.",
     "keywords": [
       "Django",
@@ -23,6 +23,10 @@
       },
       "APPLICATION_SECRET": {
         "description": "Paste the APPLICATION SECRET provided when you registered your Application. (Contains no hyphens)",
+        "required": true
+      },
+      "JWT_SECRET": {
+        "description": "Paste the JWT SECRET from this website: https://www.uuidgenerator.net/version4",
         "required": true
       },
       "DJANGO_SECRET_KEY": {

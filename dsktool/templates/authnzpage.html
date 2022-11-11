@@ -1,0 +1,19 @@
+{% extends "base_generic.html" %} {% block content %}
+<h1>JWT Auththorized Page</h1>
+<div>
+  <p>
+    If you are seeing this you have a JWT session token with correct ID and Role
+    specified for viewing this page!
+  </p>
+  <p>Otherwise you should never see this page...</p>
+</div>
+<div>
+  <strong>JWT_TOKEN:</strong><br />
+  {{ jwt_token }}
+</div>
+<div>
+  <strong>DECODED TOKEN:</strong><br />
+  {{ decoded_token }}
+</div>
+
+{% load static %} {% endblock %}

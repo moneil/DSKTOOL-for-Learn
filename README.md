@@ -1,4 +1,4 @@
-# DSKTOOL for Learn v1.2.6 (07/05/2022)
+# DSKTOOL for Learn v1.2.8 (11/12/2022)
 
 See [Release Notes](#Release-Notes) below.
 
@@ -46,11 +46,18 @@ Clicking any of the below 'Deploy to Heroku' buttons will open Heroku to your ap
 
 Note: if you do not have a Heroku account you will be prompted to create one and you will be directed to the setup screen on account create completion.
 
-##### Deploy Latest Stable Release (v1.2.6): 
+### Deploy Latest Stable Release (v1.2.6): 
 <a href="https://heroku.com/deploy?template=https://github.com/moneil/DSKTOOL-for-Learn/tree/main">
   <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy"> 
 </a>
 
+### Deploy Latest Development Branch (v1.2.8 - note version on Heroku Create App Page):
+
+<a href="https://heroku.com/deploy?template=https://github.com/moneil/DSKTOOL-for-Learn/tree/dev">
+  <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy"> 
+</a>
+
+**Important: Do not use Development Branch for production**! This development branch is intended for development/testing/preview purposes only and may not always provide the best experience.
 
 ### Configuring your application
 On the setup screen you will need to name your application dyno, select a region and set the configuration variables:
@@ -81,6 +88,36 @@ Additionally, it appears that your 3LO session may expire hourly (check the "Who
 
 ## Release Notes
 
+### v1.2.8 (11/12/2022)
+<ul>
+  <li>Added session-based JWT page authorization <br />
+Once authenticateded via 3LO, your 3LO session lasts for 8 hours. <br />
+<strong>Note: You should quit your browser after use to expire 3LO authentication tokens.</strong> <br />
+JWT authorization tokens last for 15 minutes. Authorization tokens are refreshed on expiration.
+API Tokens expire very 60 minutes from first use and are refreshed on expiration.
+  </li>
+  <li>Added authorization check to run top-level application APIs.<br />
+  In this case, 'top-level' means any api used before being able to perform a search/submit workflow.
+  </li>
+  <li>Released comparable v1.2.8 docker image to https://hub.docker.com/r/northbynortheast/dsktool-for-learn/tags</li>
+</ul>
+
+### Project URL changes:
+As part of the move away from OSCELOT naming, I have made available a new github site with the new project name of [DSKTOOL for Learn](https://github.com/moneil/DSKTOOL-for-Learn).
+With this release I have also changed the the docker hub URL. Watch release notes and docker-compose.yml file.
+
+
+## ToDo
+<ul>
+  <li>Complete authorization check to run all internal application APIs.</li>
+  <li>Add Availability option to Enrollments Course/User searches</li>
+  <li>Add Date option to Enrollments Course/User searches</li>
+  <li>Add Role option to Course Membership updates</li>
+  <li>Clean up code redundancies</li>
+</ul>
+
+## Prior Releases
+
 ### v1.2.6 (07/05/2022)
 <ul>
   <li>Fixed Heroku deployment</li>
@@ -94,20 +131,6 @@ Additionally, it appears that your 3LO session may expire hourly (check the "Who
   <li>Released comparable v1.2.6 docker image to https://hub.docker.com/r/oscelot/oscelot-dsktool/tags</li>
 </ul>
 
-### Project URL changes:
-As I continue to migrate away from OSCELOT naming, I will be moving to a yet to be available new github site with the new project name of [DSKTOOL for Learn](https://github.com/moneil/DSKTOOL-for-Learn).
-I will also be changing the the docker hub URL. Watch release notes and docker-compose.yml file.
-
-
-## ToDo
-<ul>
-  <li>Add Availability option to Enrollments Course/User searches</li>
-  <li>Add Date option to Enrollments Course/User searches</li>
-  <li>Add Role option to Course Membership updates</li>
-  <li>Clean up code redundancies</li>
-</ul>
-
-## Prior Releases
 ### v1.2.5 (04/11/2022) ###
 <ul>
   <li>Removed token expiration time from index page.</li>

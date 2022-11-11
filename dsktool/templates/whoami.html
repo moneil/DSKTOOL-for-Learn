@@ -26,13 +26,13 @@
         <td style="padding:10px">{{user_json.name.middle}}</td>
         <td style="padding:10px">{{user_json.name.family}}</td>
         <td style="padding:10px">{{user_json.contact.email}}</td>
-        <td style="padding:10px">{{user_json.dataSourceId}}</td>
+        <td style="padding:10px">{{user_json.dataSourceExternalId}}</td>
         <td style="padding:10px">{{user_json.created}}</td>
       </tr>
   </tbody>
 </table>
   {% else %}
-    oops something went wrong!!
+    Oops! Something went awry!! Try reloading this page.
   {% endif %}
   <hr>
 
@@ -42,6 +42,10 @@
 Here is the json:
   <ul>
     <li><strong>My User JSON:</strong> {{ user_json }}</li>
+  </ul>
+Here is your decoded JWT:
+  <ul>
+    <li><strong>My JWT:</strong> {{ decoded_jwt }}</li>
   </ul>
 
 {% endblock %}

@@ -16,6 +16,8 @@ from django.conf import settings
 import dj_database_url
 
 
+
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -36,14 +38,14 @@ try:
     from config import adict
     print("\nSETTINGS.py: using config.py...")
     
-    SECRET_KEY = adict['django_secret_key'].strip("'")
+    SECRET_KEY = adict['DJANGO_SECRET_KEY'].strip("'")
     print(f"\nSETTINGS.py: config: SECRET_KEY: [ {SECRET_KEY} ]")
     
-    ALLOWED_HOSTS = adict['django_allowed_hosts'].split(" ")
+    ALLOWED_HOSTS = adict['DJANGO_ALLOWED_HOSTS'].split(" ")
     print(f"\nSETTINGS.py: env vars: ALLOWED_HOSTS: [ {ALLOWED_HOSTS} ]")
     
-    DEBUG = adict['django_debug']
-    print(f"\nSETTINGS.py: env vars: django_debug: [ {DEBUG} ]")
+    DEBUG = adict['DJANGO_DEBUG']
+    print(f"\nSETTINGS.py: env vars: DJANGO_DEBUG: [ {DEBUG} ]")
 
 except ImportError: #no config file...load from env
     print("\nSETTINGS.py: config.py not available using env vars ...")
@@ -85,6 +87,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django_session_timeout.middleware.SessionTimeoutMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -92,6 +95,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_EXPIRE_SECONDS = 14400
+SESSION_EXPIRE_AFTER_LAST_ACTIVITY = True
+SESSION_COOKIE_AGE = 14400 # 3 minutes # 28800 # 8 hours. "1209600(2 weeks)" by default
+SESSION_SAVE_EVERY_REQUEST = True
 
 ROOT_URLCONF = 'dsktool.urls'
 
@@ -153,7 +162,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/

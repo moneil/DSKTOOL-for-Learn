@@ -1,4 +1,4 @@
-# DSKTOOL for Learn on Docker v1.2.6 (04/11/2022)
+# DSKTOOL for Learn on Docker v1.2.8 (11/12/2022)
 
 See below [Docker Release Notes](#Release-Notes).
 
@@ -83,9 +83,11 @@ NOTE: the above generator adds single quotes. Remove remove them after pasting. 
 > 
 > `APPLICATION\_SECRET: "your application secret"`
 >
+> `JWT_SECRET: "Paste your JWT SECRET from this website: https://www.uuidgenerator.net/version4"`
+>
 > Note if you want to always run the latest image you may also edit:
 > 
-> Confirm target image version: `image: oscelot/oscelot-dsktool:version (see readme)` and replace "version (see readme)" with the  version indicated above e.g.: 1.1.6. 
+> Confirm target image version: `image: northbynortheast/dsktool-for-learn:version (see readme)` and replace "version (see readme)" with the  version indicated above e.g.: `1.2.8` or `latest`. 
 
 Open a terminal, cd to the directory where you saved the docker-compose.yaml file and enter: `$ docker-compose up -d`
 

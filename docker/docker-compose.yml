@@ -2,7 +2,7 @@ version: "3.3"
 services:
     DSKTOOL:
         container_name: DSKTOOL
-        image: oscelot/oscelot-dsktool:version (see readme)
+        image: northbynortheast/dsktool-for-learn:version (see readme)
         ports:
             - "8000:8000"
         networks:   
@@ -15,6 +15,7 @@ services:
             BLACKBOARD_LEARN_INSTANCE: "your Learn FQDN"
             APPLICATION_KEY: "your application key"
             APPLICATION_SECRET: "your application secret"
+            JWT_SECRET: "Paste your JWT SECRET from this website: https://www.uuidgenerator.net/version4"
 networks:
     dsktool:
         driver: bridge
