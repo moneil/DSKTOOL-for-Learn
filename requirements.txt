@@ -20,7 +20,7 @@ django-on-heroku==1.1.2
 django-session-timeout==0.1.0
 django_extensions==3.2.1
 django-bootstrap-v5==1.0.11
-django-mathfilters-1.0.0
+django-mathfilters==1.0.0
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.2.2
 fake-useragent==0.1.13
