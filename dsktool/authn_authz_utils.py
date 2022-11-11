@@ -27,7 +27,21 @@ import jsonpickle
 
 # app imports
 from dsktool.jwt_token_util import Jwt_token_util
+from dsktool.configuration import Configuration
 
+conf = Configuration()
+
+KEY = conf.AUTHN_KEY
+SECRET = conf.AUTHN_SECRET
+LEARNFQDN = conf.AUTHN_LEARNFQDN
+
+ISVALIDROLE = False
+ISGUESTUSER = True
+ROLE = None
+
+print(f"VIEWS: KEY: [ {KEY} ]")
+print(f"VIEWS: SECRET: [ {SECRET} ]")
+print(f"VIEWS: LEARNFQDN: [ {LEARNFQDN} ]")
 
 class Auth_Utils:
 
@@ -456,15 +470,15 @@ def get_generated_jwt(self):
 # 3LO below...
 def authnz_get_API_token(request):
     # global ROLE
-    global KEY
-    global SECRET
-    global LEARNFQDN
-    global AUTHN_BB_JSON
-    global TARGET_VIEW
-    # global EXPIRE_AT
-    global ISVALIDROLE
-    global ISGUESTUSER
-    global ROLE
+    # global KEY
+    # global SECRET
+    # global LEARNFQDN
+    # global AUTHN_BB_JSON
+    # global TARGET_VIEW
+    # # global EXPIRE_AT
+    # global ISVALIDROLE
+    # global ISGUESTUSER
+    # global ROLE
 
     logging.debug(f'SESSION KEYS:')
     logging.debug(f'{request.session.keys()}')

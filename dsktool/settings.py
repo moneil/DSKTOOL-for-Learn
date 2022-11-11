@@ -38,14 +38,14 @@ try:
     from config import adict
     print("\nSETTINGS.py: using config.py...")
     
-    SECRET_KEY = adict['django_secret_key'].strip("'")
+    SECRET_KEY = adict['DJANGO_SECRET_KEY'].strip("'")
     print(f"\nSETTINGS.py: config: SECRET_KEY: [ {SECRET_KEY} ]")
     
-    ALLOWED_HOSTS = adict['django_allowed_hosts'].split(" ")
+    ALLOWED_HOSTS = adict['DJANGO_ALLOWED_HOSTS'].split(" ")
     print(f"\nSETTINGS.py: env vars: ALLOWED_HOSTS: [ {ALLOWED_HOSTS} ]")
     
-    DEBUG = adict['django_debug']
-    print(f"\nSETTINGS.py: env vars: django_debug: [ {DEBUG} ]")
+    DEBUG = adict['DJANGO_DEBUG']
+    print(f"\nSETTINGS.py: env vars: DJANGO_DEBUG: [ {DEBUG} ]")
 
 except ImportError: #no config file...load from env
     print("\nSETTINGS.py: config.py not available using env vars ...")

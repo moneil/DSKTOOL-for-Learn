@@ -410,7 +410,7 @@ $("#searchValueCrstoSearch").change(function(){
         alert("You are not authorized to use this application. Close your browser and relogin.");
       } else {
         if (!data.is_found) {
-          alert("A course with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+          alert("A course with this identifier was not found.\n\nNote if this persists, and you are certain the identifier exists and is correctly entered, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
       // searchEnrollmentByCrs
       // searchEnrollmentByCrsandUsrIdByCRSID
       // searchEnrollmentsByUsrForm
@@ -464,7 +464,7 @@ $.ajax({
         alert("You are not authorized to use this application. Close your browser and relogin.");
       } else {
         if (!data.is_found) {
-          alert("A user with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+          alert("A user with this identifier was not found.\n\nNote if this persists, and you are certain the identifier exists and is correctly entered, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
           document.getElementById("searchEnrollmentByCrsandUsrForm").searchValueUsrtoSearch.value="";
         }
       }
@@ -507,7 +507,7 @@ $("#searchValue").change(function () {
             alert("You are not authorized to use this application. Close your browser and relogin.");
           } else {
             if (!data.is_found) {
-              alert("A user with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+              alert("A user with this identifier was not found.\n\nNote if this persists, and you are certain the identifier exists and is correctly entered, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
               document.getElementById("searchUserForm").searchValueUsrtoSearch.value="";
             }
           }
@@ -573,7 +573,7 @@ $("#searchValueCrs").change(function(){
         alert("You are not authorized to use this application. Close your browser and relogin.");
       } else {
         if (!data.is_found) {
-          alert("A course with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+          alert("A course with this identifier was not found.\n\nNote if this persists, and you are certain the identifier exists and is correctly entered, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
           toggleDivs(activeDiv);
         }
       }
@@ -620,7 +620,7 @@ $("#searchValueUsr").change(function(){
         alert("Error!\n\n" + data.error_result);
       }
       if (!data.is_found) {
-        alert("A user with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+        alert("A user with this identifier was not found.\n\nNote if this persists, and you are certain the identifier exists and is correctly entered, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
         toggleDivs(activeDiv);
       }
     }
@@ -672,7 +672,7 @@ $('#searchEnrollmentByCrsandUsrForm').on('submit', function(e){
       console.log("ajax/getCourseMembership complete...");
 
       if (!data.is_found) {
-        alert("No memberships were found for this course and user.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+        alert("No memberships were found for this course and user.\n\nNote if this persists, and you are certain the identifier exists and is correctly entered, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
       } else { // process results
         console.log("FULL RESULTS: " + JSON.stringify(data));
         newResults = data["memberships_json"];
@@ -1232,7 +1232,7 @@ $('#processSelectedMembershipsForm').on('submit', function(e) {
 		success: function (data) {
 
         if (!data.is_found) {
-          alert("There was an error processing this request. Reload page and try again.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+          alert("There was an error processing this request. Reload page and try again.\n\nNote if this persists, and you are certain the identifier exists and is correctly entered, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
         } else {
           if (!selectionCount > 0 ) {
             alert("You must select at least one record.")
@@ -1301,7 +1301,7 @@ $("#searchValue").change(function () {
             alert("You are not authorized to use this application. Close your browser and relogin.");
           } else {
             if (!data.is_found) {
-              alert("A user with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+              alert("A user with this identifier was not found.\n\nNote if this persists, and you are certain the identifier exists and is correctly entered, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
               document.getElementById("searchUserForm").searchValueUsrtoSearch.value="";
             }
           }
@@ -1698,7 +1698,7 @@ function getDataSourceKeys() {
     //data: data,
     success: function (data) {
       if (!data.is_found) {
-        alert("Data Sources could not be loaded. Reload page and try again.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+        alert("Data Sources could not be loaded. Reload page and try again.\n\nNote if this persists, and you are certain the identifier exists and is correctly entered, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
       } else {            
         let dskOptions = ""
         newResults = data["result_json"];

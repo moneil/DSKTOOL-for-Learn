@@ -43,6 +43,7 @@ from dsktool.jwt_token_util import Jwt_token_util
 # from dsktool.authn_util import authN, authn_get_API_token, authn_get_3LO_token, isAUTHNValidRole, isAUTHNGuestUser
 # from dsktool.authn_authz_utils import Auth_Utils
 import dsktool.authn_authz_utils
+from dsktool.configuration import Configuration
 
 
 # Globals
@@ -88,6 +89,22 @@ logging.basicConfig(
     format='%(asctime)s %(levelname)-8s %(message)s',
     level=logging.INFO,
     datefmt='%Y-%m-%d %H:%M:%S')
+
+conf = Configuration()
+
+print(f"VIEWS: conf.AUTHN_KEY: [ {conf.AUTHN_KEY} ]")
+print(f"VIEWS: conf.AUTHN_SECRET: [ {conf.AUTHN_SECRET} ]")
+print(f"VIEWS: conf.AUTHN_LEARNFQDN: [ {conf.AUTHN_LEARNFQDN} ]")
+print(f"VIEWS: conf.JWT_SECRET: [ {conf.JWT_SECRET} ]")
+print(f"VIEWS: conf.DJANGO_DEBUG: [ {conf.DJANGO_DEBUG} ]")
+print(f"VIEWS: conf.DJANGO_ALLOWED_HOSTS: [ {conf.DJANGO_ALLOWED_HOSTS} ]")
+print(f"VIEWS: conf.DJANGO_SECRET_KEY: [ {conf.DJANGO_SECRET_KEY} ]")
+print(f"VIEWS: conf.LOGGING_LEVEL: [ {conf.LOGGING_LEVEL} ]")
+
+KEY = conf.AUTHN_KEY
+SECRET = conf.AUTHN_SECRET
+LEARNFQDN = conf.AUTHN_LEARNFQDN
+
 
 # HTTP Error handling:
 class makeRequestHTTPError(Exception):

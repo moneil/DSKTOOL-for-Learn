@@ -78,13 +78,13 @@ Use your editor of choice and follow the directions in the config.py file:
 >     "BLACKBOARD_LEARN_INSTANCE" : "Here you enter the FQDN for your Learn instance",
 >     "APPLICATION_KEY" : "Here you enter your REST Application KEY",
 >     "APPLICATION_SECRET" : "Here you enter your REST Application SECRET",
->     "django_secret_key" : 'Here you enter a secret generated from https://djskgen.herokuapp.com'
+>     "DJANGO_SECRET_KEY" : 'Here you enter a secret generated from https://djskgen.herokuapp.com'
 
 Example:
 >     "BLACKBOARD_LEARN_INSTANCE" : "beards.ddns.net",
 >     "APPLICATION_KEY" : "9d3306bff1-da5-4225-96cd6-e1d845-db53",
 >     "APPLICATION_SECRET" : "ElWsmR6HahtEl3WiIpY3c50C7y8PrYhUoGs",
->     "django_secret_key" : "j07gpr1ny3k+upitofzhjwqigg@44)!7(cr*+(f1-b_34l-ydf"
+>     "DJANGO_SECRET_KEY" : "j07gpr1ny3k+upitofzhjwqigg@44)!7(cr*+(f1-b_34l-ydf"
 
 
 ### Create the Django database 
