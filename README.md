@@ -46,12 +46,12 @@ Clicking any of the below 'Deploy to Heroku' buttons will open Heroku to your ap
 
 Note: if you do not have a Heroku account you will be prompted to create one and you will be directed to the setup screen on account create completion.
 
-### Deploy Latest Stable Release (v1.2.6): 
+### Deploy Latest Stable Release (v1.2.8): 
 <a href="https://heroku.com/deploy?template=https://github.com/moneil/DSKTOOL-for-Learn/tree/main">
   <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy"> 
 </a>
 
-### Deploy Latest Development Branch (v1.2.8 - note version on Heroku Create App Page):
+### Deploy Latest Development Branch (note version on Heroku Create App Page):
 
 <a href="https://heroku.com/deploy?template=https://github.com/moneil/DSKTOOL-for-Learn/tree/dev">
   <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy"> 
