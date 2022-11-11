@@ -99,7 +99,6 @@ API Tokens expire very 60 minutes from first use and are refreshed on expiration
   <li>Added authorization check to run top-level application APIs.<br />
   In this case, 'top-level' means any api used before being able to perform a search/submit workflow.
   </li>
-  <li>Released comparable v1.2.8 docker image to https://hub.docker.com/r/northbynortheast/dsktool-for-learn/tags</li>
   <li>Added a Date Enrolled column to enrollments.</li>
   <li>Added a enhancements to the Reason for Change Report.</li>
   <li>Released comparable v1.2.8 docker image to https://hub.docker.com/r/northbynortheast/dsktool-for-learn/tags</li>
