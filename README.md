@@ -91,8 +91,8 @@ Additionally, it appears that your 3LO session may expire hourly (check the "Who
 ### v1.2.8 (11/12/2022)
 <ul>
   <li>Added session-based JWT page authorization <br />
-Once authenticateded via 3LO, your 3LO session lasts for 8 hours. <br />
-<strong>Note: You should quit your browser after use to expire 3LO authentication tokens.</strong> <br />
+Once authenticated via 3LO, your 3LO session lasts for 4 hours. <br />
+<strong>Note: You should quit your browser after use or use the Learn Logout link to force expire 3LO authentication tokens.</strong> <br />
 JWT authorization tokens last for 15 minutes. Authorization tokens are refreshed on expiration.
 API Tokens expire very 60 minutes from first use and are refreshed on expiration.
   </li>
