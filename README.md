@@ -100,7 +100,12 @@ API Tokens expire very 60 minutes from first use and are refreshed on expiration
   In this case, 'top-level' means any api used before being able to perform a search/submit workflow.
   </li>
   <li>Released comparable v1.2.8 docker image to https://hub.docker.com/r/northbynortheast/dsktool-for-learn/tags</li>
+  <li>Added a Date Enrolled column to enrollments.</li>
+  <li>Added a enhancements to the Reason for Change Report.</li>
+  <li>Released comparable v1.2.8 docker image to https://hub.docker.com/r/northbynortheast/dsktool-for-learn/tags</li>
 </ul>
+A special thanks to Arek Juszczyk (University of Edinburgh) for his contributions!
+
 
 ### Project URL changes:
 As part of the move away from OSCELOT naming, I have made available a new github site with the new project name of [DSKTOOL for Learn](https://github.com/moneil/DSKTOOL-for-Learn).
