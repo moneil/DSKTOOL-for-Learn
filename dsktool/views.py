@@ -314,7 +314,7 @@ def courses(request):
             logging.debug(f"COURSES: COURSE REQUEST: ACTION {task}")
             logging.debug(f"COURSES: COURSE REQUEST: Process by {searchBy}")
             logging.debug('COURSES: COURSE REQUEST: Request:\n ')
-            logging.debug({request})
+            logging.debug(request)
             payload = {}
             if (request.GET.get('isAvailabilityUpdateRequired1')):
                 if (request.GET.get('isAvailabilityUpdateRequired1') == 'true'):
@@ -327,7 +327,7 @@ def courses(request):
 
             logging.debug("COURSES: COURSE REQUEST: PAYLOAD\n")
             for x, y in payload.items():
-                logging.debug({x}, {y})
+                logging.debug(x, y)
 
             # Build and make BB request...
             if (searchBy == 'externalId'):
@@ -515,7 +515,7 @@ def enrollments(request):
             if (searchBy == 'byCrsUsr'):
                 logging.info("processing by crsusr")
                 logging.debug('Request:\n ')
-                logging.debug({request})
+                logging.debug(request)
 
                 payload = {}
                 if (request.GET.get('isAvailabilityUpdateRequired1')):
@@ -533,9 +533,9 @@ def enrollments(request):
 
                 # Build and make BB request...
                 crs = "externalId:"+request.GET.get('crsExternalId')
-                logging.debug("crs:", crs)
+                logging.debug(f'crs: {crs}')
                 usr = "externalId:"+request.GET.get('usrExternalId')
-                logging.debug("usr", usr)
+                logging.debug(f'usr: {usr}')
 
                 resp = BB.UpdateMembership(courseId=crs, userId=usr, payload=payload, params={
                                         'expand': 'user', 'fields': 'id, user.userName, user.name.given, user.name.middle, user.name.family, user.externalId, user.contact.email, availability.available, user.availability.available, dataSourceId, created'}, sync=True)
@@ -633,7 +633,7 @@ def learnlogout(request):
         if "AUTHN_BB_JSON" in request.session.keys():
             logging.info('LEARNLOGOUT: AUTHN_BB_JSON not deleted?')
             for key, value in request.session.items():
-                logging.info('{} => {}'.format(key, value))
+                logging.debug('{} => {}'.format(key, value))
     # ISVALIDROLE = False
     # BB = None
     # try:
@@ -1671,24 +1671,24 @@ def updateCourseMembership(request):
         if (resp.status_code == 200):
             logging.info("RESP:\n", resp.json())
             # resps["results"].append(respJSON["results"])
-            logging.info("RESPJSON:\n", respJSON)
-            logging.info("RESPJSON:dataSourceId", respJSON["dataSourceId"])
+            logging.debug(f'RESPJSON:\n {respJSON}')
+            logging.debug(f'RESPJSON:dataSourceId {respJSON["dataSourceId"]}')
             isFoundStatus = True
 
             for dsk in dsks:
                 #logging.info("DSK:\n", dsk)
                 #logging.info("DSKID: ", dsk["id"])
                 if (dsk["id"] == respJSON["dataSourceId"]):
-                    logging.info("DSKEXTERNALID: ", dsk["externalId"])
+                    logging.debug(f'DSKEXTERNALID: {dsk["externalId"]}')
                     respJSON["dataSourceId"] = dsk["externalId"]
-                    logging.info("RESPJSON:dataSourceId", respJSON["dataSourceId"])
+                    logging.debug(f'RESPJSON:dataSourceId {respJSON["dataSourceId"]}')
                 # else:
                 #     error_json["results":] = resp.json()
                 #     logging.info("resp.status_code:", resp.status_code)
                 #     print (f"RESPONSE:\n", error_json)
 
             resps["results"].append(respJSON)
-            logging.info("RESPS:\n", resps)
+            logging.debug(f'RESPS:\n {resps}')
 
             finalResponse = {
                 "is_found": isFoundStatus,
@@ -2724,7 +2724,7 @@ def exportmessagescsv(request):
 # [DONE]
 def exportlogscsv(request):
     items = Logs.objects.all()
-    logging.debug("items")
+    logging.debug("items:")
     for obj in items:
         logging.debug(obj.id)
         logging.debug(obj.message_id)
@@ -2804,8 +2804,8 @@ def exportzip(request):
         elif (x == 1):
             logsContents = ""
             csvname = "Logs.csv"
-            logging.info(f'CSNAME: {csvname}')
-            logging.info("DATA[X] TYPE (logs expected): ", type(data[x]))
+            logging.debug(f'CSNAME: {csvname}')
+            logging.debug(f'DATA[X] TYPE (logs expected):  {type(data[x])}')
             logsContents = " ,Id,Message Id,External Id,Course Id,Course Role, Availability Status,DataSource Id,Change Date\n"
             items = Logs.objects.all()
             for obj in items:
@@ -2819,7 +2819,7 @@ def exportzip(request):
             # print ("inMemoryFileOpened TYPE: ", inMemoryFile)
             # inMemoryFileOpened.writestr('DSKTOOL_LOGS.csv', logContents)
         else:
-            logging.info("should never ever see this")
+            logging.warning("should never ever see this")
 
         BinaryZipPath = "DSKTOOL_CSV_(" + timestr + ").zip"
 
