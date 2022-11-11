@@ -87,6 +87,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django_session_timeout.middleware.SessionTimeoutMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -96,7 +97,9 @@ MIDDLEWARE = [
 ]
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-SESSION_COOKIE_AGE = 28800 # 8 hours. "1209600(2 weeks)" by default
+SESSION_EXPIRE_SECONDS = 14400
+SESSION_EXPIRE_AFTER_LAST_ACTIVITY = True
+SESSION_COOKIE_AGE = 14400 # 3 minutes # 28800 # 8 hours. "1209600(2 weeks)" by default
 SESSION_SAVE_EVERY_REQUEST = True
 
 ROOT_URLCONF = 'dsktool.urls'

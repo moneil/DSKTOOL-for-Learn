@@ -410,12 +410,19 @@ $("#searchValueCrstoSearch").change(function(){
         alert("You are not authorized to use this application. Close your browser and relogin.");
       } else {
         if (!data.is_found) {
-          alert("A user with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
-          document.getElementById("searchUserForm").searchValueUsrtoSearch.value="";
+          alert("A course with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+      // searchEnrollmentByCrs
+      // searchEnrollmentByCrsandUsrIdByCRSID
+      // searchEnrollmentsByUsrForm
+      document.getElementById("searchEnrollmentByCrsandUsrForm").searchValueCrstoSearch.value="";
         }
       }
     }
-  }).done(function() {
+  })
+  .fail(function() {
+    alert("There has been a critical error. Likely your 3LO session has expired. Reload this page to authenticate.");
+  })
+  .always(function() {
     $("#overlay").fadeOut(300);
   });
 });
@@ -447,7 +454,7 @@ $("#searchValueUsrtoSearch").change(function(){
 
   // console.log("VALIDATE: searchEnrollmentByCrsandUsrForm:\n" + JSON.stringify(data));
 
-  $.ajax({
+$.ajax({
     //type: 'POST',
     url: '/ajax/validate_userIdentifier/',
     data: data, //$('#selectCourseForm').serialize(),
@@ -458,11 +465,15 @@ $("#searchValueUsrtoSearch").change(function(){
       } else {
         if (!data.is_found) {
           alert("A user with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
-          document.getElementById("searchUserForm").searchValueUsrtoSearch.value="";
+          document.getElementById("searchEnrollmentByCrsandUsrForm").searchValueUsrtoSearch.value="";
         }
       }
     }
-  }).done(function() {
+  })
+  .fail(function() {
+    alert("There has been a critical error. Likely your 3LO session has expired. Reload this page to authenticate.");
+  })
+  .always(function() {
     $("#overlay").fadeOut(300);
   });
 });
@@ -501,8 +512,12 @@ $("#searchValue").change(function () {
             }
           }
         }
-      }).done(function() {
-          $("#overlay").fadeOut(300);
+      })
+      .fail(function() {
+        alert("There has been a critical error. Likely your 3LO session has expired. Reload this page to authenticate.");
+      })
+      .always(function() {
+        $("#overlay").fadeOut(300);
       });
     });
 
@@ -558,15 +573,19 @@ $("#searchValueCrs").change(function(){
         alert("You are not authorized to use this application. Close your browser and relogin.");
       } else {
         if (!data.is_found) {
-          alert("A user with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
-          document.getElementById("searchUserForm").searchValueUsrtoSearch.value="";
+          alert("A course with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+          toggleDivs(activeDiv);
         }
       }
     }
-  }).done(function() {
-        $("#overlay").fadeOut(300);
+    })
+    .fail(function() {
+      alert("There has been a critical error. Likely your 3LO session has expired. Reload this page to authenticate.");
+    })
+    .always(function() {
+      $("#overlay").fadeOut(300);
+    });
   });
-});
 
 // ===== USER ===== //
 // validate user search value
@@ -605,10 +624,14 @@ $("#searchValueUsr").change(function(){
         toggleDivs(activeDiv);
       }
     }
-  }).done(function() {
-        $("#overlay").fadeOut(300);
+    })
+    .fail(function() {
+      alert("There has been a critical error. Likely your 3LO session has expired. Reload this page to authenticate.");
+    })
+    .always(function() {
+      $("#overlay").fadeOut(300);
+    });
   });
-});
 
 // ===== Searches and Updates AJAX!!!
 // [DONE] Search by course and user:
@@ -1268,12 +1291,10 @@ $("#searchValue").change(function () {
       $("#isDataSourceKeyUpdateRequired1").prop("checked", false);
       $("#comment").val('');
       
-      
-
       $.ajax({
         //type: 'POST',
         url: '/ajax/validate_courseIdentifier/',
-        data: $('#selectCourseForm').serialize(),
+        data: data, //$('#selectCourseForm').serialize(),
         dataType: 'json',
         success: function (data) {
           if (data.notauthorized) {
@@ -1285,8 +1306,12 @@ $("#searchValue").change(function () {
             }
           }
         }
-      }).done(function() {
-          $("#overlay").fadeOut(300);
+      })
+      .fail(function() {
+        alert("There has been a critical error. Likely your 3LO session has expired. Reload this page to authenticate.");
+      })
+      .always(function() {
+        $("#overlay").fadeOut(300);
       });
     });
 

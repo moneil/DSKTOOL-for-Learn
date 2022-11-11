@@ -91,15 +91,15 @@ Additionally, it appears that your 3LO session may expire hourly (check the "Who
 ### v1.2.8 (11/12/2022)
 <ul>
   <li>Added session-based JWT page authorization <br />
-Once authenticateded via 3LO, your 3LO session lasts as long as your browser is open. <br />
-<strong>Note: You must quit your browser to expire 3LO authentication tokens.</strong> <br />
+Once authenticateded via 3LO, your 3LO session lasts for 8 hours. <br />
+<strong>Note: You should quit your browser after use to expire 3LO authentication tokens.</strong> <br />
 JWT authorization tokens last for 15 minutes. Authorization tokens are refreshed on expiration.
 API Tokens expire very 60 minutes from first use and are refreshed on expiration.
   </li>
   <li>Added authorization check to run top-level application APIs.<br />
   In this case 'top-level' means any api used before being able to perform a search/submit workflow.
   </li>
-  <li>Released comparable v1.2.8 docker image to https://hub.docker.com/r/oscelot/oscelot-dsktool/tags</li>
+  <li>Released comparable v1.2.8 docker image to https://hub.docker.com/r/northbynortheast/dsktool-for-learn/tags</li>
 </ul>
 
 ### Project URL changes:

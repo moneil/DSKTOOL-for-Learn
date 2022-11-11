@@ -178,6 +178,10 @@ def authenticate(request, target=None):
     logging.debug(f'AUTH_UTILS INIT: AUTHN_SECRET: {SECRET}')
     logging.debug(f'AUTH_UTILS INIT: AUTHN_LEARNFQDN: {LEARNFQDN}')
     logging.debug(f'AUTH_UTILS INIT: TARGET_VIEW: {TARGET_VIEW}')
+    if "AUTHN_BB_JSON" in request.session.keys():
+        logging.info('AUTHN_BB_JSON IN session...')
+    else:
+        logging.info('NO AUTHN_BB_JSON in request.session!')
 
     # check for BBJSON in request or if already locally set...
     if "AUTHN_BB_JSON" not in request.session.keys(): #or AUTHN_BB_JSON is None:
@@ -290,7 +294,7 @@ def authenticate(request, target=None):
         jwtClaims = {
             'iss': 'DSKTool for Learn',
             'system': REMOTE_ADDR,
-            'exp': datetime.now(tz=timezone.utc) + timedelta(minutes=10),
+            'exp': datetime.now(tz=timezone.utc) + timedelta(minutes=15),
             'iat': datetime.now(tz=timezone.utc),
             'xsrfToken': uuid.uuid4().hex,
             'jti': uuid.uuid4().hex,
@@ -328,16 +332,6 @@ def authenticate(request, target=None):
         logging.debug(f"AUTHNZ: CONTEXT:")
         logging.debug(f"{json.dumps(context, indent=4, default=str)}")
 
-        # template = loader.get_template(TARGET_VIEW + '.html')
-        # response = HttpResponse(template.render(context))
-
-        # jwtSessionCookies = request.COOKIES
-        # logging.info(f"AUTHNZ:SESSION:COOKIES")
-        # logging.info(f"{jwtSessionCookies}")
-        # logging.info(f'AUTHNZ:JWTCLAIMS: {jwtClaims}')
-        # logging.info(f'AUTHNZ:JWT_TOKEN: {jwt_token}')
-
-
         # if (not 'JWT' in request.COOKIES):
         if (not 'JWT' in request.session.keys()):
             logging.debug(f'AUTHZN:SESSION:NO JWT ADD IT WITH THESE CLAIMS: {jwtClaims}')
@@ -365,7 +359,7 @@ def authenticate(request, target=None):
         logging.debug(f'FROM CLAIMS')
         # print(f'{json.dumps(jwtClaims, indent=4, default=str)}')
 
-        timeremaining = (jwtClaims["iat"]+timedelta(minutes=3)
+        timeremaining = (jwtClaims["iat"]+timedelta(minutes=15)
                         )-datetime.now(tz=timezone.utc)
 
         logging.info(f'JWT TIME REMAINING: {timeremaining}')
@@ -461,24 +455,28 @@ def get_generated_jwt(self):
 
 # 3LO below...
 def authnz_get_API_token(request):
-    global ROLE
+    # global ROLE
     global KEY
     global SECRET
     global LEARNFQDN
     global AUTHN_BB_JSON
-    global EXPIRE_AT
+    global TARGET_VIEW
+    # global EXPIRE_AT
     global ISVALIDROLE
     global ISGUESTUSER
+    global ROLE
 
-    # logging.info(f'authnz_get_API_token variables:')
-    # logging.info(f'KEY: {KEY}')
-    # logging.info(f'SECRET: {SECRET}')
-    # logging.info(f'LEARNFQDN: {LEARNFQDN}')
-    # logging.info(f'ISVALIDROLE: {ISVALIDROLE}')
-    # logging.info(f'ISGUESTUSER: {ISGUESTUSER}')
-    # logging.info(f'ROLE: {ROLE}')
+    logging.debug(f'SESSION KEYS:')
+    logging.debug(f'{request.session.keys()}')
 
-
+    # KEY = request.session.get("AUTHN_KEY")
+    logging.debug(f'authnz_get_API_token variables:')
+    logging.debug(f'KEY: {KEY}')
+    logging.debug(f'SECRET: {SECRET}')
+    logging.debug(f'LEARNFQDN: {LEARNFQDN}')
+    logging.debug(f'ISVALIDROLE: {ISVALIDROLE}')
+    logging.debug(f'ISGUESTUSER: {ISGUESTUSER}')
+    logging.debug(f'ROLE: {ROLE}')
 
     # if request.session:
     #     print saysome
@@ -508,8 +506,7 @@ def authnz_get_API_token(request):
     if (code == None):
         exit()
 
-    user_bb = BbRest(
-        KEY, SECRET, f"https://{LEARNFQDN}", code=code, redirect_uri=absolute_redirect_uri)
+    user_bb = BbRest(KEY, SECRET, f"https://{LEARNFQDN}", code=code, redirect_uri=absolute_redirect_uri)
 
     AUTHN_BB_JSON = jsonpickle.encode(user_bb)
     logging.debug(f'GETAPITOKEN::USER_AUTHN_BB: {AUTHN_BB_JSON}')
@@ -551,6 +548,7 @@ def authnz_get_3LO_token(request):
     global AUTHN_BB_JSON
     global AUTHN_BB
     global KEY
+    global SECRET
 
     logging.info('ENTER AUTHNZ_GET_3LO_TOKEN')
 

@@ -87,7 +87,7 @@ NOTE: the above generator adds single quotes. Remove remove them after pasting. 
 >
 > Note if you want to always run the latest image you may also edit:
 > 
-> Confirm target image version: `image: oscelot/oscelot-dsktool:version (see readme)` and replace "version (see readme)" with the  version indicated above e.g.: 1.1.6. 
+> Confirm target image version: `image: northbynortheast/dsktool-for-learn:version (see readme)` and replace "version (see readme)" with the  version indicated above e.g.: `1.2.8` or `latest`. 
 
 Open a terminal, cd to the directory where you saved the docker-compose.yaml file and enter: `$ docker-compose up -d`
 

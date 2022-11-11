@@ -427,7 +427,11 @@ $("#searchValueUsrtoSearch").change(function(){
         }
       }
     }
-  }).done(function() {
+  })
+  .fail(function() {
+    alert("There has been a critical error. Likely your 3LO session has expired. Reload this page to authenticate.");
+  })
+  .always(function() {
     // console.log("OVERLAY TIME")
     $("#overlay").fadeOut(300);
     console.log("HASFOCUS: " + document.activeElement.id);
@@ -435,7 +439,7 @@ $("#searchValueUsrtoSearch").change(function(){
       // alert("I DON'T KNOW WHAT YOU CLICKED");
       document.getElementById("submitSearchUserForm").focus();
     }
-  });
+  })
 });
 
 

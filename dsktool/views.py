@@ -40,7 +40,6 @@ from wsgiref.util import FileWrapper
 from dsktool.jwt_token_util import Jwt_token_util
 # from dsktool.authn_util import Authn_util
 # import dsktool.authn_util
-from config import adict
 # from dsktool.authn_util import authN, authn_get_API_token, authn_get_3LO_token, isAUTHNValidRole, isAUTHNGuestUser
 # from dsktool.authn_authz_utils import Auth_Utils
 import dsktool.authn_authz_utils
@@ -91,8 +90,6 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S')
 
 # HTTP Error handling:
-
-
 class makeRequestHTTPError(Exception):
     def __init__(self, code, message):
         self.code = code
@@ -102,60 +99,7 @@ class makeRequestHTTPError(Exception):
         return repr(self.code + ": " + self.message)
 
 
-# def isValidRole(AUTHN_BB_JSON):
-#     global ISVALIDROLE
-#     global ROLE
-
-#     ISVALIDROLE = False
-
-#     validRoles = ['SystemAdmin']
-#     VALIDROLE = False
-
-#     BB = jsonpickle.decode(AUTHN_BB_JSON)
-#     resp = BB.call('GetUser', userId="me", params={
-#                    'fields': 'userName, systemRoleIds'}, sync=True)
-
-#     user_json = resp.json()
-
-#     userSystemRoles = user_json['systemRoleIds']
-#     #logging.debug("userSystemRoles: " + json.dumps(userSystemRoles))
-#     for role in userSystemRoles:
-#         if role in validRoles:
-#             logging.debug("ISVALIDROLE: ValidRole: " + role)
-#             VALIDROLE = True
-#             ROLE = role
-
-#     ISVALIDROLE = VALIDROLE
-#     logging.debug("ISVALIDROLE: boolean: " + str(ISVALIDROLE))
-
-#     return VALIDROLE
-
 # [DONE]
-
-
-# def isGuestUser(AUTHN_BB_JSON):
-#     global ISGUESTUSER
-
-#     guestStatus = False
-
-#     BB = jsonpickle.decode(AUTHN_BB_JSON)
-#     resp = BB.call('GetUser', userId="me", params={
-#                    'fields': 'userName'}, sync=True)
-
-#     user_json = resp.json()
-
-#     logging.debug(f"ISGUESTUSER::userName: {user_json['userName']}")
-
-#     if user_json['userName'] == 'guest':
-#         guestStatus = True
-#         ISGUESTUSER = True
-#     else:
-#         guestStatus = False
-#         ISGUESTUSER = False
-
-#     logging.debug("ISGUESTUSER:: boolean: " + str(ISGUESTUSER))
-#     return guestStatus
-
 def getBBRest(request):
     BBR = jsonpickle.decode(request.session['AUTHN_BB_JSON'])
     BBR.supported_functions()  # This and the following are required after
@@ -329,12 +273,10 @@ def courses(request):
                 dskresp = BB.GetDataSources(
                     limit=5000, params={'fields': 'id, externalId'}, sync=True)
                 dsks_json = dskresp.json()
-                logging.debug("COURSES: COURSE REQUEST: DSKS:\n",
-                            dsks_json["results"])
+                logging.debug(f'COURSES: COURSE REQUEST: DSKS: {dsks_json["results"]}')
                 dsks = dsks_json["results"]
                 dsks = sortDsk(dsks, 'externalId')
-                logging.debug(
-                    "COURSES: COURSE REQUEST: SIZE OF DSK LIST:", len(dsks))
+                logging.debug(f'COURSES: COURSE REQUEST: SIZE OF DSK LIST: {len(dsks)}')
 
                 context = {
                     'course_json': course_json,
@@ -355,7 +297,7 @@ def courses(request):
             logging.debug(f"COURSES: COURSE REQUEST: ACTION {task}")
             logging.debug(f"COURSES: COURSE REQUEST: Process by {searchBy}")
             logging.debug('COURSES: COURSE REQUEST: Request:\n ')
-            logging.debug(request)
+            logging.debug({request})
             payload = {}
             if (request.GET.get('isAvailabilityUpdateRequired1')):
                 if (request.GET.get('isAvailabilityUpdateRequired1') == 'true'):
@@ -368,7 +310,7 @@ def courses(request):
 
             logging.debug("COURSES: COURSE REQUEST: PAYLOAD\n")
             for x, y in payload.items():
-                logging.debug(x, y)
+                logging.debug({x}, {y})
 
             # Build and make BB request...
             if (searchBy == 'externalId'):
@@ -396,7 +338,7 @@ def courses(request):
                 }
             else:
                 error_json = resp.json()
-                logging.debug(f"COURSES: COURSE REQUEST: RESPONSE:\n", error_json)
+                logging.debug(f'COURSES: COURSE REQUEST: RESPONSE:\n {error_json}')
                 context = {
                     'error_json': error_json,
                 }
@@ -442,7 +384,7 @@ def enrollments(request):
     context = None
 
     # View function for site enrollments page.
-    logging.info('ENROLLMENTS: ENTER ')
+    logging.info('ENROLLMENTS: ENTER')
 
     if dsktool.authn_authz_utils.isAuthenticated(request) and dsktool.authn_authz_utils.isAuthorized(request):
         BB = getBBRest(request)
@@ -470,7 +412,7 @@ def enrollments(request):
                                         'expand': 'user', 'fields': 'id, user.userName, user.name.given, user.name.middle, user.name.family, user.externalId, user.contact.email, availability.available, user.availability.available, dataSourceId, created'}, sync=True)
                 if (resp.status_code == 200):
                     member_json = resp.json()
-                    logging.info("MBRJSON:\n", member_json["results"])
+                    logging.info(f'MBRJSON:\n {member_json["results"]}')
 
                     dskresp = BB.GetDataSource(
                         dataSourceId=member_json['dataSourceId'], sync=True)
@@ -482,10 +424,10 @@ def enrollments(request):
                     dskresp = BB.GetDataSources(
                         limit=5000, params={'fields': 'id, externalId'}, sync=True)
                     dsks_json = dskresp.json()
-                    logging.info("DSKS:\n", dsks_json["results"])
+                    logging.info(f'DSKS:\n {dsks_json["results"]}')
                     dsks = dsks_json["results"]
                     dsks = sortDsk(dsks, 'externalId')
-                    logging.info("SIZE OF DSK LIST:", len(dsks))
+                    logging.info(f'SIZE OF DSK LIST: {len(dsks)}')
 
                     context = {
                         'member_json': member_json,
@@ -493,12 +435,11 @@ def enrollments(request):
                     }
                 else:
                     error_json = resp.json()
-                    logging.info(f"RESPONSE:\n", error_json)
+                    logging.info(f'RESPONSE:\n {error_json}')
                     context = {
                         'error_json': error_json,
                     }
-                logging.debug(
-                    "EXITING ENROLLMENTS: searchBy task: search by byCrsUsr")
+                logging.debug("EXITING ENROLLMENTS: searchBy task: search by byCrsUsr")
 
                 # return render(request, 'enrollments.html', context=context)
                 template = loader.get_template('enrollments.html')
@@ -509,7 +450,7 @@ def enrollments(request):
                 error_json = {
                     'message': 'Searching by Course is not currently supported'
                 }
-                logging.info(f"RESPONSE:\n", error_json)
+                logging.info(f'RESPONSE:\n {error_json}')
                 context = {
                     'error_json': error_json,
                 }
@@ -525,7 +466,7 @@ def enrollments(request):
                 error_json = {
                     'message': 'Searching by Course is not currently supported'
                 }
-                logging.info(f"RESPONSE:\n", error_json)
+                logging.info(f'RESPONSE:\n {error_json}')
                 context = {
                     'error_json': error_json,
                 }
@@ -541,7 +482,7 @@ def enrollments(request):
                 error_json = {
                     'message': 'Cannot process request'
                 }
-                logging.info(f"RESPONSE:\n", error_json)
+                logging.info(f'RESPONSE:\n {error_json}')
                 context = {
                     'error_json': error_json,
                 }
@@ -556,8 +497,8 @@ def enrollments(request):
 
             if (searchBy == 'byCrsUsr'):
                 logging.info("processing by crsusr")
-                logging.info('Request:\n ')
-                logging.info(request)
+                logging.debug('Request:\n ')
+                logging.debug({request})
 
                 payload = {}
                 if (request.GET.get('isAvailabilityUpdateRequired1')):
@@ -569,15 +510,15 @@ def enrollments(request):
                         payload["dataSourceId"] = request.GET.get(
                             'selectedDataSourceKey')
 
-                logging.info("PAYLOAD\n")
+                logging.debug("PAYLOAD\n")
                 for x, y in payload.items():
-                    logging.info(x, y)
+                    logging.debug(x, y)
 
                 # Build and make BB request...
                 crs = "externalId:"+request.GET.get('crsExternalId')
-                logging.info("crs:", crs)
+                logging.debug("crs:", crs)
                 usr = "externalId:"+request.GET.get('usrExternalId')
-                logging.info("usr", usr)
+                logging.debug("usr", usr)
 
                 resp = BB.UpdateMembership(courseId=crs, userId=usr, payload=payload, params={
                                         'expand': 'user', 'fields': 'id, user.userName, user.name.given, user.name.middle, user.name.family, user.externalId, user.contact.email, availability.available, user.availability.available, dataSourceId, created'}, sync=True)
@@ -593,7 +534,7 @@ def enrollments(request):
                     }
                 else:
                     error_json = resp.json()
-                    logging.info(f"RESPONSE:\n", error_json)
+                    logging.debug(f'RESPONSE:\n {error_json}')
                     context = {
                         'error_json': error_json,
                     }
@@ -703,8 +644,8 @@ def getUser(request):
     searchValueUsr = request.GET.get('searchValueUsr')
     if (searchValueUsr is not None):
         searchValueUsr = searchValueUsr.strip()
-    logging.info("getUser: SEARCHBY: ", searchBy)
-    logging.info("getUser: SEARCHVALUEUSR: ", searchValueUsr)
+    logging.debug(f'getUser: SEARCHBY: {searchBy}')
+    logging.debug(f'getUser: SEARCHVALUEUSR: {searchValueUsr}')
 
     usr = ''
 
@@ -717,7 +658,7 @@ def getUser(request):
     elif (searchBy == 'familyName'):
         usr = "name.family:" + searchValueUsr
 
-    logging.info(f"user pattern: {usr}")
+    logging.debug(f"user pattern: {usr}")
 
     # Process request...
     resp = BB.GetUser(userId=usr, params={
@@ -743,7 +684,7 @@ def getUser(request):
 
     else:
         error_json = resp.json()
-        logging.info(f"RESPONSE:\n", error_json)
+        logging.debug(f'RESPONSE:\n {error_json}')
         context = {
             'error_json': error_json,
         }
@@ -783,7 +724,7 @@ def updateUser(request):
                 'selectedDataSourceKey')
             logging.info("DATASOURCE UPDATE REQUIRED")
 
-    logging.info("PASSABLE PAYLOAD:\n", passedPayload)
+    logging.debug("PASSABLE PAYLOAD:\n", passedPayload)
 
     # ----------------------------------------------
     # get user data BEFORE the change
@@ -809,7 +750,7 @@ def updateUser(request):
         dskresp = BB.GetDataSource(
             dataSourceId=result_json['dataSourceId'], sync=True)
         dsk_json = dskresp.json()
-        logging.info(f"RESPONSE:\n", result_json)
+        logging.debug(f'RESPONSE:\n {result_json}')
         isFoundStatus = True
 
         result_json['dataSourceId'] = dsk_json['externalId']
@@ -819,7 +760,7 @@ def updateUser(request):
         }
     else:
         error_json = resp.json()  # return actual error
-        logging.info(f"RESPONSE:\n", error_json)
+        logging.debug(f'RESPONSE:\n {error_json}')
         context = {
             "is_found": isFoundStatus,
             'error_json': error_json,
@@ -848,36 +789,37 @@ def getUsers(request):
     if (searchValueUsr is not None):
         searchValueUsr = searchValueUsr.strip()
         if (searchBy):
-            logging.info("GETUSERS SEARCH BY: ", searchBy)
+            logging.debug("GETUSERS SEARCH BY: ", searchBy)
     else:
-        logging.info("GETUSERS SEARCHBY NOT SET")
+        logging.debug("GETUSERS SEARCHBY NOT SET")
     if (searchValueUsr is not None):
-        logging.info("GETUSERS SEARCHVALUEUSR: ", searchValueUsr)
+        logging.debug("GETUSERS SEARCHVALUEUSR: ", searchValueUsr)
     else:
-        logging.info("GETUSERS SEARCHVALUEUSR NOT SET")
+        logging.debug("GETUSERS SEARCHVALUEUSR NOT SET")
     if (searchOptions is not None):
-        logging.info(f"GETUSERS SEARCHOPTIONS: ", searchOptions)
+        logging.debug(f"GETUSERS SEARCHOPTIONS: ", searchOptions)
         searchOptionList = searchOptions.split(';')
-        logging.info(f"GETUSERS SEARCHOPTIONLIST: ", searchOptionList)
-        logging.info(f"IS BY AVAILABILITY A SELECTED OPTION? ",
+        logging.debug(f"GETUSERS SEARCHOPTIONLIST: ", searchOptionList)
+        logging.debug(f"IS BY AVAILABILITY A SELECTED OPTION? ",
             searchOptionList.count('searchAvailability'))
-        logging.info(f"IS BY DATE A SELECTED OPTION? ",
+        logging.debug(f"IS BY DATE A SELECTED OPTION? ",
             searchOptionList.count('date'))
     else:
-        logging.info("GETUSERS SEARCHOPTIONLIST NOT SET")
+        logging.debug("GETUSERS SEARCHOPTIONLIST NOT SET")
     if (searchAvailabilityOption is not None):
-        logging.info(f"GETUSERS searchAvailabilityOption: ", searchAvailabilityOption)
+        logging.debug(f"GETUSERS searchAvailabilityOption: ", searchAvailabilityOption)
     else:
-        logging.info("GETUSERS searchAvailabilityOption NOT SET")
+        logging.debug("GETUSERS searchAvailabilityOption NOT SET")
     if (searchDate is not None):
-        logging.info(f"GETUSERS searchDate: ", searchDate)
+        logging.debug(f'GETUSERS searchDate: {searchDate}')
     else:
         logging.info("GETUSERS searchDate NOT SET")
     if (searchDateOption is not None):
-        logging.info(f"GETUSERS searchDateOption: ", searchDateOption)
+        logging.debug(f'GETUSERS searchDateOption: {searchDateOption}')
     else:
         logging.info("GETUSERS searchDateOption NOT SET")
-    logging.info(f"GETUSERS REQUEST:\n", request)
+    logging.debug(f'GETUSERS REQUEST:\n {request}')
+    
     isFoundStatus = False
     searchByDate = False
     searchByAvailability = False
@@ -889,8 +831,7 @@ def getUsers(request):
             searchByDate = True
         if searchOptionList.count('availability') == 1:
             searchByAvailability = True
-    logging.info("SEARCH OPTIONS: byAvailability: ",
-        searchByAvailability, "byDate: ", searchByDate)
+    logging.debug(f'SEARCH OPTIONS: byAvailability:  {searchByAvailability}, "byDate: ", {searchByDate}')
 
     # BbRestSetup(request, 'users', True)
 
@@ -942,7 +883,7 @@ def getUsers(request):
 
     if (resp.status_code == 200):
         users_json = resp.json()
-        logging.info(f"USER COUNT(prepurge): ", len(users_json["results"]))
+        logging.debug(f'USER COUNT(prepurge): {len(users_json["results"])}')
 
         dsksResp = BB.GetDataSources(
             limit=5000, params={'fields': 'id, externalId'})
@@ -953,12 +894,11 @@ def getUsers(request):
         if filterByAvailability:
             # filter resp by selected availability...
             logging.info("GETUSERS EXECUTE AVAILABILITY PURGE")
-            logging.info("AVAILABILITY OPTION: ", searchAvailabilityOption)
+            logging.debug(f'AVAILABILITY OPTION: {searchAvailabilityOption}')
             purgedResults = availabilityPurge(
                 users_json, searchAvailabilityOption)
             # logging.info("FILTERBYAVAILABILITY PURGED AVAILABILITY RESULTS:\n", purgedResults)
-            logging.info("FILTERBYAVAILABILITY PURGED RESULTS COUNT: ",
-                len(purgedResults["results"]))
+            logging.debug(f'FILTERBYAVAILABILITY PURGED RESULTS COUNT: {len(purgedResults["results"])}')
             users_json = purgedResults
 
         if filterByDSK:
@@ -966,26 +906,25 @@ def getUsers(request):
             logging.info("PURGING RESULTS based on DSK")
             purgedResults = datasourcePurge(users_json, searchValueUsr)
             # logging.info("FILTERBYDSK PURGED DSK RESULTS:\n", purgedResults)
-            logging.info("FILTERBYDSK PURGED RESULTS COUNT: ",
-                len(purgedResults["results"]))
+            logging.debug(f'FILTERBYDSK PURGED RESULTS COUNT: {len(purgedResults["results"])}')
             users_json = purgedResults
 
         users_json["length"] = len(users_json)
         # logging.info("DATASOURCE PURGE: users_json: /n", users_json)
-        logging.info("users_json SIZE: ", len(users_json))
+        logging.debug(f'users_json SIZE: {len(users_json)}')
 
         # we always want to replace dsk primary keys with the dsk externalId...
         for idx, user in enumerate(users_json["results"]):
             for dsk in dsks:
-                logging.debug("DSK:\n", dsk)
-                logging.debug("DSKID: ", dsk["id"])
+                logging.debug(f'DSK:\n {dsk}')
+                logging.debug(f'DSKID: {dsk["id"]}')
                 if (dsk["id"] == user["dataSourceId"]):
                     users_json["results"][idx]["dataSourceId"] = dsk["externalId"]
 
     if (users_json):
-            logging.debug("USERS_JSON TYPE: ", type(users_json))
+            logging.debug(f'USERS_JSON TYPE: {type(users_json)}')
     if (dsks):
-            logging.debug("DSKS TYPE: ", type(dsks))
+            logging.debug(f'DSKS TYPE: {type(dsks)}')
 
     context = {
         'users_json': users_json,
@@ -1085,22 +1024,20 @@ def updateUsers(request):
             logging.debug("RESPJSON:dataSourceId", respJSON["dataSourceId"])
             isFoundStatus = True
             for dsk in dsks:
-                # logging.info("DSK:\n", dsk)
-                # logging.info("DSKID: ", dsk["id"])
                 if (dsk["id"] == respJSON["dataSourceId"]):
-                    logging.info("DSKEXTERNALID: ", dsk["externalId"])
+                    logging.debug(f'DSKEXTERNALID: {dsk["externalId"]}')
                     respJSON["dataSourceId"] = dsk["externalId"]
-                    logging.info("RESPJSON:dataSourceId", respJSON["dataSourceId"])
+                    logging.debug(f'RESPJSON:dataSourceId {respJSON["dataSourceId"]}')
 
             resps["results"].append(respJSON)
-            logging.info("RESPS:\n", resps)
+            logging.debug(f'RESPS:\n {resps}')
 
             finalResponse = {
                 "is_found": isFoundStatus,
                 "result_json": resps["results"],
             }
 
-        logging.info("FINAL RESPONSE:\n", finalResponse)
+        logging.debug(f'FINAL RESPONSE:\n {finalResponse}')
     # STOPPED HERE
     return JsonResponse(finalResponse)
 
@@ -1127,21 +1064,21 @@ def updateCourseMemberships(request):
     context = None
 
     finalResponse = {}
-    logging.info("request method: ", request.method)
-    logging.info("request: ", request)
+    logging.debug(f'request method: {request.method}')
+    logging.debug(f'request: {request}')
     searchValue = request.GET.get("crsSearchValue")
-    logging.info("request searchValue: ", searchValue)
+    logging.debug(f'request searchValue: {searchValue}')
     searchBy = request.GET.get("crsSearchBy")
-    logging.info("request searchBy: ", searchBy)
+    logging.debug(f'request searchBy: {searchBy}')
     userArray = request.GET.getlist('pmcUserId[]')
-    logging.info("request pmcUsersList: \n", userArray)
+    logging.debug(f'request pmcUsersList: \n {userArray}')
 
     if (searchBy == "externalId"):
         crs = "externalId:"+searchValue
-        logging.info("COURSE TO UPDATE: ", crs)
+        logging.debug(f'COURSE TO UPDATE: {crs}')
     elif (searchBy == "courseId"):
         crs = "courseId:"+searchValue
-        logging.info("COURSE TO UPDATE:", crs)
+        logging.debug(f'COURSE TO UPDATE: {crs}')
 
     #BbRestSetup(request, redirectRequired=True)
     BB = getBBRest(request)
@@ -1151,10 +1088,10 @@ def updateCourseMemberships(request):
     dsks = dsks_json["results"]
 
     resps = {'results': []}
-    logging.info("RESPS SET TO EMPTY RESULTS")
+    logging.debug("RESPS SET TO EMPTY RESULTS")
 
     if (request.GET.get('isUpdateRequired1') == 'true'):
-        logging.info("isUpdateRequired1", request.GET.get('isUpdateRequired1'))
+        logging.debug(f'isUpdateRequired1 {request.GET.get("isUpdateRequired1")}')
 
         # ----------------------------------------------
         # insert message to local DB
@@ -1165,26 +1102,22 @@ def updateCourseMemberships(request):
         for user in userArray:
             payload = {}
             if (request.GET.get('isAvailabilityUpdateRequired1')):
-                logging.info(user + ": isAvailabilityUpdateRequired1: ",
-                    request.GET.get('isAvailabilityUpdateRequired1'))
+                logging.debug(f'{user} : isAvailabilityUpdateRequired1: {request.GET.get("isAvailabilityUpdateRequired1")}')
 
                 if (request.GET.get('isAvailabilityUpdateRequired1') == 'true'):
                     payload = {'availability': {
                         "available": request.GET.get('selectedAvailability')}}
-                    logging.info(user + ": availability: ",
-                        request.GET.get('selectedAvailability'))
+                    logging.debug(f"{user} : availability: {request.GET.get('selectedAvailability')}")
 
             if (request.GET.get('isDataSourceKeyUpdateRequired1')):
-                logging.info(user + ": isDataSourceKeyUpdateRequired1: ",
-                    request.GET.get('isDataSourceKeyUpdateRequired1'))
+                logging.debug(f"{user} : isDataSourceKeyUpdateRequired1: {request.GET.get('isDataSourceKeyUpdateRequired1')}")
 
                 if (request.GET.get('isDataSourceKeyUpdateRequired1') == 'true'):
                     payload["dataSourceId"] = request.GET.get(
                         'selectedDataSourceKey')
-                    logging.info(user + ": dataSourceId: ",
-                        request.GET.get('selectedDataSourceKey'))
+                    logging.debug(f"{user} : dataSourceId: {request.GET.get('selectedDataSourceKey')}")
 
-            logging.info("PAYLOAD: \n", payload)
+            logging.debug("PAYLOAD: \n", payload)
 
             # ----------------------------------------------
             # get data BEFORE the change
@@ -1206,25 +1139,25 @@ def updateCourseMemberships(request):
                             message=message, call_name='membership', state='after')
                 # ----------------------------------------------
 
-                logging.info("RESP:\n", resp.json())
+                logging.debug(f'RESP:\n {resp.json()}')
                 # resps["results"].append(respJSON["results"])
-                logging.info("User:" + user + "UPDATED WITH PAYLOAD: \n", payload)
-                logging.info("RESPJSON:\n", respJSON)
-                logging.info("RESPJSON:dataSourceId", respJSON["dataSourceId"])
+                logging.debug(f'User: {user} UPDATED WITH PAYLOAD: \n {payload}')
+                logging.debug(f'RESPJSON:\n {respJSON}')
+                logging.debug(f'RESPJSON:dataSourceId {respJSON["dataSourceId"]}')
 
                 for dsk in dsks:
                     #logging.info("DSK:\n", dsk)
                     #logging.info("DSKID: ", dsk["id"])
                     if (dsk["id"] == respJSON["dataSourceId"]):
-                        logging.info("DSKEXTERNALID: ", dsk["externalId"])
+                        logging.debug(f'DSKEXTERNALID: {dsk["externalId"]}')
                         respJSON["dataSourceId"] = dsk["externalId"]
-                        logging.info("RESPJSON:dataSourceId",
-                            respJSON["dataSourceId"])
+                        logging.debug(f'RESPJSON:dataSourceId {respJSON["dataSourceId"]}')
 
             else:
+                error_json = None
                 error_json["results":] = resp.json()
-                logging.info("resp.status_code:", resp.status_code)
-                logging.info(f"RESPONSE:\n", error_json)
+                logging.debug(f'resp.status_code: {resp.status_code}')
+                logging.debug(f'RESPONSE:\n {error_json}')
 
             resps["results"].append(respJSON)
             logging.info("RESPS:\n", resps)
@@ -1340,6 +1273,7 @@ def validate_userIdentifier(request):
     logging.info("ENTER validate_userIdentifier...")
     response = None
     context = None
+    foundStatus = False
 
     if ("ISVALIDUSER" in request.session.keys() and request.session['ISVALIDUSER']): #authenticated 
         logging.info(f'ISVALIDUSER: {request.session["ISVALIDUSER"]}')
@@ -2101,20 +2035,21 @@ def updateUserMemberships(request):
                             message=message, call_name='membership', state='after')
                 # ----------------------------------------------
             else:
+                error_json = None                
                 error_json["results":] = resp.json()
-                logging.info("resp.status_code:", resp.status_code)
-                logging.info(f"RESPONSE:\n", error_json)
+                logging.debug("resp.status_code:", resp.status_code)
+                logging.debug(f"RESPONSE:\n", error_json)
 
             resps["results"].append(respJSON)
             #logging.info("RESPS:\n", resps)
 
-        logging.info("ISFOUNDSTATUS: ", isFoundStatus)
+        logging.debug(f'ISFOUNDSTATUS: {isFoundStatus}')
         finalResponse = {
             "is_found": isFoundStatus,
             "updateList": resps["results"],
         }
 
-        logging.info("FINAL RESPONSE:\n", finalResponse)
+        logging.debug(f'FINAL RESPONSE:\n {finalResponse}')
 
     return JsonResponse(finalResponse)
 
@@ -2128,8 +2063,8 @@ def getCourse(request):
     searchValue = request.GET.get('searchValue')
     if (searchValue is not None):
         searchValue = searchValue.strip()
-    logging.info("SEARCHBY: ", searchBy)
-    logging.info("SEARCHVALUE: ", searchValue)
+    logging.debug(f'SEARCHBY: {searchBy}')
+    logging.debug(f'SEARCHVALUE: {searchValue}')
 
     # Process request...
     if (searchBy == 'externalId'):
@@ -2139,7 +2074,7 @@ def getCourse(request):
     else:
         crs = searchValue
 
-    logging.info(f"course pattern: {crs}")
+    logging.debug(f"course pattern: {crs}")
 
     isFoundStatus = False
 
@@ -2148,7 +2083,7 @@ def getCourse(request):
     resp = BB.GetCourse(courseId=crs, params={
                         'fields': 'id, courseId, externalId, name, organization, availability.available, dataSourceId, created, modified'}, sync=True)
 
-    logging.info("GETCOURSE RESP: \n", resp.json())
+    logging.debug(f'GETCOURSE RESP:\n {resp.json()}')
 
     if (resp.status_code == 200):
         course_json = resp.json()
@@ -2175,7 +2110,7 @@ def getCourse(request):
 
     else:
         error_json = resp.json()
-        logging.info(f"RESPONSE:\n", error_json)
+        logging.debug(f'RESPONSE:\n {error_json}')
         context = {
             'error_json': error_json,
         }
@@ -2188,34 +2123,32 @@ def updateCourse(request):
     context = None
 
     logging.info("UPDATE COURSE...")
-    logging.info('Request:\n ')
-    logging.info(request)
-    logging.info("isUpdateRequired1: ", request.GET.get("isUpdateRequired1"))
-    logging.info("isAvailabilityUpdateRequired1:",
-        request.GET.get("isAvailabilityUpdateRequired1"))
-    logging.info("selectedAvailability: ", request.GET.get("selectedAvailability"))
-    logging.info("isDataSourceKeyUpdateRequired1: ",
-        request.GET.get("isDataSourceKeyUpdateRequired1"))
+    logging.debug('Request:\n ')
+    logging.debug(request)
+    logging.debug(f'isUpdateRequired1: {request.GET.get("isUpdateRequired1")}')
+    logging.debug(f'isAvailabilityUpdateRequired1: {request.GET.get("isAvailabilityUpdateRequired1")}')
+    logging.debug(f'selectedAvailability: {request.GET.get("selectedAvailability")}')
+    logging.debug(f'isDataSourceKeyUpdateRequired1: {request.GET.get("isDataSourceKeyUpdateRequired1")}')
     selectedDSK = request.GET.get("selectedDataSourceKey")
-    logging.info("selectedDataSourceKey: ", selectedDSK)
+    logging.debug(f'selectedDataSourceKey: {selectedDSK}')
     updateValue = request.GET.get('pmcCourseId[]')
-    logging.info("UPDATE VALUE: ", updateValue)
+    logging.debug(f'UPDATE VALUE: {updateValue}')
 
     isFoundStatus = False
     passedPayload = {}
 
     if (request.GET.get('isAvailabilityUpdateRequired1')):
         if (request.GET.get('isAvailabilityUpdateRequired1') == 'true'):
-            logging.info("AVAILABILITY UPDATE REQUIRED")
+            logging.debug("AVAILABILITY UPDATE REQUIRED")
             passedPayload = {'availability': {
                 "available": request.GET.get('selectedAvailability')}}
     if (request.GET.get('isDataSourceKeyUpdateRequired1')):
         if (request.GET.get('isDataSourceKeyUpdateRequired1') == 'true'):
             passedPayload["dataSourceId"] = request.GET.get(
                 'selectedDataSourceKey')
-            logging.info("DATASOURCE UPDATE REQUIRED")
+            logging.debug("DATASOURCE UPDATE REQUIRED")
 
-    logging.info("PASSABLE PAYLOAD:\n", passedPayload)
+    logging.debug(f'PASSABLE PAYLOAD:\n {passedPayload}')
 
     BB = getBBRest(request)
 
@@ -2244,7 +2177,7 @@ def updateCourse(request):
         dskresp = BB.GetDataSource(
             dataSourceId=result_json['dataSourceId'], sync=True)
         dsk_json = dskresp.json()
-        logging.info(f"RESPONSE:\n", result_json)
+        logging.debug(f'RESPONSE:\n {result_json}')
         isFoundStatus = True
 
         result_json['dataSourceId'] = dsk_json['externalId']
@@ -2255,7 +2188,7 @@ def updateCourse(request):
         }
     else:
         error_json = resp.json()
-        logging.info(f"RESPONSE:\n", error_json)
+        logging.debug(f'RESPONSE:\n {error_json}')
         context = {
             "is_found": isFoundStatus,
             'error_json': error_json,
@@ -2293,26 +2226,24 @@ def getCourses(request):
 
     if (searchValue is not None):
         searchValue = searchValue.strip()
-        logging.info("GETCOURSES SEARCHBY: ", searchBy)
+        logging.debug(f'GETCOURSES SEARCHBY: {searchBy}')
     if (searchValue is not None):
-        logging.info("GETCOURSES SEARCHVALUE: ", searchValue)
+        logging.debug(f'GETCOURSES SEARCHVALUE:  {searchValue}')
     if (searchOperator is not None):
-        logging.info("GETCOURSES SEARCHOPERATOR: ", searchOperator)
+        logging.debug(f'GETCOURSES SEARCHOPERATOR: ", {searchOperator}')
     if (searchOptions is not None):
-        logging.info(f"GETCOURSES SEARCHOPTIONS: ", searchOptions)
+        logging.debug(f'GETCOURSES SEARCHOPTIONS: {searchOptions}')
         searchOptionList = searchOptions.split(';')
-        logging.info(f"GETCOURSES SEARCHOPTIONLIST: ", searchOptionList)
-        logging.info(f"IS BY AVAILABILITY A SELECTED OPTION? ",
-            searchOptionList.count('searchAvailability'))
-        logging.info(f"IS BY DATE A SELECTED OPTION? ",
-            searchOptionList.count('date'))
+        logging.debug(f'GETCOURSES SEARCHOPTIONLIST: {searchOptionList}')
+        logging.debug(f'IS BY AVAILABILITY A SELECTED OPTION? {searchOptionList.count("searchAvailability")}')
+        logging.debug(f'IS BY DATE A SELECTED OPTION? {searchOptionList.count("date")}')
     if (searchAvailabilityOption is not None):
-        logging.info(f"GETCOURSES searchAvailabilityOption: ", searchAvailabilityOption)
+        logging.debug(f'GETCOURSES searchAvailabilityOption: {searchAvailabilityOption}')
     if (searchDate is not None):
-        logging.info(f"GETCOURSES searchDate: ", searchDate)
+        logging.debug(f'GETCOURSES searchDate: {searchDate}')
     if (searchDateOption is not None):
-        logging.info(f"GETCOURSES searchDateOption: ", searchDateOption)
-    logging.info(f"GETCOURSES REQUEST:\n", request)
+        logging.debug(f'GETCOURSES searchDateOption: {searchDateOption}')
+    logging.debug(f'GETCOURSES REQUEST:\n {request}')
     isFoundStatus = False
     searchByDate = False
     searchByAvailability = False
@@ -2324,8 +2255,7 @@ def getCourses(request):
             searchByDate = True
         if searchOptionList.count('availability') == 1:
             searchByAvailability = True
-    logging.info("SEARCH OPTIONS: byAvailability: ",
-        searchByAvailability, "byDate: ", searchByDate)
+    logging.debug(f'SEARCH OPTIONS: byAvailability: {searchByAvailability}, byDate: {searchByDate}')
 
     if searchBy == "DSK":  # we want courses with a specific DSK
         if searchByDate:
@@ -2366,7 +2296,7 @@ def getCourses(request):
 
     if (resp.status_code == 200):
         courses_json = resp.json()
-        logging.info(f"COURSES COUNT(prepurge): ", len(courses_json["results"]))
+        logging.debug(f'COURSES COUNT(prepurge): {len(courses_json["results"])}')
 
         # are we purging DSKs based on incoming option?
         # purge results based on options
@@ -2380,26 +2310,24 @@ def getCourses(request):
         if filterByAvailability:
             # filter resp by selected availability...
             logging.info("GETCOURSES EXECUTE AVAILABILITY PURGE")
-            logging.info("AVAILABILITY OPTION: ", searchAvailabilityOption)
+            logging.debug(f'AVAILABILITY OPTION: {searchAvailabilityOption}')
             purgedResults = availabilityPurge(
                 courses_json, searchAvailabilityOption)
-            logging.info("FILTERBYAVAILABILITY PURGED AVAILABILITY RESULTS:\n", purgedResults)
-            logging.info("FILTERBYAVAILABILITY PURGED RESULTS COUNT: ",
-                len(purgedResults["results"]))
+            logging.info(f'FILTERBYAVAILABILITY PURGED AVAILABILITY RESULTS:\n {purgedResults}')
+            logging.info(f'FILTERBYAVAILABILITY PURGED RESULTS COUNT: {len(purgedResults["results"])}')
             courses_json = purgedResults
 
         if filterByDSK:
             # filter resp by selected date...
             logging.info("PURGING RESULTS based on DSK")
             purgedResults = datasourcePurge(courses_json, searchValue)
-            logging.info("FILTERBYDSK PURGED DSK RESULTS:\n", purgedResults)
-            logging.info("FILTERBYDSK PURGED RESULTS COUNT: ",
-                len(purgedResults["results"]))
+            logging.debug(f'FILTERBYDSK PURGED DSK RESULTS:\n {purgedResults}')
+            logging.debug(f'FILTERBYDSK PURGED RESULTS COUNT: {len(purgedResults["results"])}')
             courses_json = purgedResults
 
         courses_json["length"] = len(courses_json)
-        logging.info("DATASOURCE PURGE: courses_json: /n", courses_json)
-        logging.info("courses_json SIZE: ", len(courses_json))
+        logging.debug(f'DATASOURCE PURGE: courses_json: /n {courses_json}')
+        logging.debug(f'courses_json SIZE: {len(courses_json)}')
 
         # we always want to replace dsk primary keys with the dsk externalId...
         for idx, course in enumerate(courses_json["results"]):
@@ -2409,8 +2337,8 @@ def getCourses(request):
                 if (dsk["id"] == course["dataSourceId"]):
                     courses_json["results"][idx]["dataSourceId"] = dsk["externalId"]
 
-        logging.info("COURSES_JSON TYPE: ", type(courses_json))
-        logging.info("DSKS TYPE: ", type(dsks))
+        logging.debug(f'COURSES_JSON TYPE: {type(courses_json)}')
+        logging.debug(f'DSKS TYPE: {type(dsks)}')
 
         context = {
             'result_json': courses_json,
@@ -2430,24 +2358,19 @@ def updateCourses(request):
     isFoundStatus = False
     resps = {'results': []}
     logging.info("RESPS SET TO EMPTY RESULTS")
-    logging.info('updateCourses: Request:\n ')
-    # print (request)
-    logging.info("updateCourses: isUpdateRequired1: ",
-        request.GET.get("isUpdateRequired1"))
-    logging.info("updateCourses: isAvailabilityUpdateRequired1:",
-        request.GET.get("isAvailabilityUpdateRequired1"))
-    logging.info("updateCourses: selectedAvailability: ",
-        request.GET.get("selectedAvailability"))
-    logging.info("updateCourses: isDataSourceKeyUpdateRequired1: ",
-        request.GET.get("isDataSourceKeyUpdateRequired1"))
+    logging.debug(f'updateCourses: Request:\n {request}')
+    logging.debug(f'updateCourses: isUpdateRequired1: {request.GET.get("isUpdateRequired1")}')
+    logging.debug(f'updateCourses: isAvailabilityUpdateRequired1: {request.GET.get("isAvailabilityUpdateRequired1")}')
+    logging.debug(f'updateCourses: selectedAvailability:  {request.GET.get("selectedAvailability")}')
+    logging.debug(f'updateCourses: isDataSourceKeyUpdateRequired1: {request.GET.get("isDataSourceKeyUpdateRequired1")}')
     selectedDSK = request.GET.get("selectedDataSourceKey")
-    logging.info("updateCourses: selectedDataSourceKey: ", selectedDSK)
-    logging.info("updateCourses: pmcCourseId[]: " + request.GET.get("pmcCourseId[]"))
+    logging.debug(f'updateCourses: selectedDataSourceKey: {selectedDSK}')
+    logging.debug(f'updateCourses: pmcCourseId[]: {request.GET.get("pmcCourseId[]")}')
     updateList = request.GET.get('pmcCourseId[]')
-    logging.info("updateCourses: updateList: ", updateList)
+    logging.debug(f'updateCourses: updateList: {updateList}')
     updateCourseList = updateList.split(',')
 
-    logging.info("updateCourses: updateCourseList: ", updateCourseList)
+    logging.debug(f'updateCourses: updateCourseList: {updateCourseList}')
 
     passedPayload = {}
 
@@ -2462,7 +2385,7 @@ def updateCourses(request):
                 'selectedDataSourceKey')
             logging.info("updateCourses: DATASOURCE UPDATE REQUIRED")
 
-    logging.info("updateCourses: PASSABLE PAYLOAD:\n", passedPayload)
+    logging.debug(f'updateCourses: PASSABLE PAYLOAD:\n {passedPayload}')
 
     BB = getBBRest(request)
 
@@ -2477,7 +2400,7 @@ def updateCourses(request):
     # ----------------------------------------------
 
     for x in range(len(updateCourseList)):
-        logging.info("coursePK: ", updateCourseList[x])
+        logging.debug(f'coursePK: {updateCourseList[x]}')
         updateValue = updateCourseList[x]
 
         # ----------------------------------------------
@@ -2502,32 +2425,32 @@ def updateCourses(request):
                         message=message, call_name='course', state='after')
             # ----------------------------------------------
 
-            logging.info("RESP:\n", resp.json())
+            logging.debug(f'RESP:\n {resp.json()}')
             # resps["results"].append(respJSON["results"])
-            logging.info("RESPJSON:\n", respJSON)
-            logging.info("RESPJSON:dataSourceId", respJSON["dataSourceId"])
+            logging.debug(f'RESPJSON:\n {respJSON}')
+            logging.debug(f'RESPJSON:dataSourceId {respJSON["dataSourceId"]}')
             isFoundStatus = True
             for dsk in dsks:
                 # logging.info("DSK:\n", dsk)
                 # logging.info("DSKID: ", dsk["id"])
                 if (dsk["id"] == respJSON["dataSourceId"]):
-                    logging.info("DSKEXTERNALID: ", dsk["externalId"])
+                    logging.debug(f'DSKEXTERNALID: {dsk["externalId"]}')
                     respJSON["dataSourceId"] = dsk["externalId"]
-                    logging.info("RESPJSON:dataSourceId", respJSON["dataSourceId"])
+                    logging.debug(f'RESPJSON:dataSourceId {respJSON["dataSourceId"]}')
         # else:
         #     error_json["results":] = resp.json()
-        #     logging.info("resp.status_code:", resp.status_code)
+        #     logging.debug("resp.status_code:", resp.status_code)
         #     print (f"RESPONSE:\n", error_json)
 
             resps["results"].append(respJSON)
-            logging.info("RESPS:\n", resps)
+            logging.debug(f'RESPS:\n {resps}')
 
             finalResponse = {
                 "is_found": isFoundStatus,
                 "result_json": resps["results"],
             }
 
-        logging.info("FINAL RESPONSE:\n", finalResponse)
+        logging.debug(f'FINAL RESPONSE:\n {finalResponse}')
     # STOPPED HERE
     return JsonResponse(finalResponse)
 
@@ -2537,7 +2460,7 @@ def getMembershipsByDSK(request):
     context = None
 
     logging.info("GET MEMBERSHIPS BY DSK CALLED")
-    logging.info("request method: ", request.method)
+    logging.debug(f'request method: {request.method}')
 
     searchBy = request.GET.get('searchBy')
     searchValue = request.GET.get('searchValue')
@@ -2545,10 +2468,10 @@ def getMembershipsByDSK(request):
     # pmc = request.GET.get('searchValue')
     if (searchValue is not None):
         searchValue = searchValue.strip()
-    logging.info("LEARNFQDN", LEARNFQDN)
-    logging.info("SEARCHBY: ", searchBy)
-    logging.info("SEARCHVALUE: ", searchValue)
-    logging.info("CRSAVAILFILTER: ", crsAvailFilter)
+    logging.debug(f'LEARNFQDN {LEARNFQDN}')
+    logging.debug(f'SEARCHBY: {searchBy}')
+    logging.debug(f'SEARCHVALUE: {searchValue}')
+    logging.debug(f'CRSAVAILFILTER: {crsAvailFilter}')
 
     isFoundStatus = False
 
@@ -2573,7 +2496,7 @@ def getDataSourceKeys(request):
     response = None
     context = None
 
-    logging.info(f"getDataSourceKeys request:\n", request)
+    logging.debug(f'getDataSourceKeys request:\n {request}')
 
     BB = getBBRest(request)
 
@@ -2584,8 +2507,8 @@ def getDataSourceKeys(request):
     if (resp.status_code == 200):
         result_json = resp.json()  # return actual error
 
-        logging.info(f"GET DSKS RESP: \n", resp.json())
-        logging.info(f"DSK COUNT: ", len(result_json["results"]))
+        logging.debug(f'GET DSKS RESP: \n {resp.json()}')
+        logging.debug(f'DSK COUNT: {len(result_json["results"])}')
 
         dsks = result_json["results"]
         dsks = sortDsk(dsks, 'externalId')
@@ -2598,7 +2521,7 @@ def getDataSourceKeys(request):
         }
     else:
         error_json = resp.json()
-        logging.info(f"ERROR RESPONSE:\n", error_json)
+        logging.debug(f'ERROR RESPONSE:\n {error_json}')
         context = {
             "is_found": isFoundStatus,
             'error_json': error_json,
@@ -2614,20 +2537,18 @@ def datasourcePurge(resp, dataSourceOption):
     purgedResponse = {"results": []}
     #dataSourceExternalId = dskList[dataSourceToKeep]["externalId"]
     logging.info("CALLED DATASOURCEPURGE...")
-    logging.info("DATASOURCE PURGE: datasourceOption: ", dataSourceToKeep)
-    logging.info("RESP:\n", resp)
+    logging.debug(f'DATASOURCE PURGE: datasourceOption: {dataSourceToKeep}')
+    logging.debug(f'RESP:\n {resp}')
     #logging.info("DATASOURCE EXTERNALID: ", dataSourceExternalId)
 
     # iterate over resp, and remove any records not matching the datasourceOption
     # if result:dataSourceId == datasourceToKeep then update the dataSourseExternalId.
     items = purgedResponse["results"]
 
-    BB = getBBRest(request)
-
     for idx, item in enumerate(resp["results"]):
         if (item["dataSourceId"] == dataSourceToKeep):
-            logging.info("ITEM: ", item)
-            logging.info(type(item))
+            logging.debug(f'ITEM: {item}')
+            # logging.debug(type(item))
             items.append(item)
             if "hasChildren" in item and item["hasChildren"] == True:
                 # get children and add to items
@@ -2638,10 +2559,10 @@ def datasourcePurge(resp, dataSourceOption):
                     children_json = children.json()
                     for idx2, child in enumerate(children_json["results"]):
                         child["childCourse"]["modified"] = child["childCourse"]["created"]
-                        logging.info("CHILD: ", child["childCourse"])
+                        logging.debug(f'CHILD: {child["childCourse"]}')
                         items.append(child["childCourse"])
 
-    logging.info("DATASOURCE PURGE PURGEDRESPONSE SIZE: ", len(purgedResponse))
+    logging.debug(f'DATASOURCE PURGE PURGEDRESPONSE SIZE: {len(purgedResponse)}')
 
     return purgedResponse
 
@@ -2652,18 +2573,18 @@ def availabilityPurge(resp, searchAvailabilityOption):
     purgedResponse = {"results": []}
 
     logging.info("Called availabilityPurge")
-    logging.info("AVAILABILITY PURGE: searchAvailabilityOption: ", availabilityToKeep)
+    logging.debug(f'AVAILABILITY PURGE: searchAvailabilityOption: {availabilityToKeep}')
     items = purgedResponse["results"]
 
     for idx, item in enumerate(resp["results"]):
         itemAvailability = item["availability"]["available"]
-        logging.info("ITEM AVAILABILITY: ", itemAvailability.upper())
+        logging.debug(f'ITEM AVAILABILITY: {itemAvailability.upper()}')
         if (item["availability"]["available"].upper() == availabilityToKeep.upper()):
-            logging.info("ITEM: ", item)
-            logging.info(type(item))
+            logging.debug(f'ITEM: {item}')
+            # logging.debug(type(item))
             items.append(item)
-    # logging.info("AVAILABILITY PURGE: purgedResponse: ", purgedResponse)
-    logging.info("AVAILABILITY PURGE PURGEDRESPONSE SIZE: ", len(purgedResponse))
+    logging.debug(f'AVAILABILITY PURGE: purgedResponse: {purgedResponse}')
+    logging.debug(f'AVAILABILITY PURGE PURGEDRESPONSE SIZE: {len(purgedResponse)}')
 
     return purgedResponse
 
@@ -2745,13 +2666,13 @@ def exportcsvzip(request):
 def exportmessagescsv(request):
     logging.info("ENTER EXPORTMESSAGES")
     items = Messages.objects.all()
-    logging.info("items")
+    logging.debug("items")
     for obj in items:
-        logging.info(obj.id)
-        logging.info(obj.created_at)
-        logging.info(obj.user_id)
-        logging.info(obj.change_type)
-        logging.info(obj.change_comment)
+        logging.debug(obj.id)
+        logging.debug(obj.created_at)
+        logging.debug(obj.user_id)
+        logging.debug(obj.change_type)
+        logging.debug(obj.change_comment)
 
     logging.info("PRE RESPONSE SETUP")
 
@@ -2786,17 +2707,17 @@ def exportmessagescsv(request):
 # [DONE]
 def exportlogscsv(request):
     items = Logs.objects.all()
-    logging.info("items")
+    logging.debug("items")
     for obj in items:
-        logging.info(obj.id)
-        logging.info(obj.message_id)
-        logging.info(obj.external_id)
-        logging.info(obj.course_id)
-        logging.info(obj.course_role)
-        logging.info(obj.availability_status)
-        logging.info(obj.datasource_id)
-        logging.info(obj.state)
-        logging.info(obj.created_at)
+        logging.debug(obj.id)
+        logging.debug(obj.message_id)
+        logging.debug(obj.external_id)
+        logging.debug(obj.course_id)
+        logging.debug(obj.course_role)
+        logging.debug(obj.availability_status)
+        logging.debug(obj.datasource_id)
+        logging.debug(obj.state)
+        logging.debug(obj.created_at)
 
     response = HttpResponse(
         content_type='text/csv',
@@ -2829,10 +2750,10 @@ def purgeData(request):
 def exportzip(request):
     csv_datas = build_multiple_csv_files()
     for datum in csv_datas:
-        logging.info(datum)
+        logging.debug(datum)
     timestr = time.strftime("%Y%m%d-%H%M")
     zip_file_name = "DSKTOOL_CVS__(" + timestr + ").zip"
-    logging.info("ZIPFILENAME: ", zip_file_name)
+    logging.info(f'ZIPFILENAME: {zip_file_name}')
 
     inMemoryFile = io.BytesIO()
 
@@ -2848,8 +2769,8 @@ def exportzip(request):
             msgContents = ""
             csvname = "Messages.csv"
             logging.info("setting csv name for messages")
-            logging.info("CSNAME: ", csvname)
-            logging.info("DATA[X] TYPE: ", type(data[x]))
+            logging.debug(f'CSNAME: {csvname}')
+            logging.debug(f'DATA[X] TYPE: {type(data[x])}')
             msgContents = "Id,User Name,Change Type,Comment,Change Date\n"
             items = Messages.objects.all()
             for obj in items:
@@ -2866,13 +2787,13 @@ def exportzip(request):
         elif (x == 1):
             logsContents = ""
             csvname = "Logs.csv"
-            logging.info("CSNAME: ", csvname)
+            logging.info(f'CSNAME: {csvname}')
             logging.info("DATA[X] TYPE (logs expected): ", type(data[x]))
             logsContents = " ,Id,Message Id,External Id,Course Id,Course Role, Availability Status,DataSource Id,Change Date\n"
             items = Logs.objects.all()
             for obj in items:
                 changeDate = obj.created_at.strftime("%m/%d/%Y %H:%M:%S %Z")
-                logging.info("CHANGEDATE: ", changeDate)
+                logging.debug(f'CHANGEDATE: {changeDate}')
                 objdata = [str(obj.state), str(obj.id), str(obj.message_id), str(obj.external_id), str(
                     obj.course_id), str(obj.course_role), str(obj.availability_status), str(obj.datasource_id), changeDate]
                 logsContents = logsContents + ",".join(objdata) + "\n"
@@ -2916,8 +2837,8 @@ def authnzpage(request):
     response = None
     context = None
 
-    logging.info(f'AUTHNZPAGE: session.keys: {request.session.keys()}')
-    logging.info(" ")
+    logging.debug(f'AUTHNZPAGE: session.keys: {request.session.keys()}')
+    logging.debug(" ")
 
     if dsktool.authn_authz_utils.isAuthenticated(request) and dsktool.authn_authz_utils.isAuthorized(request):
         jwt_utils = Jwt_token_util()
@@ -2930,8 +2851,7 @@ def authnzpage(request):
         response = HttpResponse(template.render(context))
         jwt_utils = None
     else:
-        logging.info(
-            f'AUTHN_AUTHZ_UTILS: AUTHN or AUTHZ FAILED! ... AUTHENTICATING!')
+        logging.info(f'AUTHN_AUTHZ_UTILS: AUTHN or AUTHZ FAILED! ... AUTHENTICATING!')
         response = dsktool.authn_authz_utils.authenticate(
             request, target='authnzpage')
 

@@ -464,12 +464,16 @@ $("#searchValue").change(function(){
         alert("You are not authorized to use this application. Close your browser and relogin.");
       } else {
         if (!data.is_found) {
-          alert("A user with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
-          document.getElementById("searchUserForm").searchValueUsrtoSearch.value="";
+          alert("A course with this identifier was not found.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+          document.getElementById("searchCourseForm").searchValue.value="";
         }
       }
     }
-  }).done(function() {
+  })
+  .fail(function() {
+    alert("There has been a critical error. Likely your 3LO session has expired. Reload this page to authenticate.");
+  })
+  .always(function() {
     // console.log("OVERLAY TIME")
     $("#overlay").fadeOut(300);
   });
@@ -774,7 +778,7 @@ $('#processCourseForm').on('submit', function(e) {
     data: updateData,
     success: function (data) {
       if (!data.is_found) {
-        alert("There was an error processing this request. Try submitting again, if that fails reload page and try again.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+        alert("There was an error processing this request. Try submitting again, if that fails reload page and try again.");
       } else {
         // process selected records
         //console.log(newResults[row]);
@@ -1005,7 +1009,7 @@ function getDataSourceKeys() {
     //data: data,
     success: function (data) {
       if (!data.is_found) {
-        alert("Data Sources could not be loaded. Try submitting again, if that fails reload page and try again.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
+        alert("Data Sources could not be loaded. Reload page and try again.\n\nNote if this persists, your 3LO session may have expired. Please use the 'Learn Logout' link to the left, log back into Learn, and reload the DSKTOOL.");
       } else {            
         let dskOptions = ""
         newResults = data["result_json"];
