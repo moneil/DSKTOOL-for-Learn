@@ -10,8 +10,28 @@ Note: You must also go to the [Anthology Developer Portal](https://developer.ant
 3. Install and start ngrok or similar tunneling tool
 4. copy config-template.py to config.py
 5. edit config.py with your settings
-6. run $ python .\manage.py migrate
-7. run $ python .\manage.py runserver
+6. run: virtualenv dsktool -p python3
+6. run: source dsktool/bin/activate
+7. run: pip install --no-cache-dir -r requirements.txt
+8. run: pip install django-extensions Werkzeug
+9. run: python manage.py migrate
+10. run: python manage.py runserver 
+
+ 	or 
+
+ 	python manage.py runserver_plus --cert-file cert.pem --key-file key.pem
+
+ You can set up https by following this:
+ https://timonweb.com/django/https-django-development-server-ssl-certificate/
+
+#### Notes:
+
+##### Using BbREST to call Blackboard REST APIS:
+> resp = bb.call('GetUser',userId="?userName=" + searchValueUsr, params={'fields':'id, userName, name.given, name.middle, name.family, externalId, contact.email, availability.available, dataSourceId, modified'}, sync=True )
+
+##### Migrations:
+> python manage.py makemigrations dsktool
+ python manage.py migrate   
 
 ### Run from Docker 
 You may also run DSKTool for Learn using Docker for Desktop. See this project's  [./docker/README.md](./docker/README.md) for Docker details.
