@@ -47,6 +47,11 @@
         "description": "Leave this set as is for successful deploy.",
         "required": true,
         "value": "1"
+      },
+      "LOGGING_LEVEL": {
+        "description": "Leave this set as is for successful deploy. (not currently used.)",
+        "required": false,
+        "value": "INFO"
       }
     }
   }
