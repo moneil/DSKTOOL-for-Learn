@@ -27,3 +27,4 @@ cert.pem
 key.pem
 cert.crt
 cert.key
+*.backup
