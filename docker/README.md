@@ -1,4 +1,4 @@
-# DSKTOOL for Learn on Docker v1.2.8 (11/12/2022)
+# DSKTOOL for Learn on Docker v1.2.9 (06/28/2023)
 
 See below [Docker Release Notes](#Release-Notes).
 
@@ -87,7 +87,7 @@ NOTE: the above generator adds single quotes. Remove remove them after pasting. 
 >
 > Note if you want to always run the latest image you may also edit:
 > 
-> Confirm target image version: `image: northbynortheast/dsktool-for-learn:version (see readme)` and replace "version (see readme)" with the  version indicated above e.g.: `1.2.8` or `latest`. 
+> Confirm target image version: `image: northbynortheast/dsktool-for-learn:version (see readme)` and replace "version (see readme)" with the  version indicated above e.g.: `1.2.9` or `latest`. 
 
 Open a terminal, cd to the directory where you saved the docker-compose.yaml file and enter: `$ docker-compose up -d`
 
@@ -113,6 +113,20 @@ This and future releases will update this section only with changes/additions to
 
 Application Release Notes are available at: <a href='https://github.com/moneil/DSKTOOL-for-Heroku'>https://github.com/moneil/DSKTOOL-for-Heroku</a> </li>
 
+### v1.2.9 (06/28/2023)
+<ul>
+  <li>
+    Created a multistage build dockerfile to facilitate smaller application image.
+  </li>
+  <li>
+    Container updated to run as 'dsktool' user.
+  </li>
+  <li>
+	Pushed new images. See: https://hub.docker.com/r/northbynortheast/dsktool-for-learn/tags
+  </li>
+</ul>
+
+  Thank you to Chinmaya (chinmaya-n) for the PR!
 ### v1.1.5 (06/25/2021)
 <ul>
   <li>Fixed issue with Django ALLOW_HOSTS which prevented docker images from correctly running</li>
