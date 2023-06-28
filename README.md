@@ -1,4 +1,4 @@
-# DSKTOOL for Learn v1.2.8 (11/12/2022)
+# DSKTOOL for Learn v1.2.9 (06/28/2023)
 
 See [Release Notes](#Release-Notes) below.
 
@@ -46,7 +46,7 @@ Clicking any of the below 'Deploy to Heroku' buttons will open Heroku to your ap
 
 Note: if you do not have a Heroku account you will be prompted to create one and you will be directed to the setup screen on account create completion.
 
-### Deploy Latest Stable Release (v1.2.8): 
+### Deploy Latest Stable Release (v1.2.9): 
 <a href="https://heroku.com/deploy?template=https://github.com/moneil/DSKTOOL-for-Learn/tree/main">
   <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy"> 
 </a>
@@ -87,6 +87,21 @@ Additionally, it appears that your 3LO session may expire hourly (check the "Who
 <hr>
 
 ## Release Notes
+
+### v1.2.9 (06/28/2023)
+<ul>
+  <li>
+    Created a multistage build dockerfile to facilitate smaller application image.
+  </li>
+  <li>
+    Container updated to run as 'dsktool' user.
+  </li>
+  <li>
+	Pushed new images. See: https://hub.docker.com/r/northbynortheast/dsktool-for-learn/tags
+  </li>
+</ul>
+
+A special thank you to Chinmaya Naguri (Ohio University Office of Information Technology) for his PR!
 
 ### v1.2.8 (11/12/2022)
 <ul>
