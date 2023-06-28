@@ -9,7 +9,11 @@ venv
 
 # ignore config file
 config.py
+my-docker-compose.yml
 docker/my-docker-compose.yml
 
 #ignore Dockerfile
 Dockerfile
+
+# ignore (temporary) backup files
+*.backup
