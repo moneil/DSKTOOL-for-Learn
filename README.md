@@ -46,7 +46,7 @@ Clicking any of the below 'Deploy to Heroku' buttons will open Heroku to your ap
 
 Note: if you do not have a Heroku account you will be prompted to create one and you will be directed to the setup screen on account create completion.
 
-:warning: After initial deployment to Heroku it may take a few minutes for your site to become available. During startup time you may see a "There's nothing here..." page on visiting your site. Grab a coffee and check back after several minutes.
+:warning: After initial deployment to Heroku it may take several minutes for your site to become available. During startup time you may see a "There's nothing here..." page on visiting your site. Grab a coffee, you deserve it.
 
 ### Deploy Latest Stable Release (v1.2.9): 
 <a href="https://heroku.com/deploy?template=https://github.com/moneil/DSKTOOL-for-Learn/tree/main">
