@@ -3,9 +3,9 @@ adict = {
     "APPLICATION_KEY" : "",
     "APPLICATION_SECRET" : "",
     "DJANGO_SECRET_KEY" : '',
-    "DJANGO_ALLOWED_HOSTS" : "127.0.0.1 localhost .ngrok.io .herokuapp.com [::1]",
+    "DJANGO_ALLOWED_HOSTS" : "127.0.0.1 localhost .ngrok.io .ngrok-free.app .herokuapp.com [::1]",
     "DJANGO_DEBUG" : "False",
     "JWT_SECRET": "",
-    "LOGGING_LEVEL": ""
+    "LOGGING_LEVEL": "",
     "disable_collectstatic" : "1",
 }
